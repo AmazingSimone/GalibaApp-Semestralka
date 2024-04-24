@@ -9,6 +9,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +25,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.galibaapp_semestralka.screens.FollowScreen
-import com.example.galibaapp_semestralka.screens.HomeScreen
+import com.example.galibaapp_semestralka.screens.HomeScreen.HomeScreen
+import com.example.galibaapp_semestralka.ui.theme.secondaryContainerLight
 
 data class NavItem(
     val label: String,
@@ -44,19 +46,16 @@ fun BottomNavBar() {
     var selected: Screens = Screens.HOME
     Scaffold (
 
-//        if (selected == Screens.HOME) {
-//
-//        } else {
-//
-//        }
-
         floatingActionButton = {
-            if (selected == Screens.HOME) FloatingActionButton(
-            onClick = { /*TODO*/ }
+
+            FloatingActionButton(
+                onClick = { /*TODO*/ },
+                containerColor = secondaryContainerLight
         ) {
             Icon(Icons.Filled.Add, "Floating action button.")
         }
                                },
+
 
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -68,6 +67,7 @@ fun BottomNavBar() {
 
                 listOfNavItems.forEach { navItem ->
                     NavigationBarItem (
+                        colors = NavigationBarItemDefaults.colors(),
                         selected = currentRouteDestination?.hierarchy?.any { it.route == navItem.route } == true,
                         onClick = {
                             navController.navigate(navItem.route) {
@@ -104,6 +104,8 @@ fun BottomNavBar() {
     }
 
 }
+
+
 
 @Preview
 @Composable
