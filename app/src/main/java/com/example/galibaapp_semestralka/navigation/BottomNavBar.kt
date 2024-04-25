@@ -9,7 +9,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.galibaapp_semestralka.screens.FollowScreen
 import com.example.galibaapp_semestralka.screens.HomeScreen.HomeScreen
-import com.example.galibaapp_semestralka.ui.theme.secondaryContainerLight
 
 data class NavItem(
     val label: String,
@@ -50,7 +48,7 @@ fun BottomNavBar() {
 
             FloatingActionButton(
                 onClick = { /*TODO*/ },
-                containerColor = secondaryContainerLight
+                //containerColor = secondaryContainerLight
         ) {
             Icon(Icons.Filled.Add, "Floating action button.")
         }
@@ -67,7 +65,7 @@ fun BottomNavBar() {
 
                 listOfNavItems.forEach { navItem ->
                     NavigationBarItem (
-                        colors = NavigationBarItemDefaults.colors(),
+                        //colors = NavigationBarItemDefaults.colors(),
                         selected = currentRouteDestination?.hierarchy?.any { it.route == navItem.route } == true,
                         onClick = {
                             navController.navigate(navItem.route) {

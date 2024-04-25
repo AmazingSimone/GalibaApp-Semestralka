@@ -30,16 +30,13 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,9 +56,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.ui.theme.primaryLight
-import com.example.galibaapp_semestralka.ui.theme.surfaceContainerLight
-import com.example.galibaapp_semestralka.ui.theme.surfaceContainerLowLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,18 +63,18 @@ import com.example.galibaapp_semestralka.ui.theme.surfaceContainerLowLight
 fun HomeScreen() {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.background
     ) {
         Box(contentAlignment = androidx.compose.ui.Alignment.TopStart) {
             Column(
-                modifier = Modifier.padding(20.dp, 20.dp)
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
             )
             {
                 Text(
                     modifier = Modifier.padding(vertical = 0.dp),
                     text = "Ahoj, Šimon!",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                    color = MaterialTheme.colorScheme.onSurface
+                    //color = MaterialTheme.colorScheme.onSurface
                 )
 
                     Box (Modifier.clickable {
@@ -92,7 +86,7 @@ fun HomeScreen() {
                         Text(
                             text = "Banska Bystrica, Slovensko",
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            //color = MaterialTheme.colorScheme.onSurface,
 
                             )
                         IconButton(
@@ -114,7 +108,7 @@ fun HomeScreen() {
                     )
                 }
                 SearchBar (
-                    colors = SearchBarDefaults.colors(surfaceContainerLight),
+                    //colors = SearchBarDefaults.colors(surfaceContainerLight),
                     query = text,
                     onQueryChange = {
                         text = it
@@ -173,12 +167,14 @@ fun HomeScreen() {
                     modifier = Modifier.padding(vertical = 10.dp),
                     text = "Galiby v okoli:",
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    color = MaterialTheme.colorScheme.onSurface
+                    //color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Column (modifier = Modifier
                     //.fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+
+                    ,
 
                     //verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -295,7 +291,7 @@ fun CustomCard(
         mutableStateOf(true)
     }
     Card(
-        colors = CardDefaults.cardColors(surfaceContainerLowLight),
+        //colors = CardDefaults.cardColors(surfaceContainerLowLight),
         modifier = Modifier
             .animateContentSize()
             .clickable {
@@ -399,13 +395,13 @@ fun CustomCard(
                         OutlinedButton(
                             modifier = Modifier.padding(end = 10.dp),
                             onClick = { },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+                            //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
                             ) {
                             Text("Mam zaujem")
                         }
                         Button(
                             onClick = { /*TODO*/ },
-                            colors = ButtonDefaults.buttonColors(primaryLight)
+                            //colors = ButtonDefaults.buttonColors(primaryLight)
                         ) {
                             Text(text = "Pridem")
                         }

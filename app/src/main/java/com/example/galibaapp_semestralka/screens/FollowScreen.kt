@@ -18,12 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,15 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.ui.theme.primaryLight
-import com.example.galibaapp_semestralka.ui.theme.surfaceLight
 
 
 @Composable
 fun FollowScreen() {
     Surface (
         modifier = Modifier.fillMaxSize(),
-        color = surfaceLight
+        color = MaterialTheme.colorScheme.background
     ) {
 
         Column {
@@ -64,7 +60,7 @@ fun FollowScreen() {
                             modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
                             text = "Sleduješ",
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                            color = MaterialTheme.colorScheme.onSurface
+                            //color = MaterialTheme.colorScheme.onSurface
                         )
                         IconButton(
                             modifier = Modifier.padding(end = 20.dp),
@@ -113,14 +109,14 @@ fun CustomListItem(
     Box (Modifier.clickable {  }) {
 
         ListItem(
-            colors = ListItemDefaults.colors(surfaceLight),
+            //colors = ListItemDefaults.colors(surfaceLight),
             headlineContent = { Text(text =meno )  },
             supportingContent = { Text(text = popis)  },
             trailingContent = { val checkedState = remember { mutableStateOf(true) }
                 Checkbox(
                     checked = checkedState.value,
                     onCheckedChange = { checkedState.value = it },
-                    colors = CheckboxDefaults.colors(primaryLight)
+                    //colors = CheckboxDefaults.colors(primaryLight)
 
                 ) },
 
