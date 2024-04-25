@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.navigation.M3SearchNavDrawer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -65,11 +66,16 @@ fun HomeScreen() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+
+
         Box(contentAlignment = androidx.compose.ui.Alignment.TopStart) {
+
             Column(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
             )
             {
+
+
                 Text(
                     modifier = Modifier.padding(vertical = 0.dp),
                     text = "Ahoj, Šimon!",
@@ -100,68 +106,8 @@ fun HomeScreen() {
                         }
                     }
                 }
-                var text by remember { mutableStateOf("") }
-                var active by remember { mutableStateOf(false) }
-                var items = remember {
-                    mutableStateListOf(
-                        ""
-                    )
-                }
-                SearchBar (
-                    //colors = SearchBarDefaults.colors(surfaceContainerLight),
-                    query = text,
-                    onQueryChange = {
-                        text = it
-                    },
-                    onSearch = {
-                        items.add(text)
-                        active = false
-                        text = ""
-                    },
-                    active = active,
-                    onActiveChange = {
-                        active = it
-                    },
-                    placeholder = { Text(text = "Hladaj Galibu") },
-                    leadingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
 
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu"
-                        )
-                    }
-                    },
-                    trailingIcon = {
-                        if (active) {
-                            Icon(
-                                modifier = Modifier.clickable {
-                                    if (text.isNotEmpty()) {
-                                        text = ""
-                                    } else {
-                                        active = false
-                                    }
-                                },
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "close"
-                            )
-                        } else {
-                            Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-                        }
-
-                    }
-                ) {
-                    items.forEach {
-                        Row(modifier = Modifier.padding(all = 14.dp)) {
-                            Icon(
-                                modifier = Modifier.padding(end = 10.dp),
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "history icon"
-                            )
-                            Text(text = it)
-                        }
-                    }
-                }
+                M3SearchNavDrawer()
 
                 Text(
                     modifier = Modifier.padding(vertical = 10.dp),
@@ -172,10 +118,7 @@ fun HomeScreen() {
 
                 Column (modifier = Modifier
                     //.fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-
-                    ,
-
+                    .verticalScroll(rememberScrollState()),
                     //verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -288,7 +231,7 @@ fun CustomCard(
         @DrawableRes profilePic: Int
 ) {
     var showFullContent by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     Card(
         //colors = CardDefaults.cardColors(surfaceContainerLowLight),

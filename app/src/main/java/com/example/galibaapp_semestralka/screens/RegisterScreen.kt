@@ -1,5 +1,6 @@
 package com.example.galibaapp_semestralka.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,14 +14,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.navigation.Screens
 
+@ExperimentalMaterial3Api
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -65,7 +73,9 @@ fun RegisterScreen(navController: NavController) {
             var login by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
-                modifier = Modifier.focusRequester(loginFocusRequester).width(250.dp),
+                modifier = Modifier
+                    .focusRequester(loginFocusRequester)
+                    .width(250.dp),
                 value = login,
                 onValueChange = { login = it },
                 label = { Text("Pouzivatelske Meno") },
@@ -84,6 +94,9 @@ fun RegisterScreen(navController: NavController) {
                         passwordFocusRequester.requestFocus()
                     }
                 ),
+                supportingText = {
+                    Text(text = "Take pouzivatelske meno uz existuje")
+                },
                 isError = true
             )
 
@@ -93,7 +106,9 @@ fun RegisterScreen(navController: NavController) {
             var heslo by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
-                modifier = Modifier.focusRequester(passwordFocusRequester).width(250.dp),
+                modifier = Modifier
+                    .focusRequester(passwordFocusRequester)
+                    .width(250.dp),
                 value = heslo,
                 onValueChange = { heslo = it },
                 label = { Text("Heslo") },
@@ -118,7 +133,9 @@ fun RegisterScreen(navController: NavController) {
             var heslo2 by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
-                modifier = Modifier.focusRequester(password2FocusRequester).width(250.dp),
+                modifier = Modifier
+                    .focusRequester(password2FocusRequester)
+                    .width(250.dp),
                 value = heslo2,
                 onValueChange = { heslo2 = it },
                 label = { Text("Potvrd heslo") },
@@ -142,11 +159,43 @@ fun RegisterScreen(navController: NavController) {
                 isError = true
             )
 
+            var options = mutableStateListOf<String>("Posluchac", "Umelec")
+            var selectedIndex  by remember {
+                mutableStateOf(0)
+            }
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+
+            SingleChoiceSegmentedButtonRow{
+
+                options.forEachIndexed { index, option ->
+                    SegmentedButton(
+                        selected = selectedIndex == index
+                        , onClick = { selectedIndex = index }
+                        , shape = SegmentedButtonDefaults.itemShape(
+                            index = index
+                            , count = options.size
+                        )
+                    )
+                    {
+                        Text(text = option)
+                    }
+                }
+
+            }
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+
             TextButton(onClick = {
                 navController.navigate(Screens.LOGIN.name)
             }) {
                 Text(text = "Uz mas ucet ?")
             }
+
+
+            Spacer(modifier = Modifier.padding(10.dp))
 
             Button(onClick = { /*TODO*/ }) {
                 Text(text = "Registracia")
