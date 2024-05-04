@@ -27,12 +27,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.navigation.Screens
 
 @Composable
-fun UserScreen() {
+fun UserScreen(
+    navController: NavController
+) {
     Surface {
 
         Column (
@@ -49,10 +52,10 @@ fun UserScreen() {
                     .padding(all = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.navigate(Screens.HOME.name) }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "iconClose")
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.navigate(Screens.EDIT_USER_PROFILE.name) }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "editProfileIcon")
                 }
 
@@ -69,22 +72,22 @@ fun UserScreen() {
                 modifier = Modifier
                     .size(200.dp)
                     .clip(CircleShape),
-                painter = painterResource(id = R.drawable.backonlabelpfp),
+                painter = painterResource(id = R.drawable.empty_profile),
                 contentScale = ContentScale.Crop,
                 contentDescription = null
             )
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
-                text = "Umelec/Kapela",
+                text = "Posluchac",
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize
             )
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
-                text = "Back On Label",
-                fontSize = MaterialTheme.typography.displayMedium.fontSize,
+                text = "Simone Bartanus",
+                fontSize = MaterialTheme.typography.displaySmall.fontSize,
                 fontWeight = FontWeight.Bold
             )
 
@@ -98,7 +101,7 @@ fun UserScreen() {
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = { navController.navigate(Screens.REGISTER.name) }) {
                     Text(text = "Odhlasit sa")
                 }
                 Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -116,8 +119,8 @@ fun UserScreen() {
     }
 }
 
-@Composable
-@Preview
-fun PreviewUserSceen() {
-    UserScreen()
-}
+//@Composable
+//@Preview
+//fun PreviewUserSceen() {
+//    UserScreen()
+//}

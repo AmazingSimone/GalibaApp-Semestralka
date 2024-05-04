@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -38,13 +39,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.navigation.Screens
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun EditUserInfoScreen() {
+fun EditUserInfoScreen(
+    navController: NavController
+) {
     Surface {
         Column (
             modifier = Modifier
@@ -66,7 +70,9 @@ fun EditUserInfoScreen() {
                     text = "Uprav profil",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
-                Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
+                IconButton(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) }) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
+                }
             }
 
             Surface(
@@ -75,7 +81,7 @@ fun EditUserInfoScreen() {
                     modifier = Modifier
                         .size(200.dp)
                         .clip(CircleShape),
-                    painter = painterResource(id = R.drawable.backonlabelpfp),
+                    painter = painterResource(id = R.drawable.empty_profile),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
@@ -186,15 +192,15 @@ fun EditUserInfoScreen() {
             )
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) }) {
                 Text(text = "Ulozit zmeny")
             }
         }
     }
 }
 
-@Composable
-@Preview
-fun PreviewEditUserInfoScreen() {
-    EditUserInfoScreen()
-}
+//@Composable
+//@Preview
+//fun PreviewEditUserInfoScreen() {
+//    EditUserInfoScreen()
+//}

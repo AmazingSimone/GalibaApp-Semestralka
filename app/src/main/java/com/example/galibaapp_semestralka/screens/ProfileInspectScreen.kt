@@ -28,25 +28,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
 
 @Composable
 fun ProfileInspectScreen(
+    navController: NavController,
     id: String // hned na zaciatku si vypita id aby ho naisel v databaze a nasledne to vytvori screen z nacitanych udajov
 ) {
 
     Surface {
 
+
+
+
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .padding(all = 10.dp),
+            .padding(all = 10.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+
         Column (
 //            modifier = Modifier
 //                .fillMaxSize()
@@ -57,53 +64,33 @@ fun ProfileInspectScreen(
 
             Row (
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(all = 10.dp),
                 horizontalArrangement = Arrangement.Start
             ){
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "iconClose")
                 }
 
             }
 
-            //Spacer(modifier = Modifier.padding(all = 20.dp))
-
-//            Image(
-//                modifier = Modifier
-//                    .size(200.dp)
-//                    .clip(CircleShape),
-//                painter = painterResource(id = R.drawable.backonlabelpfp),
-//                contentScale = ContentScale.Crop,
-//                contentDescription = null
-//            )
-//            Spacer(modifier = Modifier.padding(all = 10.dp))
-//
-//            Text(
-//                text = "Umelec/Kapela",
-//                fontSize = MaterialTheme.typography.bodyLarge.fontSize
-//            )
-//
-//            Spacer(modifier = Modifier.padding(all = 10.dp))
-//
-//            Text(
-//                text = "Back On Label",
-//                fontSize = MaterialTheme.typography.displayMedium.fontSize,
-//                fontWeight = FontWeight.Bold
-//            )
-            ProfileInfo(R.drawable.backonlabelpfp,isArtist = true, name = "Back On Label","aosijosdvnasdl;vnls;dvnlsndvslndvlsjnadvlknjsadvklnsazlkdvnlsazdnklazsjnvsz")
+            ProfileInfo(R.drawable.backonlabelpfp,isArtist = true, name = "Back On Label","celkom nás to všetko baví \uD83D\uDC97\n" +
+                    ".\n" +
+                    "24.5. - bastriguli! underground v @totojevyklad ✨\n" +
+                    "28.6. - Project Banska 3 v @klub_77 ❌\n" +
+                    "4.7. - Kvíz v @zahradacnk \uD83E\uDDE0")
 
 
         }
 
-        Column (modifier = Modifier
-            //.fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        Column (
             //verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ){
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             CustomCard (
+                navController,
             image = R.drawable.backtooldschoolposter,
             title = "Back To Oldschool",
             location = "Klub 77, Banska Bystrica",
@@ -114,8 +101,6 @@ fun ProfileInspectScreen(
             autor = "Back On Label",
             profilePic = R.drawable.backonlabelpfp
         )
-
-
         }
     }
 
@@ -167,9 +152,9 @@ fun ProfileInfo(
     HorizontalDivider()
 }
 
-@Composable
-@Preview
-fun PreviewProfileInspectScreen() {
-    ProfileInspectScreen("id")
-}
+//@Composable
+//@Preview
+//fun PreviewProfileInspectScreen() {
+//    ProfileInspectScreen("id")
+//}
 

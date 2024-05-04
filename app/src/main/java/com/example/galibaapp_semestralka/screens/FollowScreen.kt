@@ -34,13 +34,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.navigation.Screens
 
 
 @Composable
-fun FollowScreen() {
+fun FollowScreen(
+    navController: NavController
+) {
     Surface (
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -64,7 +67,7 @@ fun FollowScreen() {
                         )
                         IconButton(
                             modifier = Modifier.padding(end = 20.dp),
-                            onClick = { /*TODO*/ }) {
+                            onClick = {  }) {
 
                             Icon(
 
@@ -84,7 +87,7 @@ fun FollowScreen() {
 
                     .verticalScroll(rememberScrollState())){
 
-                    CustomListItem(meno = "Back On Label", profilePic = R.drawable.backonlabelpfp)
+                    CustomListItem(navController,meno = "Back On Label", profilePic = R.drawable.backonlabelpfp)
 
 
 
@@ -100,13 +103,14 @@ fun FollowScreen() {
 
 @Composable
 fun CustomListItem(
+    navController: NavController,
     meno: String,
     popis: String = "",
     @DrawableRes
     profilePic: Int
 ) {
     //TODO - spytaj sa jak mam spravit podmienku aby sa tam bud pridal alebo nepridal parameter
-    Box (Modifier.clickable {  }) {
+    Box (Modifier.clickable { navController.navigate(Screens.USER_PROFILE.name) }) {
 
         ListItem(
             //colors = ListItemDefaults.colors(surfaceLight),
@@ -156,8 +160,8 @@ fun CustomListItemCard(
 }
 
 
-@Preview()
-@Composable
-fun FollowScreenPreview() {
-    FollowScreen()
-}
+//@Preview()
+//@Composable
+//fun FollowScreenPreview() {
+//    FollowScreen()
+//}

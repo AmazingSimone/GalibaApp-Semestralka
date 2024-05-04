@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -35,13 +36,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun EditEvent() {
+fun EditEvent(navController: NavHostController) {
     Surface {
         Column (
             modifier = Modifier
@@ -63,7 +64,11 @@ fun EditEvent() {
                     text = "Uprav Galibu",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
-                Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
+                IconButton(
+                    onClick = { navController.popBackStack() }
+                ) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
+                }
             }
 
             var nazovAkcie by rememberSaveable { mutableStateOf("") }
@@ -161,15 +166,15 @@ fun EditEvent() {
             )
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { navController.popBackStack() }) {
                 Text(text = "Ulozit zmeny")
             }
         }
     }
 }
 
-@Composable
-@Preview
-fun PreviewEditEvent() {
-    EditEvent()
-}
+//@Composable
+//@Preview
+//fun PreviewEditEvent() {
+//    EditEvent(navController)
+//}

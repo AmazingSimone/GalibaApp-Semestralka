@@ -17,7 +17,7 @@ fun LoginRegisterNavigation() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Screens.REGISTER.name
+        startDestination = Screens.LOGIN.name
     ) {
         composable(route = Screens.LOGIN.name) { LoginScreen(navController) }
         composable(route = Screens.REGISTER.name) { RegisterScreen(navController) }
