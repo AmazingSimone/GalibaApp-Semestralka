@@ -41,14 +41,33 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.galibaapp_semestralka.navigation.Screens
 
 @ExperimentalMaterial3Api
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+
+    var login by rememberSaveable { mutableStateOf("") }
+    var heslo by rememberSaveable { mutableStateOf("") }
+    var heslo2 by rememberSaveable { mutableStateOf("") }
+
+    var isPasswordSame by remember {
+        mutableStateOf(false)
+    }
+    isPasswordSame = heslo != heslo2
+    val isFieldsEmpty = login.isNotEmpty() && heslo.isNotEmpty() && heslo2.isNotEmpty()
+
+    var loginBeenClicked by remember {
+        mutableStateOf(false)
+    }
+    var passwordBeenClicked by remember {
+        mutableStateOf(false)
+    }
+    var password2BeenClicked by remember {
+        mutableStateOf(false)
+    }
+
     Surface (modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)) {
@@ -70,14 +89,15 @@ fun RegisterScreen(navController: NavController) {
 
             val (loginFocusRequester, passwordFocusRequester, password2FocusRequester) = remember { FocusRequester.createRefs() }
 
-            var login by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
                 modifier = Modifier
                     .focusRequester(loginFocusRequester)
                     .width(250.dp),
                 value = login,
-                onValueChange = { login = it },
+                onValueChange = { login = it
+                                loginBeenClicked = true
+                                },
                 label = { Text("Pouzivatelske Meno") },
                 singleLine = true,
                 trailingIcon = {
@@ -95,22 +115,28 @@ fun RegisterScreen(navController: NavController) {
                     }
                 ),
                 supportingText = {
-                    Text(text = "Take pouzivatelske meno uz existuje")
+                    //Text(text = "Take pouzivatelske meno uz existuje")
+                                 if (loginBeenClicked && login.isEmpty()) {
+                                     Text(text = "Povinny udaj!")
+                                 }
                 },
-                isError = true
+
+                isError = loginBeenClicked && login.isEmpty()
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
 
 
-            var heslo by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
                 modifier = Modifier
                     .focusRequester(passwordFocusRequester)
                     .width(250.dp),
                 value = heslo,
-                onValueChange = { heslo = it },
+                onValueChange = {
+                    heslo = it
+                    passwordBeenClicked = true
+                                },
                 label = { Text("Heslo") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
@@ -124,20 +150,28 @@ fun RegisterScreen(navController: NavController) {
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.Lock, contentDescription = "passIcon")
                 },
-                isError = true
+                supportingText = {
+                    //Text(text = "Take pouzivatelske meno uz existuje")
+                    if (passwordBeenClicked && heslo.isEmpty()) {
+                        Text(text = "Povinny udaj!")
+                    }
+                },
+                isError = passwordBeenClicked && ((password2BeenClicked && isPasswordSame) || heslo.isEmpty())
 
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
 
-            var heslo2 by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
                 modifier = Modifier
                     .focusRequester(password2FocusRequester)
                     .width(250.dp),
                 value = heslo2,
-                onValueChange = { heslo2 = it },
+                onValueChange = {
+                    heslo2 = it
+                    password2BeenClicked = true
+                                },
                 label = { Text("Potvrd heslo") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -146,7 +180,12 @@ fun RegisterScreen(navController: NavController) {
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        navController.navigate(Screens.HOME.name)
+                        ///navController.navigate(Screens.HOME.name)
+                        isPasswordSame = heslo != heslo2
+
+                        if (!isPasswordSame && isFieldsEmpty) {
+                            onRegisterClick()
+                        }
                     }
                 ),
                 trailingIcon = {
@@ -154,9 +193,13 @@ fun RegisterScreen(navController: NavController) {
                 },
                 visualTransformation = PasswordVisualTransformation(),
                 supportingText = {
-                    Text(text = "Hesla sa nezhoduju")
+                    if (password2BeenClicked && passwordBeenClicked && isPasswordSame) {
+                        Text(text = "Hesla sa nezhoduju")
+                    } else if (password2BeenClicked && heslo2.isEmpty()) {
+                        Text(text = "Povinny udaj!")
+                    }
                 },
-                isError = true
+                isError = password2BeenClicked && ((passwordBeenClicked && isPasswordSame) || heslo2.isEmpty())
             )
 
             var options = mutableStateListOf<String>("Posluchac", "Umelec")
@@ -188,16 +231,22 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.padding(10.dp))
 
 
-            TextButton(onClick = {
-                navController.navigate(Screens.LOGIN.name)
-            }) {
+            TextButton(onClick =
+                //navController.navigate(Screens.LOGIN.name)
+                onLoginClick
+            ) {
                 Text(text = "Uz mas ucet ?")
             }
 
 
             Spacer(modifier = Modifier.padding(10.dp))
 
-            Button(onClick = { /*TODO*/ }) {
+            Button(
+                onClick = {
+                          onRegisterClick()
+                 },
+                enabled = isFieldsEmpty && !isPasswordSame
+                ) {
                 Text(text = "Registracia")
             }
         }

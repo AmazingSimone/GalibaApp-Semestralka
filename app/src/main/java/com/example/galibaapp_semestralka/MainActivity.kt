@@ -16,16 +16,7 @@ class  MainActivity : ComponentActivity() {
 
                 //ProfileInspectScreen(id = "9")
             LoginRegisterNavigation()
-                //BottomNavBar()
 
-        //M3SearchNavDrawer()
-                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Greeting("Android")
-//                }
 
             }
         }

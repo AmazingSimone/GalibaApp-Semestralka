@@ -35,12 +35,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.galibaapp_semestralka.navigation.Screens
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+    var login by rememberSaveable { mutableStateOf("") }
+    var heslo by rememberSaveable { mutableStateOf("") }
+
+    val isFieldsEmpty = login.isNotEmpty() && heslo.isNotEmpty()
+
+    var loginBeenClicked by remember {
+        mutableStateOf(false)
+    }
+    var passwordBeenClicked by remember {
+        mutableStateOf(false)
+    }
 
     Surface (modifier = Modifier
         .fillMaxSize()
@@ -53,7 +62,6 @@ fun LoginScreen(navController: NavController) {
         ) {
 
             Text(
-
                 text = "Vitaj Spat !",
                 fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                 fontWeight = FontWeight.Bold
@@ -61,20 +69,22 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.padding(10.dp))
 
-            var login by rememberSaveable { mutableStateOf("") }
 
             val (loginFocusRequester, passwordFocusRequester) = remember { FocusRequester.createRefs() }
 
             OutlinedTextField(
                 modifier = Modifier.focusRequester(loginFocusRequester).width(250.dp),
                         value = login,
-                onValueChange = { login = it },
+                onValueChange = {
+                    login = it
+                    loginBeenClicked = true
+                                },
                 label = { Text("Login") },
                 singleLine = true,
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.Person, contentDescription = "accBoxIcon")
                 },
-                prefix = { 
+                prefix = {
                     Text(text = "@")
                 },
                 keyboardOptions = KeyboardOptions(
@@ -83,16 +93,24 @@ fun LoginScreen(navController: NavController) {
                 keyboardActions = KeyboardActions(
                     onNext = { passwordFocusRequester.requestFocus() }
                 ),
-                isError = true
+                supportingText = {
+                    //Text(text = "Take pouzivatelske meno uz existuje")
+                    if (loginBeenClicked && login.isEmpty()) {
+                        Text(text = "Povinny udaj!")
+                    }
+                },
+                isError = loginBeenClicked && login.isEmpty()
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
-            var heslo by rememberSaveable { mutableStateOf("") }
 
             OutlinedTextField(
                 modifier = Modifier.focusRequester(passwordFocusRequester).width(250.dp),
                 value = heslo,
-                onValueChange = { heslo = it },
+                onValueChange = {
+                    heslo = it
+                    passwordBeenClicked = true
+                },
                 label = { Text("Heslo") },
                 singleLine = true,
                 trailingIcon = {
@@ -105,32 +123,36 @@ fun LoginScreen(navController: NavController) {
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        navController.navigate(Screens.HOME.name)
+                        ///navController.navigate(Screens.HOME.name)
+
+
+                        if (isFieldsEmpty) {
+                            onLoginClick()
+                        }
                     }
                 ),
                 visualTransformation = PasswordVisualTransformation(),
                 supportingText = {
-                    Text(text = "Pouzivatelske meno alebo heslo je nespravne")
+                    //Text(text = "Pouzivatelske meno alebo heslo je nespravne")
+                    if (passwordBeenClicked && heslo.isEmpty()) {
+                        Text(text = "Povinny udaj!")
+                    }
                 },
-                isError = true
+                isError = passwordBeenClicked && heslo.isEmpty()
             )
 
-            TextButton(onClick = {
-                navController.navigate(Screens.REGISTER.name)
-            }) {
+            TextButton(onClick = onRegisterClick) {
                 Text(text = "Nemas ucet ?")
             }
 
-            Button(onClick = {
-
-                navController.navigate(Screens.HOME.name)
-            }) {
+            Button(
+                onClick = onLoginClick,
+                enabled = isFieldsEmpty
+            ) {
                 Text(text = "Prihlasenie")
             }
         }
-
     }
-
 }
 
 //@Preview
