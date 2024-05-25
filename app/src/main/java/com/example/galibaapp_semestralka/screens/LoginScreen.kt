@@ -12,8 +12,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -34,11 +37,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.data.LoginRegisterViewModel
+import com.example.galibaapp_semestralka.data.UIevent
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginRegisterViewModel = viewModel()) {
     var login by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
@@ -73,10 +80,13 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
             val (loginFocusRequester, passwordFocusRequester) = remember { FocusRequester.createRefs() }
 
             OutlinedTextField(
-                modifier = Modifier.focusRequester(loginFocusRequester).width(250.dp),
+                modifier = Modifier
+                    .focusRequester(loginFocusRequester)
+                    .width(250.dp),
                         value = login,
                 onValueChange = {
                     login = it
+                    loginViewModel.onLoginEvent(UIevent.loginChanged(it))
                     loginBeenClicked = true
                                 },
                 label = { Text("Login") },
@@ -104,17 +114,35 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
 
             Spacer(modifier = Modifier.padding(10.dp))
 
+            val passwordVisible = remember {
+                mutableStateOf(false)
+            }
+
             OutlinedTextField(
-                modifier = Modifier.focusRequester(passwordFocusRequester).width(250.dp),
+                modifier = Modifier
+                    .focusRequester(passwordFocusRequester)
+                    .width(250.dp),
                 value = heslo,
                 onValueChange = {
                     heslo = it
+                    loginViewModel.onLoginEvent(UIevent.passwordChanged(it))
                     passwordBeenClicked = true
                 },
                 label = { Text("Heslo") },
                 singleLine = true,
                 trailingIcon = {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = "passIcon")
+                    val iconImage = if (heslo.isEmpty()) {
+                        Icons.Default.Lock
+                    } else if (passwordVisible.value && heslo.isNotEmpty()) {
+                        Icons.Filled.Visibility
+                    } else {
+                        Icons.Filled.VisibilityOff
+                    }
+                    IconButton(onClick = {
+                        passwordVisible.value = !passwordVisible.value
+                    }) {
+                        Icon(imageVector = iconImage, contentDescription ="" )
+                    }
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -131,14 +159,15 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                         }
                     }
                 ),
-                visualTransformation = PasswordVisualTransformation(),
                 supportingText = {
                     //Text(text = "Pouzivatelske meno alebo heslo je nespravne")
                     if (passwordBeenClicked && heslo.isEmpty()) {
                         Text(text = "Povinny udaj!")
                     }
                 },
-                isError = passwordBeenClicked && heslo.isEmpty()
+                isError = passwordBeenClicked && heslo.isEmpty(),
+                visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+
             )
 
             TextButton(onClick = onRegisterClick) {
@@ -146,7 +175,9 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
             }
 
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    loginViewModel.onLoginEvent(UIevent.LoginButtonClicked)
+                    onLoginClick() },
                 enabled = isFieldsEmpty
             ) {
                 Text(text = "Prihlasenie")

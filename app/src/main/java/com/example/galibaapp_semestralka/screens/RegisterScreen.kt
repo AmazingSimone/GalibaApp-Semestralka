@@ -13,9 +13,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
@@ -40,13 +43,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.data.LoginRegisterViewModel
+import com.example.galibaapp_semestralka.data.UIevent
 
 @ExperimentalMaterial3Api
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
+fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginRegisterViewModel: LoginRegisterViewModel = viewModel()) {
 
     var login by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
@@ -95,8 +102,10 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                     .focusRequester(loginFocusRequester)
                     .width(250.dp),
                 value = login,
-                onValueChange = { login = it
-                                loginBeenClicked = true
+                onValueChange = {
+                    login = it
+                    loginRegisterViewModel.onRegisterEvent(UIevent.loginChanged(it))
+                    loginBeenClicked = true
                                 },
                 label = { Text("Pouzivatelske Meno") },
                 singleLine = true,
@@ -127,6 +136,9 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
             Spacer(modifier = Modifier.padding(10.dp))
 
 
+            val passwordVisible = remember {
+                mutableStateOf(false)
+            }
 
             OutlinedTextField(
                 modifier = Modifier
@@ -135,12 +147,12 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                 value = heslo,
                 onValueChange = {
                     heslo = it
+                    loginRegisterViewModel.onRegisterEvent(UIevent.passwordChanged(it))
                     passwordBeenClicked = true
                                 },
                 label = { Text("Heslo") },
                 singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
+                        keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 ),
@@ -148,7 +160,20 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                     onNext = { password2FocusRequester.requestFocus() }
                 ),
                 trailingIcon = {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = "passIcon")
+                    //Icon(imageVector = Icons.Default.Lock, contentDescription = "passIcon")
+
+                    val iconImage = if (heslo.isEmpty()) {
+                        Icons.Default.Lock
+                    } else if (passwordVisible.value && heslo.isNotEmpty()) {
+                        Icons.Filled.Visibility
+                    } else {
+                        Icons.Filled.VisibilityOff
+                    }
+                    IconButton(onClick = {
+                        passwordVisible.value = !passwordVisible.value
+                    }) {
+                        Icon(imageVector = iconImage, contentDescription ="" )
+                    }
                 },
                 supportingText = {
                     //Text(text = "Take pouzivatelske meno uz existuje")
@@ -156,12 +181,16 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                         Text(text = "Povinny udaj!")
                     }
                 },
-                isError = passwordBeenClicked && ((password2BeenClicked && isPasswordSame) || heslo.isEmpty())
+                isError = passwordBeenClicked && ((password2BeenClicked && isPasswordSame) || heslo.isEmpty()),
+                visualTransformation = if(passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
 
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
 
+            val confirmPasswordVisible = remember {
+                mutableStateOf(false)
+            }
 
             OutlinedTextField(
                 modifier = Modifier
@@ -170,6 +199,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                 value = heslo2,
                 onValueChange = {
                     heslo2 = it
+                    loginRegisterViewModel.onRegisterEvent(UIevent.confirmPasswordChanged(it))
                     password2BeenClicked = true
                                 },
                 label = { Text("Potvrd heslo") },
@@ -189,9 +219,19 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                     }
                 ),
                 trailingIcon = {
-                    Icon(imageVector = Icons.Default.Lock, contentDescription = "passIcon")
+                    val iconImage = if (heslo2.isEmpty()) {
+                        Icons.Default.Lock
+                    } else if (confirmPasswordVisible.value && heslo2.isNotEmpty()) {
+                        Icons.Filled.Visibility
+                    } else {
+                        Icons.Filled.VisibilityOff
+                    }
+                    IconButton(onClick = {
+                        confirmPasswordVisible.value = !confirmPasswordVisible.value
+                    }) {
+                        Icon(imageVector = iconImage, contentDescription ="" )
+                    }
                 },
-                visualTransformation = PasswordVisualTransformation(),
                 supportingText = {
                     if (password2BeenClicked && passwordBeenClicked && isPasswordSame) {
                         Text(text = "Hesla sa nezhoduju")
@@ -199,7 +239,9 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
                         Text(text = "Povinny udaj!")
                     }
                 },
-                isError = password2BeenClicked && ((passwordBeenClicked && isPasswordSame) || heslo2.isEmpty())
+                isError = password2BeenClicked && ((passwordBeenClicked && isPasswordSame) || heslo2.isEmpty()),
+                visualTransformation = if(confirmPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+
             )
 
             var options = mutableStateListOf<String>("Posluchac", "Umelec")
@@ -214,11 +256,17 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
 
                 options.forEachIndexed { index, option ->
                     SegmentedButton(
-                        selected = selectedIndex == index
-                        , onClick = { selectedIndex = index }
-                        , shape = SegmentedButtonDefaults.itemShape(
-                            index = index
-                            , count = options.size
+                        selected = selectedIndex == index,
+                        onClick = {
+                            selectedIndex = index
+                            if (selectedIndex == 0) {
+                            loginRegisterViewModel.onRegisterEvent(UIevent.isArtistChanged(false))
+                        } else {
+                            loginRegisterViewModel.onRegisterEvent(UIevent.isArtistChanged(true))
+                        } },
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = options.size
                         )
                     )
                     {
@@ -243,6 +291,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
 
             Button(
                 onClick = {
+                          loginRegisterViewModel.onRegisterEvent(UIevent.RegisterButtonClicked)
                           onRegisterClick()
                  },
                 enabled = isFieldsEmpty && !isPasswordSame
