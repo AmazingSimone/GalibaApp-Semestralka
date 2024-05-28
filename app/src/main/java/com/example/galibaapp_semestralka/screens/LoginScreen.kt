@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -33,6 +33,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,16 +41,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.galibaapp_semestralka.data.LoginRegisterViewModel
-import com.example.galibaapp_semestralka.data.UIevent
+import com.example.galibaapp_semestralka.data.LoginUIevent
+import com.example.galibaapp_semestralka.data.LoginViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginRegisterViewModel = viewModel()) {
-    var login by rememberSaveable { mutableStateOf("") }
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginViewModel = viewModel()) {
+    var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
-    val isFieldsEmpty = login.isNotEmpty() && heslo.isNotEmpty()
+    val isFieldsEmpty = email.isNotEmpty() && heslo.isNotEmpty()
 
     var loginBeenClicked by remember {
         mutableStateOf(false)
@@ -83,21 +84,20 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
                 modifier = Modifier
                     .focusRequester(loginFocusRequester)
                     .width(250.dp),
-                        value = login,
+                        value = email,
                 onValueChange = {
-                    login = it
-                    loginViewModel.onLoginEvent(UIevent.loginChanged(it))
+                    email = it
+                    loginViewModel.onLoginEvent(LoginUIevent.emailChanged(it))
                     loginBeenClicked = true
                                 },
-                label = { Text("Login") },
+                label = { Text("Email") },
                 singleLine = true,
                 trailingIcon = {
-                    Icon(imageVector = Icons.Default.Person, contentDescription = "accBoxIcon")
+                    Icon(imageVector = Icons.Default.Email, contentDescription = "accBoxIcon")
                 },
-                prefix = {
-                    Text(text = "@")
-                },
+
                 keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
@@ -105,11 +105,11 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
                 ),
                 supportingText = {
                     //Text(text = "Take pouzivatelske meno uz existuje")
-                    if (loginBeenClicked && login.isEmpty()) {
+                    if (loginBeenClicked && email.isEmpty()) {
                         Text(text = "Povinny udaj!")
                     }
                 },
-                isError = loginBeenClicked && login.isEmpty()
+                isError = loginBeenClicked && email.isEmpty()
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
@@ -117,7 +117,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
             val passwordVisible = remember {
                 mutableStateOf(false)
             }
-
+            val localFocusManager = LocalFocusManager.current
             OutlinedTextField(
                 modifier = Modifier
                     .focusRequester(passwordFocusRequester)
@@ -125,7 +125,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
                 value = heslo,
                 onValueChange = {
                     heslo = it
-                    loginViewModel.onLoginEvent(UIevent.passwordChanged(it))
+                    loginViewModel.onLoginEvent(LoginUIevent.passwordChanged(it))
                     passwordBeenClicked = true
                 },
                 label = { Text("Heslo") },
@@ -149,16 +149,9 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
                     imeAction = ImeAction.Done
 
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        ///navController.navigate(Screens.HOME.name)
-
-
-                        if (isFieldsEmpty) {
-                            onLoginClick()
-                        }
-                    }
-                ),
+                keyboardActions = KeyboardActions{
+                    localFocusManager.clearFocus()
+                },
                 supportingText = {
                     //Text(text = "Pouzivatelske meno alebo heslo je nespravne")
                     if (passwordBeenClicked && heslo.isEmpty()) {
@@ -176,7 +169,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
 
             Button(
                 onClick = {
-                    loginViewModel.onLoginEvent(UIevent.LoginButtonClicked)
+                    loginViewModel.onLoginEvent(LoginUIevent.LoginButtonClicked)
                     onLoginClick() },
                 enabled = isFieldsEmpty
             ) {

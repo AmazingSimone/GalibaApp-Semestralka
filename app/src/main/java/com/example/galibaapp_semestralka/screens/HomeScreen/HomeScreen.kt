@@ -25,7 +25,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
@@ -34,23 +33,17 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -75,68 +68,67 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController,drawerState: DrawerState) {
 
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+//    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-// icons to mimic drawer destinations
-    val items = listOf(
-        Icons.Default.LocationOn,
+//// icons to mimic drawer destinations
+//    val items = listOf(
+//        Icons.Default.LocationOn,
+//
+//        Icons.Default.LocationOn,
+//        Icons.Default.LocationOn,
+//
+//        )
+//
+//
+//    val selectedItem = remember { mutableStateOf(items[0]) }
+//    ModalNavigationDrawer(
+//        drawerState = drawerState,
+//        drawerContent = {
+//            ModalDrawerSheet() {
+//                Column(Modifier.verticalScroll(rememberScrollState())) {
+//
+//                    Text(text = "Galiba",
+//                        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+//                        modifier = Modifier.padding(12.dp)
+//
+//                    )
+//                    HorizontalDivider()
+//                    NavigationDrawerItem(
+//                        icon = { Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null) },
+//                        label = { Text("Simon Bartanus") },
+//                        selected = false,
+//                        onClick = {
+//                            scope.launch { drawerState.close() }
+//                            //selectedItem.value = item
+//                            navController.navigate(Screens.PERSONAL_USER_PROFILE.name)
+//
+//                        },
+//                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//                    )
+//                    HorizontalDivider()
+//                    Spacer(Modifier.height(12.dp))
+//                    items.forEach { item ->
+//                        NavigationDrawerItem(
+//                            icon = { Icon(item, contentDescription = null) },
+//                            label = { Text(item.name) },
+//                            selected = item == selectedItem.value,
+//                            onClick = {
+//                                scope.launch { drawerState.close() }
+//                                selectedItem.value = item
+//                            },
+//                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+//                        )
+//                        Spacer(Modifier.height(12.dp))
+//
+//                    }
+//                }
+//            }
+//        },
 
-        Icons.Default.LocationOn,
-        Icons.Default.LocationOn,
-
-        )
-
-
-    val selectedItem = remember { mutableStateOf(items[0]) }
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet() {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-
-                    Text(text = "Galiba",
-                        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-                        modifier = Modifier.padding(12.dp)
-
-                    )
-                    HorizontalDivider()
-                    NavigationDrawerItem(
-                        icon = { Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null) },
-                        label = { Text("Simon Bartanus") },
-                        selected = false,
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                            //selectedItem.value = item
-                            navController.navigate(Screens.PERSONAL_USER_PROFILE.name)
-
-                        },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
-                    HorizontalDivider()
-                    Spacer(Modifier.height(12.dp))
-                    items.forEach { item ->
-                        NavigationDrawerItem(
-                            icon = { Icon(item, contentDescription = null) },
-                            label = { Text(item.name) },
-                            selected = item == selectedItem.value,
-                            onClick = {
-                                scope.launch { drawerState.close() }
-                                selectedItem.value = item
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                        Spacer(Modifier.height(12.dp))
-
-                    }
-
-                }
-            }
-        },
-
-        content = {
+        //content = {
             Surface (
                 //color = MaterialTheme.colorScheme.background
             ) {
@@ -278,105 +270,6 @@ fun HomeScreen(navController: NavController) {
                             {
 
 
-//                Column {
-//
-//                    Text(
-//                        modifier = Modifier.padding(vertical = 0.dp),
-//                        text = "Ahoj, Šimon!",
-//                        fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-//                        //color = MaterialTheme.colorScheme.onSurface
-//                    )
-//
-//                    Box (Modifier.clickable {
-//
-//                    }) {
-//                        Row (
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ){
-//                            Text(
-//                                text = "Banska Bystrica, Slovensko",
-//                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-//                                //color = MaterialTheme.colorScheme.onSurface,
-//
-//                            )
-//                            IconButton(
-//
-//                                onClick = { /*TODO*/ }) {
-//
-//                                Icon(
-//                                    imageVector = Icons.Default.LocationOn,
-//                                    contentDescription = ""
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                var text by remember { mutableStateOf("") }
-//                var active by remember { mutableStateOf(false) }
-//                var items = remember {
-//                    mutableStateListOf(
-//                        ""
-//                    )
-//                }
-//                SearchBar (
-//                    //colors = SearchBarDefaults.colors(surfaceContainerLight),
-//                    query = text,
-//                    onQueryChange = {
-//                        text = it
-//                    },
-//                    onSearch = {
-//                        items.add(text)
-//                        active = false
-//                        text = ""
-//                    },
-//                    active = active,
-//                    onActiveChange = {
-//                        active = it
-//                    },
-//                    placeholder = { Text(text = "Hladaj Galibu") },
-//                    leadingIcon = {
-//                        IconButton(onClick = {
-//                            //scope.launch { drawerState.open()}
-//                        }) {
-//
-//                            Icon(
-//                                imageVector = Icons.Default.Menu,
-//                                contentDescription = "Menu"
-//                            )
-//                        }
-//                    },
-//                    trailingIcon = {
-//                        if (active) {
-//                            Icon(
-//                                modifier = Modifier.clickable {
-//                                    if (text.isNotEmpty()) {
-//                                        text = ""
-//                                    } else {
-//                                        active = false
-//                                    }
-//                                },
-//                                imageVector = Icons.Default.Close,
-//                                contentDescription = "close"
-//                            )
-//                        } else {
-//                            Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-//                        }
-//
-//                    }
-//                ) {
-//                    items.forEach {
-//                        Row(modifier = Modifier.padding(all = 14.dp)) {
-//                            Icon(
-//                                modifier = Modifier.padding(end = 10.dp),
-//                                imageVector = Icons.Default.Refresh,
-//                                contentDescription = "history icon"
-//                            )
-//                            Text(text = it)
-//                        }
-//                    }
-//                }
-
                                 Text(
                                     modifier = Modifier.padding(vertical = 10.dp),
                                     text = "Galiby v okoli:",
@@ -410,15 +303,11 @@ fun HomeScreen(navController: NavController) {
                                 }
                             }
                         }
-
                     }
-
-
-
                 }
             }
-        }
-    )
+        //}
+    //)
 
 
 
