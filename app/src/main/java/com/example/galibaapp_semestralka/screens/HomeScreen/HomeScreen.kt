@@ -66,71 +66,14 @@ import com.example.galibaapp_semestralka.navigation.Screens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun HomeScreen(navController: NavController,drawerState: DrawerState) {
 
 
-//    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-//// icons to mimic drawer destinations
-//    val items = listOf(
-//        Icons.Default.LocationOn,
-//
-//        Icons.Default.LocationOn,
-//        Icons.Default.LocationOn,
-//
-//        )
-//
-//
-//    val selectedItem = remember { mutableStateOf(items[0]) }
-//    ModalNavigationDrawer(
-//        drawerState = drawerState,
-//        drawerContent = {
-//            ModalDrawerSheet() {
-//                Column(Modifier.verticalScroll(rememberScrollState())) {
-//
-//                    Text(text = "Galiba",
-//                        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-//                        modifier = Modifier.padding(12.dp)
-//
-//                    )
-//                    HorizontalDivider()
-//                    NavigationDrawerItem(
-//                        icon = { Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null) },
-//                        label = { Text("Simon Bartanus") },
-//                        selected = false,
-//                        onClick = {
-//                            scope.launch { drawerState.close() }
-//                            //selectedItem.value = item
-//                            navController.navigate(Screens.PERSONAL_USER_PROFILE.name)
-//
-//                        },
-//                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//                    )
-//                    HorizontalDivider()
-//                    Spacer(Modifier.height(12.dp))
-//                    items.forEach { item ->
-//                        NavigationDrawerItem(
-//                            icon = { Icon(item, contentDescription = null) },
-//                            label = { Text(item.name) },
-//                            selected = item == selectedItem.value,
-//                            onClick = {
-//                                scope.launch { drawerState.close() }
-//                                selectedItem.value = item
-//                            },
-//                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-//                        )
-//                        Spacer(Modifier.height(12.dp))
-//
-//                    }
-//                }
-//            }
-//        },
 
-        //content = {
             Surface (
-                //color = MaterialTheme.colorScheme.background
             ) {
 
                 Column(
@@ -138,11 +81,7 @@ fun HomeScreen(navController: NavController,drawerState: DrawerState) {
                     horizontalAlignment = Alignment.CenterHorizontally,
 
                     ) {
-//                Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
-//                Spacer(Modifier.height(20.dp))
-//                Button(onClick = { scope.launch { drawerState.open() } }) {
-//                    Text("Click to open")
-//                }
+
 
                     Column (
                         modifier = Modifier
@@ -257,7 +196,9 @@ fun HomeScreen(navController: NavController,drawerState: DrawerState) {
                         Scaffold (
                             floatingActionButton = {
                                 FloatingActionButton(
-                                    onClick = { navController.navigate(Screens.CREATE_EVENT.name) },
+                                    onClick = {navController.navigate(Screens.CREATE_EVENT.name) {
+                                        launchSingleTop = true
+                                    } },
                                     //containerColor = secondaryContainerLight
                                 ) {
                                     Icon(Icons.Filled.Add, "Floating action button.")
@@ -513,7 +454,9 @@ fun CustomCard(
                             }
                         }
                         Button(
-                            onClick = { navController.navigate(Screens.EDIT_EVENT.name) },
+                            onClick = { navController.navigate(Screens.EDIT_EVENT.name) {
+                                launchSingleTop = true
+                            } },
                             //colors = ButtonDefaults.buttonColors(primaryLight)
                         ) {
                             Text(
@@ -531,7 +474,9 @@ fun CustomCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable(
                         onClick = {
-                            navController.navigate(Screens.USER_PROFILE.name)
+                            navController.navigate(Screens.USER_PROFILE.name) {
+                                launchSingleTop = true
+                            }
                         }
                     )
                 ) {

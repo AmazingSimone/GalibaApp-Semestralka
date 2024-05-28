@@ -70,7 +70,9 @@ fun EditUserInfoScreen(
                     text = "Uprav profil",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
-                IconButton(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) }) {
+                IconButton(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) {
+                    popUpTo(Screens.HOME.name)
+                } }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
                 }
             }
