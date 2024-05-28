@@ -194,7 +194,9 @@ fun EditUserInfoScreen(
             )
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            Button(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) }) {
+            Button(onClick = { navController.navigate(Screens.PERSONAL_USER_PROFILE.name) {
+                popUpTo(Screens.HOME.name)
+            } }) {
                 Text(text = "Ulozit zmeny")
             }
         }

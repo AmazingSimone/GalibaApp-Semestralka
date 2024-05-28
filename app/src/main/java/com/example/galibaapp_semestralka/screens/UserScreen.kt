@@ -55,7 +55,9 @@ fun UserScreen(
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "iconClose")
                 }
-                IconButton(onClick = { navController.navigate(Screens.EDIT_USER_PROFILE.name)  }) {
+                IconButton(onClick = { navController.navigate(Screens.EDIT_USER_PROFILE.name) {
+                    launchSingleTop = true
+                } }) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "editProfileIcon")
                 }
 
@@ -101,7 +103,9 @@ fun UserScreen(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-                Button(onClick = { navController.navigate(Screens.LOGIN.name) }) {
+                Button(onClick = { navController.navigate(Screens.LOGIN.name) {
+                    popUpTo("home-navigation")
+                } }) {
                     Text(text = "Odhlasit sa")
                 }
                 Spacer(modifier = Modifier.padding(all = 10.dp))

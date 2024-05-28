@@ -240,7 +240,7 @@ fun BottomNavBar() {
                         FollowScreen(navController)
                     }
 
-                    composable(route = Screens.REGISTER.name) {
+                    composable(route = Screens.LOGIN.name) {
                         Start()
                     }
 
@@ -289,19 +289,19 @@ fun Start() {
                 onRegisterClick = {
                     navController.navigateToSingleTop(Screens.REGISTER.name)
                 }) }
-            composable(route = Screens.REGISTER.name) { RegisterScreen(
-                onLoginClick = {
-                    navController.navigateToSingleTop(Screens.LOGIN.name)
-                },
-                onRegisterClick = {
-                    navController.navigate(Screens.HOME.name) {
-                        popUpTo(route = "login-navigation")
+            composable(route = Screens.REGISTER.name) {
+                RegisterScreen(
+                    onLoginClick = {
+                        navController.navigateToSingleTop(Screens.LOGIN.name)
+                    },
+                    onRegisterClick = {
+                        navController.navigate(Screens.HOME.name) {
+                            popUpTo(route = "login-navigation")
 
+                        }
                     }
-                }
-            )
+                )
             }
-
         }
         composable(route = Screens.HOME.name) { BottomNavBar() }
     }
