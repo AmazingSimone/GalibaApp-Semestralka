@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "681950730821",
+    "project_id": "galibaapp-semestralka",
+    "storage_bucket": "galibaapp-semestralka.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681950730821:android:15d3c1144479832af5e12c",
+        "android_client_info": {
+          "package_name": "com.example.galibaapp_semestralka"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-CHy7z99n85xFr5MImQJWVEld2Cy9Xh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
