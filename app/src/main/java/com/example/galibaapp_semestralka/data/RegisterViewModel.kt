@@ -74,33 +74,6 @@ class RegisterViewModel : ViewModel() {
         }
     }
 
-//    fun signUp() : Boolean {
-//        var success = mutableStateOf(false)
-//
-//        viewModelScope.launch {
-//            registerInProgress.value = true
-//            success.value = false
-//            try {
-//                createUserInFirebase(
-//                    registrationUIState.value.email,
-//                    registrationUIState.value.password
-//                )
-//                Log.d(TAG, "User created successfully")
-//                success.value = true
-//                Log.d(TAG, "success val: ${success.value}")
-//            } catch (e: Exception) {
-//                Log.d(TAG, "Error: ${e.message}")
-//                success.value = false
-//            }
-//            registerInProgress.value = false
-//
-//
-//        }
-//        Log.d(TAG, "return success val: ${success.value}")
-//
-//        return success.value
-//    }
-
     fun signUp(onSuccess: () -> Unit, onFailure: () -> Unit) {
 
         //var success = mutableStateOf(true)

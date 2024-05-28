@@ -369,7 +369,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 //                        }
                         Button(
                             onClick = {
-                                onRegisterClick()
+                                //onRegisterClick()
                                 if (!registerViewModel.isAnyUserInputError()) {
 
                                     //registerViewModel.onRegisterEvent(RegisterUIevent.RegisterButtonClicked)
@@ -393,7 +393,6 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                                 duration = SnackbarDuration.Short
                                             )
                                         }
-
                                     }
 
                                     registerViewModel.signUp(onSuccess, onFailure)
@@ -413,12 +412,12 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 }
 
                             },
-                            enabled = true
-//                            !(registerViewModel.registrationUIState.value.usernameErr ||
-//                                    registerViewModel.registrationUIState.value.usernameIsEmpty ||
-//                                    registerViewModel.registrationUIState.value.emailErr ||
-//                                    registerViewModel.registrationUIState.value.passwordErr ||
-//                                    registerViewModel.registrationUIState.value.passwordMatchErr)
+                            enabled =
+                            !(registerViewModel.registrationUIState.value.usernameErr ||
+                                    registerViewModel.registrationUIState.value.usernameIsEmpty ||
+                                    registerViewModel.registrationUIState.value.emailErr ||
+                                    registerViewModel.registrationUIState.value.passwordErr ||
+                                    registerViewModel.registrationUIState.value.passwordMatchErr)
                         ) {
                             Text(text = "Registracia")
 
