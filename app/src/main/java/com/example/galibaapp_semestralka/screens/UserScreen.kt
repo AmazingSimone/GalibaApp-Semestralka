@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.data.HomeViewModel
 import com.example.galibaapp_semestralka.data.LoginViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import kotlinx.coroutines.launch
@@ -45,11 +46,11 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserScreen(
-    navController: NavController,loginViewModel: LoginViewModel = viewModel()
+    navController: NavController,loginViewModel: LoginViewModel = viewModel(),homeViewModel: HomeViewModel = viewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
+    homeViewModel.getUserData()
 
     Surface {
 
@@ -109,6 +110,13 @@ fun UserScreen(
                         text = "Simone Bartanus",
                         fontSize = MaterialTheme.typography.displaySmall.fontSize,
                         fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                    Text(
+                        text = homeViewModel.emailId.value?:"",
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
                     )
 
                 }

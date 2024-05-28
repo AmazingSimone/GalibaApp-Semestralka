@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -48,6 +49,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.galibaapp_semestralka.data.HomeViewModel
 import com.example.galibaapp_semestralka.screens.CreateEvent
 import com.example.galibaapp_semestralka.screens.EditEvent
 import com.example.galibaapp_semestralka.screens.EditUserInfoScreen
@@ -271,41 +273,48 @@ fun BottomNavBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Start() {
+fun Start(homeViewModel: HomeViewModel = viewModel()) {
     val navController = rememberNavController()
+    homeViewModel.checkForActiveUser()
     NavHost(
         navController = navController,
         startDestination = "login-navigation"
     ) {
 
+        if (homeViewModel.isUserLoggedIn.value == false) {
+            navigation(startDestination = Screens.LOGIN.name, route = "login-navigation") {
+                composable(route = Screens.LOGIN.name) {
+                    LoginScreen(
+                        onLoginClick = {
+                            navController.navigate(Screens.HOME.name) {
+                                popUpTo(route = "login-navigation")
+                            }
+                        },
+                        onRegisterClick = {
+                            navController.navigateToSingleTop(Screens.REGISTER.name)
+                        })
+                }
+                composable(route = Screens.REGISTER.name) {
+                    RegisterScreen(
+                        onLoginClick = {
+                            navController.navigateToSingleTop(Screens.LOGIN.name)
+                        },
+                        onRegisterClick = {
+                            navController.navigate(Screens.HOME.name) {
+                                popUpTo(route = "login-navigation")
 
-        navigation(startDestination = Screens.LOGIN.name,route = "login-navigation") {
-            composable(route = Screens.LOGIN.name) { LoginScreen(
-                onLoginClick = {
-                    navController.navigate(Screens.HOME.name) {
-                        popUpTo(route = "login-navigation")
-                    }
-                },
-                onRegisterClick = {
-                    navController.navigateToSingleTop(Screens.REGISTER.name)
-                }) }
-            composable(route = Screens.REGISTER.name) {
-                RegisterScreen(
-                    onLoginClick = {
-                        navController.navigateToSingleTop(Screens.LOGIN.name)
-                    },
-                    onRegisterClick = {
-                        navController.navigate(Screens.HOME.name) {
-                            popUpTo(route = "login-navigation")
-
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+            composable(route = Screens.HOME.name) { BottomNavBar() }
+        } else {
+            composable(route = "login-navigation") { BottomNavBar() }
         }
-        composable(route = Screens.HOME.name) { BottomNavBar() }
     }
 }
+
 
 fun NavController.navigateToSingleTop(route:String) {
     navigate(route) {
