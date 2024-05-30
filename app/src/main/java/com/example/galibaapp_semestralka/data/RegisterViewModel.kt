@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.galibaapp_semestralka.data.constrains.Validator
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 //data class Register (
 //    var login :String = "",
@@ -16,6 +17,9 @@ class RegisterViewModel : ViewModel() {
     private val TAG = RegisterViewModel::class.simpleName
     var registrationUIState = mutableStateOf(RegistrationUIState())
     var registerInProgress = mutableStateOf(false)
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val firebaseFirestore = FirebaseFirestore.getInstance()
+
 
     fun onRegisterEvent(event: RegisterUIevent) {
         when (event) {
@@ -82,13 +86,19 @@ class RegisterViewModel : ViewModel() {
 
         registerInProgress.value = true
 
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(
+
+
+        firebaseAuth.createUserWithEmailAndPassword(
             registrationUIState.value.email,
             registrationUIState.value.password
         ).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(TAG, "User created successfully")
                 //success.value = true
+                firebaseFirestore.collection("users").document(task.result.user?.uid.toString()).set(mapOf(
+                    "username" to registrationUIState.value.username,
+                    "isArtist" to registrationUIState.value.isArtist
+                ))
                 onSuccess()
             } else {
                 onFailure()

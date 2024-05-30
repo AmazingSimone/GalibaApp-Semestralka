@@ -26,6 +26,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -34,9 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.HomeViewModel
 import com.example.galibaapp_semestralka.data.LoginViewModel
@@ -46,12 +50,17 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserScreen(
-    navController: NavController,loginViewModel: LoginViewModel = viewModel(),homeViewModel: HomeViewModel = viewModel()
+    navController: NavHostController,loginViewModel: LoginViewModel = viewModel(),homeViewModel: HomeViewModel = viewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    homeViewModel.getUserData()
 
+    val username by homeViewModel.username.observeAsState()
+    val isArtist by homeViewModel.isArtist.observeAsState()
+
+    LaunchedEffect(Unit) {
+        homeViewModel.getUserData()
+    }
     Surface {
 
         Scaffold (
@@ -79,13 +88,7 @@ fun UserScreen(
                         } }) {
                             Icon(imageVector = Icons.Default.Edit, contentDescription = "editProfileIcon")
                         }
-
-
-
                     }
-
-
-
 
                     Spacer(modifier = Modifier.padding(all = 20.dp))
 
@@ -100,17 +103,20 @@ fun UserScreen(
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
                     Text(
-                        text = "Posluchac",
+                        text = if (isArtist == true) "Umelec/Kapela" else "Posluchac",
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize
                     )
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
                     Text(
-                        text = "Simone Bartanus",
-                        fontSize = MaterialTheme.typography.displaySmall.fontSize,
-                        fontWeight = FontWeight.Bold
+                        text = ("@" + (username ?: "")),
+                        fontSize = MaterialTheme.typography.displayMedium.fontSize,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
@@ -134,9 +140,12 @@ fun UserScreen(
 
                         val onSuccess = {
 
-                            navController.navigate(Screens.LOGIN.name) {
-                                popUpTo("home-navigation")
-                            }
+                            navController.popBackStack()
+                            navController.popBackStack()
+                            navController.navigate(Screens.AUTHROOT.name)
+//                            {
+//                                popUpTo(Screens.REGISTER.name)
+//                            }
                         }
 
                         val onFailure:() -> Unit = {
