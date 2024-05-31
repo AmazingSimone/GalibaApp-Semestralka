@@ -68,7 +68,7 @@ class RegisterViewModel : ViewModel() {
             }
 
             is RegisterUIevent.isArtistChanged -> {
-                registrationUIState.value = registrationUIState.value.copy(isArtist = event.artist)
+                registrationUIState.value = registrationUIState.value.copy(isArtist = event.isArtist)
                 printState()
             }
 
@@ -97,6 +97,7 @@ class RegisterViewModel : ViewModel() {
                 //success.value = true
                 firebaseFirestore.collection("users").document(task.result.user?.uid.toString()).set(mapOf(
                     "username" to registrationUIState.value.username,
+                    "bio" to registrationUIState.value.bio,
                     "isArtist" to registrationUIState.value.isArtist
                 ))
                 onSuccess()

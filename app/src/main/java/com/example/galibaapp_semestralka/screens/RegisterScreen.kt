@@ -2,6 +2,7 @@ package com.example.galibaapp_semestralka.screens
 
 //import RegisterViewModel
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -49,6 +49,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -57,15 +58,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.RegisterUIevent
 import com.example.galibaapp_semestralka.data.RegisterViewModel
-import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @SuppressLint("UnrememberedMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, registerViewModel: RegisterViewModel = viewModel()) {
+fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, registerViewModel: RegisterViewModel = viewModel(),firebaseViewModel: FirebaseViewModel) {
 
     var username by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -367,6 +368,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 //                        {
 //                            Text(text = "Click me")
 //                        }
+                        val context = LocalContext.current
                         Button(
                             onClick = {
                                 //onRegisterClick()
@@ -376,26 +378,30 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                     //registerViewModel.signUp()
                                     //if (
 
+
+
                                     val onSuccess = {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "User registered successfully",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
+//                                        scope.launch {
+//                                            snackbarHostState.showSnackbar(
+//                                                message = "User registered successfully",
+//                                                duration = SnackbarDuration.Short
+//                                            )
+//                                        }
+                                        Toast.makeText(context, "Konto bolo uspesne vytvorene", Toast.LENGTH_LONG).show()
                                         onRegisterClick()
                                     }
 
                                     val onFailure:() -> Unit = {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "Pri vytvarani konta sa stala chyba",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
+//                                        scope.launch {
+//                                            snackbarHostState.showSnackbar(
+//                                                message = "Pri vytvarani konta sa stala chyba",
+//                                                duration = SnackbarDuration.Short
+//                                            )
+//                                        }
+                                        Toast.makeText(context, "Pri registracii nasala chyba", Toast.LENGTH_LONG).show()
                                     }
 
-                                    registerViewModel.signUp(onSuccess, onFailure)
+                                    firebaseViewModel.signUp(onSuccess, onFailure,registerViewModel)
                                         //)) {
 //                                        scope.launch {
 //                                            snackbarHostState.showSnackbar(

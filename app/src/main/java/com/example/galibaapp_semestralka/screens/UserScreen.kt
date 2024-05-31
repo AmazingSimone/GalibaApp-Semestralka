@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.HomeViewModel
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.LoginViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import kotlinx.coroutines.launch
@@ -50,16 +50,19 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserScreen(
-    navController: NavHostController,loginViewModel: LoginViewModel = viewModel(),homeViewModel: HomeViewModel = viewModel()
+    navController: NavHostController, loginViewModel: LoginViewModel = viewModel(), firebaseViewModel: FirebaseViewModel
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val username by homeViewModel.username.observeAsState()
-    val isArtist by homeViewModel.isArtist.observeAsState()
+    val username by firebaseViewModel.username.observeAsState()
+    val email by firebaseViewModel.emailId.observeAsState()
+    val bio by firebaseViewModel.bio.observeAsState()
+    val isArtist by firebaseViewModel.isArtist.observeAsState()
+
 
     LaunchedEffect(Unit) {
-        homeViewModel.getUserData()
+        firebaseViewModel.getUserData()
     }
     Surface {
 
@@ -121,8 +124,14 @@ fun UserScreen(
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
                     Text(
-                        text = homeViewModel.emailId.value?:"",
+                        text = email?:"",
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    )
+                    Spacer(modifier = Modifier.padding(all = 10.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp),
+                        text = bio?:"",
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
 
                 }
@@ -157,7 +166,7 @@ fun UserScreen(
                             }
                         }
 
-                        loginViewModel.logout(onSuccess,onFailure)
+                        firebaseViewModel.logout(onSuccess,onFailure)
                     }
                     ) {
                         Text(text = "Odhlasit sa")

@@ -8,7 +8,7 @@ sealed class RegisterUIevent {
 
     data class confirmPasswordChanged(val confirmPassword :String) : RegisterUIevent()
 
-    data class isArtistChanged(val artist :Boolean) : RegisterUIevent()
+    data class isArtistChanged(val isArtist :Boolean) : RegisterUIevent()
 
 
     //object RegisterButtonClicked : RegisterUIevent()

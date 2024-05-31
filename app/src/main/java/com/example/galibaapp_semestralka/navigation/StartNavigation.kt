@@ -9,21 +9,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.example.galibaapp_semestralka.data.HomeViewModel
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.screens.HomeScreen.HomeScreenNavigation
 import com.example.galibaapp_semestralka.screens.LoginScreen
 import com.example.galibaapp_semestralka.screens.RegisterScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Start(navController : NavHostController = rememberNavController(), homeViewModel: HomeViewModel = viewModel()) {
+fun Start(navController : NavHostController = rememberNavController(), firebaseViewModel: FirebaseViewModel = viewModel()) {
 
-    homeViewModel.checkForActiveUser()
+    firebaseViewModel.checkForActiveUser()
 
     NavHost(
         navController = navController,
         route = Screens.ROOT.name,
-        startDestination = if(homeViewModel.isUserLoggedIn.value == true) {
+        startDestination = if(firebaseViewModel.isUserLoggedIn.value == true) {
             Screens.HOME.name
         } else {
             Screens.AUTHROOT.name
@@ -41,7 +41,8 @@ fun Start(navController : NavHostController = rememberNavController(), homeViewM
 
                     onRegisterClick = {
                         navController.navigateToSingleTop(Screens.REGISTER.name)
-                    }
+                    },
+                    firebaseViewModel = firebaseViewModel
                 )
             }
             composable(route = Screens.REGISTER.name) {
@@ -50,11 +51,13 @@ fun Start(navController : NavHostController = rememberNavController(), homeViewM
                     onRegisterClick = {
                         navController.popBackStack()
                         navController.navigate(Screens.HOME.name)
-                    })
+                    },
+                    firebaseViewModel = firebaseViewModel
+                )
             }
         }
         composable(route = Screens.HOME.name) {
-            HomeScreenNavigation()
+            HomeScreenNavigation(firebaseViewModel = firebaseViewModel)
         }
     }
 }

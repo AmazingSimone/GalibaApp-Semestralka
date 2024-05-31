@@ -2,6 +2,7 @@
 
 package com.example.galibaapp_semestralka.screens.HomeScreen
 
+//import com.example.galibaapp_semestralka.navigation.listOfNavItems
 import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateContentSize
@@ -77,7 +78,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -88,10 +88,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.HomeViewModel
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.navigation.Start
-//import com.example.galibaapp_semestralka.navigation.listOfNavItems
 import com.example.galibaapp_semestralka.screens.CreateEvent
 import com.example.galibaapp_semestralka.screens.EditEvent
 import com.example.galibaapp_semestralka.screens.EditUserInfoScreen
@@ -107,13 +106,13 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController,
     drawerState: DrawerState,// = rememberDrawerState(initialValue = DrawerValue.Closed),
-    homeViewModel: HomeViewModel// = viewModel()
+    firebaseViewModel: FirebaseViewModel// = viewModel()
 ) {
 
-    val username by homeViewModel.username.observeAsState()
+    val username by firebaseViewModel.username.observeAsState()
 
     LaunchedEffect(Unit) {
-        homeViewModel.getUserData()
+        firebaseViewModel.getUserData()
     }
 
 
@@ -385,15 +384,15 @@ fun HomeScreenNavigation(
     navController: NavHostController = rememberNavController(),
     //oldNavController: NavHostController,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    homeViewModel: HomeViewModel = viewModel()
+    firebaseViewModel: FirebaseViewModel
 ) {
 
 
-    val username by homeViewModel.username.observeAsState()
-    val isArtist by homeViewModel.isArtist.observeAsState()
+    val username by firebaseViewModel.username.observeAsState()
+    val isArtist by firebaseViewModel.isArtist.observeAsState()
 
     LaunchedEffect(Unit) {
-        homeViewModel.getUserData()
+        firebaseViewModel.getUserData()
     }
     val scope = rememberCoroutineScope()
     // icons to mimic drawer destinations
@@ -545,7 +544,7 @@ fun HomeScreenNavigation(
                     HomeScreen(
                         navController = navController,
                         drawerState = drawerState,
-                        homeViewModel = homeViewModel
+                        firebaseViewModel = firebaseViewModel
                     )
                 }
                 composable(route = Screens.FOLLOW.name) {
@@ -571,10 +570,10 @@ fun HomeScreenNavigation(
                     startDestination = Screens.USER_PROFILE.name
                 ) {
                     composable(route = Screens.PERSONAL_USER_PROFILE.name) {
-                        UserScreen(navController)
+                        UserScreen(navController, firebaseViewModel = firebaseViewModel)
                     }
                     composable(route = Screens.EDIT_USER_PROFILE.name) {
-                        EditUserInfoScreen(navController)
+                        EditUserInfoScreen(navController,firebaseViewModel)
                         // A AJ TOTO
                     }
                 }

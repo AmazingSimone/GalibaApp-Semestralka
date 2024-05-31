@@ -1,6 +1,7 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -41,6 +41,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -49,14 +50,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.LoginUIevent
 import com.example.galibaapp_semestralka.data.LoginViewModel
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginViewModel = viewModel(),firebaseViewModel: FirebaseViewModel) {
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
@@ -188,25 +189,29 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewM
                             Text(text = "Nemas ucet ?")
                         }
 
+                        val context = LocalContext.current
                         Button(
                             onClick = {
                                 //loginViewModel.onLoginEvent(LoginUIevent.LoginButtonClicked)
 
                                 if (!loginViewModel.isAnyUserInputError()) {
                                     val onSuccess = {
+                                        Toast.makeText(context, "Vitaj spat!", Toast.LENGTH_LONG).show()
                                         onLoginClick()
                                     }
 
                                     val onFailure: () -> Unit = {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(
-                                                message = "Nespravny login alebo heslo",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
+//                                        scope.launch {
+//                                            snackbarHostState.showSnackbar(
+//                                                message = "Nespravny login alebo heslo",
+//                                                duration = SnackbarDuration.Short
+//                                            )
+//                                        }
+                                        Toast.makeText(context, "Nespravny login alebo heslo", Toast.LENGTH_LONG).show()
+                                        //TODO 01 odstran tym padom ostatne Scaffoldy ktore si vytvaral kvoli zlym Snackbarom
                                         loginViewModel.badLogin.value = true
                                     }
-                                    loginViewModel.login(onSuccess, onFailure)
+                                    firebaseViewModel.login(onSuccess, onFailure, loginViewModel)
                                 }
                             },
                             enabled = !(
