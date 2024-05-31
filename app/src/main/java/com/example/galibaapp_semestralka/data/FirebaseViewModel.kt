@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
 
 class FirebaseViewModel : ViewModel() {
 
@@ -27,7 +28,7 @@ class FirebaseViewModel : ViewModel() {
 
 
     fun checkForActiveUser() {
-        isUserLoggedIn.value = FirebaseAuth.getInstance().currentUser != null
+        isUserLoggedIn.value = firebaseAuth.currentUser != null
         if (isUserLoggedIn.value == true) {
             getUserData()
         }
@@ -126,12 +127,12 @@ class FirebaseViewModel : ViewModel() {
         firebaseAuth.addAuthStateListener(authStateListener)
     }
 
-    fun updateData(onSuccess: () -> Unit, onFailure: () -> Unit, username: String?, bio: String?, isArtist: Boolean?) {
+    fun updateData(onSuccess: () -> Unit, onFailure: () -> Unit, newUsername: String?, newBio: String?, changedIsArtist: Boolean?) {
 
         firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).set(mapOf(
-            "username" to username,
-            "bio" to bio,
-            "isArtist" to isArtist
+            "username" to newUsername,
+            "bio" to newBio,
+            "isArtist" to changedIsArtist
         ))
             .addOnSuccessListener {
                 Log.d(TAG, "Updated")
@@ -140,6 +141,24 @@ class FirebaseViewModel : ViewModel() {
             .addOnFailureListener {
                 Log.d(TAG, "Failure ")
 
+                onFailure()
+            }
+
+    }
+
+    fun createEvent(onSuccess: () -> Unit, onFailure: () -> Unit, nazovAkcie:String, miestoAkcie:String, datumAkcie: LocalDate, popisakcie:String) {
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("event").add(mapOf(
+            "eventName" to nazovAkcie,
+            "location" to miestoAkcie,
+            "date" to datumAkcie,
+            "eventDetails" to popisakcie
+        ))
+            .addOnSuccessListener {
+                Log.d(TAG, "Event created")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.d(TAG, "Event failure")
                 onFailure()
             }
 

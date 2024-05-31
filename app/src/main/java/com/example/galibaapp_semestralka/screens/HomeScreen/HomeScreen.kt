@@ -4,7 +4,9 @@ package com.example.galibaapp_semestralka.screens.HomeScreen
 
 //import com.example.galibaapp_semestralka.navigation.listOfNavItems
 import android.annotation.SuppressLint
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -378,6 +380,7 @@ fun HomeScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreenNavigation(
@@ -558,7 +561,7 @@ fun HomeScreenNavigation(
                     //tuto pozor aby sa to vymazalo z backstacku...
                 }
                 composable(route = Screens.CREATE_EVENT.name) {
-                    CreateEvent(navController)
+                    CreateEvent(navController, firebaseViewModel = firebaseViewModel)
                     //aj toto
                 }
                 composable(route = Screens.EDIT_EVENT.name) {

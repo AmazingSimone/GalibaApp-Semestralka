@@ -80,6 +80,15 @@ dependencies {
 
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.7")
     implementation ("androidx.compose.ui:ui:1.6.7")
-    implementation ("androidx.navigation:navigation-compose:2.7.7") 
+    implementation ("androidx.navigation:navigation-compose:2.7.7")
+
+    implementation ("com.google.maps.android:maps-compose:2.11.1")
+    implementation ("com.google.android.gms:play-services-maps:18.2.0")
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+
+
+    // Material 3 CALENDAR by github.com/maxkeppeler
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.2.1")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.2.1")
 
 }

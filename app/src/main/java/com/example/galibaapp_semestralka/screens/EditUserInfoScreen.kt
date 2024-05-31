@@ -164,7 +164,7 @@ fun EditUserInfoScreen(
 
             var userBioChanged = remember { mutableStateOf(bio) }
 
-            val maxCharBio = 300
+            val maxCharBio = 150
             OutlinedTextField(
                 modifier = Modifier
                     .focusRequester(userBioFocusRequester)
@@ -176,7 +176,8 @@ fun EditUserInfoScreen(
                     }
                 },
                 label = { Text("Bio") },
-                minLines = 10,
+                minLines = 5,
+                maxLines = 5,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
