@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,10 +24,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -76,9 +77,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -89,7 +96,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.navigation.Start
@@ -102,6 +108,7 @@ import com.example.galibaapp_semestralka.screens.UserScreen
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
@@ -115,6 +122,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getUserData()
+        //firebaseViewModel.getAllEventsCreated()
     }
 
 
@@ -265,27 +273,81 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Column(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .verticalScroll(rememberScrollState())
-                    ) {
+//                    Column(
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(20.dp))
+//                            .verticalScroll(rememberScrollState())
+//                    ) {
+//
+//                        //Spacer(modifier = Modifier.height(15.dp))
+//
+//                        CustomCard(
+//                            firebaseViewModel,
+//                            navController,
+//                            image = R.drawable.backtooldschoolposter,
+//                            title = "Back To Oldschool",
+//                            location = "Klub 77",
+//                            city = "Banska Bystrica",
+//                            cityPrefix = "BB",
+//                            date = "6.5.2023",
+//                            time = "19:00",
+//                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
+//                                    ".\n" +
+//                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
+//                            author = "Back On Label",
+//                            profilePic = R.drawable.backonlabelpfp
+//                        )
+//
+//                        CustomCard(
+//                            firebaseViewModel,
+//                            navController,
+//                            image = R.drawable.backtooldschoolposter,
+//                            title = "Back To Oldschool",
+//                            location = "Klub 77",
+//                            city = "Banska Bystrica",
+//                            cityPrefix = "BB",
+//                            date = "6.5.2023",
+//                            time = "19:00",
+//                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
+//                                    ".\n" +
+//                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
+//                            author = "Back On Label",
+//                            profilePic = R.drawable.backonlabelpfp
+//                        )
+//                    }
 
-                        Spacer(modifier = Modifier.height(15.dp))
 
-                        CustomCard(
-                            navController,
-                            image = R.drawable.backtooldschoolposter,
-                            title = "Back To Oldschool",
-                            location = "Klub 77, Banska Bystrica",
-                            date = "6.5.2023",
-                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
-                                    ".\n" +
-                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
-                            autor = "Back On Label",
-                            profilePic = R.drawable.backonlabelpfp
-                        )
-                    }
+
+                    // FIREBASE ///
+
+
+//                    val eventList = firebaseViewModel.allEvents
+//                    Log.d("Firebaseviewmodel", "${eventList.size}")
+//                    Column(
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(20.dp))
+//                    ) {
+//
+//                        for (event in eventList) {
+//                            CustomCard(
+//                                firebaseViewModel = firebaseViewModel,
+//                                navController = navController,
+//                                image = R.drawable.backonlabelpfp,
+//                                title = event?.nazov.toString(),
+//                                location = event?.miesto.toString(),
+//                                city = event?.mesto?.nazov.toString(),
+//                                cityPrefix = event?.mesto?.skratka.toString(),
+//                                date = event?.datumACas?.toLocalDate()?.format(DateTimeFormatter.ofPattern("d MMM")) .toString(),
+//                                time = event?.datumACas?.toLocalTime().toString(),
+//                                text = event?.popis.toString(),
+//                                author = firebaseViewModel.username.value.toString(),
+//                                profilePic = R.drawable.backonlabelpfp
+//                            )
+//                        }
+//                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+
+
                     //}
                     //}
                     //}
@@ -293,90 +355,15 @@ fun HomeScreen(
                 //}
 
             },
-                                            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                                    //TODO 0
-                            // OBRAZOVKY HOME SCREEN A FOLLOW SCREEN SU LEN PREKRYTE SPODNYN MAVIGACNYM BAROM NEDA SA DOSTAT NA UPLNY KONIEC LISTU
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //TODO 0
+            // OBRAZOVKY HOME SCREEN A FOLLOW SCREEN SU LEN PREKRYTE SPODNYN MAVIGACNYM BAROM NEDA SA DOSTAT NA UPLNY KONIEC LISTU
 
-                                            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-//                bottomBar = {
-//                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-//                    val currentRouteDestination = navBackStackEntry?.destination
-//                    //val selected: String = Screens.HOME.name
-//
-//                    //if (navBackStackEntry?.destination?.route == Screens.HOME.name || navBackStackEntry?.destination?.route == Screens.FOLLOW.name) {
-//
-//                        NavigationBar {
-//
-//                            listOfNavItems.forEach { navItem ->
-//                                NavigationBarItem(
-//                                    //colors = NavigationBarItemDefaults.colors(),
-//                                    selected = currentRouteDestination?.hierarchy?.any { it.route == navItem.route } == true,
-//                                    onClick = {
-//                                        navController.navigate(navItem.route) {
-//                                            popUpTo(navController.graph.findStartDestination().id) {
-//                                                saveState = true
-//                                            }
-//                                            launchSingleTop = true
-//                                            restoreState = true
-//                                        }
-//                                    },
-//                                    icon = {
-//                                        Icon(
-//                                            imageVector = navItem.icon,
-//                                            contentDescription = null
-//                                        )
-//                                    },
-//                                    label = { Text(text = navItem.label) }
-//                                )
-//                            }
-//                        }
-//                    //}
-//                }
         ) {}
-        //            { paddingValues ->
-//                NavHost(
-//                    navController = navController as NavHostController,
-//                    startDestination = Screens.HOME.name,
-//                    route = "home-navigation",
-//                    modifier = Modifier.padding(paddingValues)
-//                ) {
-//                    composable(route = Screens.HOME.name) {
-//
-//                        HomeScreen(navController, drawerState,homeViewModel)
-//                    }
-//
-//                    composable(route = Screens.FOLLOW.name) {
-//                        FollowScreen(navController)
-//                    }
-//
-//                    composable(route = Screens.LOGIN.name) {
-//                        Start()
-//                    }
-//
-//                    composable(route = Screens.PERSONAL_USER_PROFILE.name) {
-//                        UserScreen(navController)
-//                    }
-//                    composable(route = Screens.EDIT_USER_PROFILE.name) {
-//                        EditUserInfoScreen(navController)
-//                    }
-//                    composable(route = Screens.USER_PROFILE.name) {
-//                        ProfileInspectScreen(navController, "9")
-//                    }
-//                    composable(route = Screens.CREATE_EVENT.name) {
-//                        CreateEvent(navController)
-//                    }
-//                    composable(route = Screens.EDIT_EVENT.name) {
-//                        EditEvent(navController)
-//                    }
-//                }
-        //         }
 
-
-        //}
     }
 }
 
@@ -557,7 +544,7 @@ fun HomeScreenNavigation(
                     Start()
                 }
                 composable(route = Screens.USER_PROFILE.name) {
-                    ProfileInspectScreen(navController, "9")
+                    ProfileInspectScreen(firebaseViewModel, navController, "9")
                     //tuto pozor aby sa to vymazalo z backstacku...
                 }
                 composable(route = Screens.CREATE_EVENT.name) {
@@ -576,7 +563,7 @@ fun HomeScreenNavigation(
                         UserScreen(navController, firebaseViewModel = firebaseViewModel)
                     }
                     composable(route = Screens.EDIT_USER_PROFILE.name) {
-                        EditUserInfoScreen(navController,firebaseViewModel)
+                        EditUserInfoScreen(navController, firebaseViewModel)
                         // A AJ TOTO
                     }
                 }
@@ -588,24 +575,35 @@ fun HomeScreenNavigation(
 @Composable
 fun CustomCard(
     //modifier: Modifier = Modifier,
+    firebaseViewModel: FirebaseViewModel,
     navController: NavController,
     @DrawableRes image: Int,
     title: String?,
     location: String,
+    city: String,
+    cityPrefix: String,
     date: String,
+    time: String,
     text: String,
-    autor: String,
+    author: String,
     @DrawableRes profilePic: Int
 ) {
     var showFullContent by remember {
         mutableStateOf(false)
     }
+    if (text.length < 50) {
+        showFullContent = true
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+
     Card(
         //colors = CardDefaults.cardColors(surfaceContainerLowLight),
         modifier = Modifier
             .animateContentSize()
             .clickable {
-                showFullContent = !showFullContent
+                if (text.length >= 50) {
+                    showFullContent = !showFullContent
+                }
             },
         shape = RoundedCornerShape(16.dp),
         //colors = MaterialTheme.colorScheme.backgroundz,
@@ -619,118 +617,157 @@ fun CustomCard(
 
                 modifier = Modifier.fillMaxSize(),
             ) {
-                Surface(
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.wrapContentSize(),
-                ) {
+//                Surface(
+//                    shape = RoundedCornerShape(24.dp),
+//                    modifier = Modifier.wrapContentSize(),
+//                ) {
+//
+//                }
+                Box {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                        //horizontalArrangement = Arrangement.SpaceEvenly
 
-                }
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                    //horizontalArrangement = Arrangement.SpaceEvenly
-
-                )
-                {
-
-
-                    Column(
-                        modifier = Modifier
-                            .width(200.dp)
-                            .padding(end = 10.dp)
-                    ) {
-                        Text(
-                            text = title.toString(),
-                            //fontSize = 24.sp,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Text(
-                            text = location,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Text(
-                            text = date,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-
-                            text = text,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = if (showFullContent) 100 else 2
-                        )
-                    }
-
-
-
-                    Surface(
-
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.size(width = 100.dp, height = 140.dp)
-                    ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = painterResource(id = image),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = null
-                        )
-                    }
-
-
-                }
-
-
-
-
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                if (!showFullContent) {
-                    Text(
-                        text = "Read More",
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.titleLarge
                     )
-                } else {
-                    Column {
+                    {
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            OutlinedButton(
-                                modifier = Modifier.padding(end = 10.dp),
-                                onClick = { /*TODO*/ },
-                                //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+                        Column(
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(end = 10.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                        shape = RoundedCornerShape(50)
+                                    )
+                                    .padding(horizontal = 7.dp, vertical = 4.dp)
                             ) {
-                                Text("Mam zaujem")
+                                Text(
+                                    text = ("#$cityPrefix"),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                            Text(
+                                text = title.toString(),
+                                //fontSize = 24.sp,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Row (
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                ClickableLink(
+                                    text = location,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+
+                                Text(
+                                    text = ", $city",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Text(
+                                text = date,
+                                style = MaterialTheme.typography.headlineSmall
+                                //fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(2.dp))
+
+                            Text(
+                                text = "Dvere: $time",
+                                style = MaterialTheme.typography.bodyMedium
+                                //fontWeight = FontWeight.Bold
+                            )
+
+                        }
+
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.size(width = 100.dp, height = 140.dp)
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                painter = painterResource(id = image),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null
+                            )
+                        }
+
+                    }
+                }
+
+
+                //Spacer(modifier = Modifier.height(10.dp))
+                Column {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+
+                        text = text,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = if (showFullContent) 100 else 3
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+
+                    if (!showFullContent) {
+                        Text(
+                            text = "Citat viac",
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    } else {
+
+
+                        if (firebaseViewModel.username.value != author) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                OutlinedButton(
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    onClick = { /*TODO*/ },
+                                    //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+                                ) {
+                                    Text("Mam zaujem")
+                                }
+                                Button(
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    onClick = { /*TODO*/ },
+                                    //colors = ButtonDefaults.buttonColors(primaryLight)
+                                ) {
+                                    Text(text = "Pridem")
+                                }
+                            }
+                        } else {
                             Button(
-                                modifier = Modifier.padding(end = 10.dp),
-                                onClick = { /*TODO*/ },
+                                onClick = {
+                                    navController.navigate(Screens.EDIT_EVENT.name) {
+                                        launchSingleTop = true
+                                    }
+                                },
                                 //colors = ButtonDefaults.buttonColors(primaryLight)
                             ) {
-                                Text(text = "Pridem")
+                                Text(
+                                    text = "Upravit",
+                                    //fontSize = MaterialTheme.typography.bodySmall.fontSize
+                                )
                             }
-                        }
-                        Button(
-                            onClick = {
-                                navController.navigate(Screens.EDIT_EVENT.name) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            //colors = ButtonDefaults.buttonColors(primaryLight)
-                        ) {
-                            Text(
-                                text = "Upravit",
-                                //fontSize = MaterialTheme.typography.bodySmall.fontSize
-                            )
                         }
                     }
                 }
@@ -756,11 +793,13 @@ fun CustomCard(
                         contentScale = ContentScale.Crop,
                         contentDescription = null
                     )
+
+
                     Text(
-                        modifier = Modifier.padding(start = 5.dp),
-                        text = autor,
-                        fontSize = MaterialTheme.typography.labelLarge.fontSize,
-                        //fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 6.dp),
+                        text = "@$author",
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
@@ -769,6 +808,38 @@ fun CustomCard(
     }
 }
 
+@Composable
+fun ClickableLink(text: String, style: TextStyle = TextStyle.Default,
+                  color: Color = TextStyle.Default.color,
+                  fontSize: TextUnit = TextUnit.Unspecified,
+                  fontWeight: FontWeight? = null) {
+    val formattedText = text.replace(" ", "+")
+    val url = "http://maps.google.com/?q=$formattedText"
+
+    val annotatedString = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = color, fontSize = fontSize, fontWeight = fontWeight)) {
+            append(text)
+        }
+        addStringAnnotation(
+            tag = "URL",
+            annotation = url,
+            start = 0,
+            end = text.length
+        )
+    }
+
+    val uriHandler = LocalUriHandler.current
+
+    ClickableText(
+        text = annotatedString,
+        onClick = { offset ->
+            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                .firstOrNull()?.let { annotation ->
+                    uriHandler.openUri(annotation.item)
+                }
+        }
+    )
+}
 
 //@Preview
 //@Composable
