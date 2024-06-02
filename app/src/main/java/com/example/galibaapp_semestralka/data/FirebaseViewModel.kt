@@ -1,11 +1,14 @@
 package com.example.galibaapp_semestralka.data
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.galibaapp_semestralka.screens.Event
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class FirebaseViewModel : ViewModel() {
 
@@ -146,11 +149,12 @@ class FirebaseViewModel : ViewModel() {
 
     }
 
-    fun createEvent(onSuccess: () -> Unit, onFailure: () -> Unit, nazovAkcie:String, miestoAkcie:String, datumAkcie: LocalDate, popisakcie:String) {
-        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("event").add(mapOf(
+    fun createEvent(onSuccess: () -> Unit, onFailure: () -> Unit, nazovAkcie:String, miestoAkcie:String, datumACasAkcie: LocalDateTime?, mesto: Mesto?, popisakcie:String) {
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("events").add(mapOf(
             "eventName" to nazovAkcie,
             "location" to miestoAkcie,
-            "date" to datumAkcie,
+            "dateAndTime" to datumACasAkcie,
+            "city" to mesto,
             "eventDetails" to popisakcie
         ))
             .addOnSuccessListener {
@@ -164,4 +168,20 @@ class FirebaseViewModel : ViewModel() {
 
     }
 
+    fun getMyMyCreatedEvents(): SnapshotStateList<Event?> {
+        var events = mutableStateListOf<Event?>()
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("events").get().addOnSuccessListener {
+            if(!it.isEmpty) {
+                val list = it.documents
+                for (document in list) {
+                    val event : Event? = document.toObject(Event::class.java)
+                    events.add(event)
+                }
+            }
+        }.addOnFailureListener {
+
+        }
+        return events
+    }
 }

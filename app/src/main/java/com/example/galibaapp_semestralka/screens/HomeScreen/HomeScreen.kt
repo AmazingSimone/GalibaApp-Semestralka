@@ -590,7 +590,7 @@ fun CustomCard(
     //modifier: Modifier = Modifier,
     navController: NavController,
     @DrawableRes image: Int,
-    title: String,
+    title: String?,
     location: String,
     date: String,
     text: String,
@@ -640,7 +640,7 @@ fun CustomCard(
                             .padding(end = 10.dp)
                     ) {
                         Text(
-                            text = title,
+                            text = title.toString(),
                             //fontSize = 24.sp,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold

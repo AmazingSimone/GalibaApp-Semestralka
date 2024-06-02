@@ -1,16 +1,20 @@
 package com.example.galibaapp_semestralka.screens
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
@@ -59,14 +64,23 @@ import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.clock.ClockPopup
+import com.maxkeppeler.sheets.clock.models.ClockSelection
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEventViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
+fun CreateEvent(
+    navController: NavHostController,
+    createEventViewModel: CreateEventViewModel = viewModel(),
+    firebaseViewModel: FirebaseViewModel
+) {
     Surface {
         Column(
             modifier = Modifier
@@ -83,24 +97,28 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
             var datumAkcie by rememberSaveable {
                 mutableStateOf(LocalDate.MIN)
             }
-            var mesto by rememberSaveable { mutableStateOf("") }
 
-            val najdiMesto by createEventViewModel.searchText.collectAsState()
+            var casAkcie: LocalTime? by rememberSaveable { mutableStateOf(null) }
+
+
+            var datumACasAkcie: LocalDateTime? by rememberSaveable { mutableStateOf(null) }
+
+            val selectedMesto by createEventViewModel.selectedMesto.collectAsState()
+
+            val searchText by createEventViewModel.searchText.collectAsState()
 
             val mesta by createEventViewModel.mesta.collectAsState()
-
-            val isSearching by createEventViewModel.isSearching.collectAsState()
 
             var miestoAkcie by rememberSaveable { mutableStateOf("") }
 
             var popisAkcie by rememberSaveable { mutableStateOf("") }
 
 
-
-
             var showDialogCancelCreate by remember { mutableStateOf(false) }
 
             val calendarState = rememberUseCaseState()
+
+            val clockState = rememberUseCaseState()
 
 
             if (showDialogCancelCreate) {
@@ -157,7 +175,7 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
             }
 
 
-            val (eventNameFocusRequester, eventDateFocusRequester,eventCityFocusRequester, eventPlaceFocusRequester, eventBioFocusRequester) = remember { FocusRequester.createRefs() }
+            val (eventNameFocusRequester, eventDateFocusRequester, eventCityFocusRequester, eventPlaceFocusRequester, eventBioFocusRequester) = remember { FocusRequester.createRefs() }
 
             OutlinedTextField(
                 modifier = Modifier
@@ -171,7 +189,7 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = { eventDateFocusRequester.requestFocus() }
+                    onNext = { eventCityFocusRequester.requestFocus() }
                 )
             )
 
@@ -209,7 +227,6 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
                         )
                     }
                 },
-
                 placeholder = { Text("Datum akcie") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -219,30 +236,101 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
                     onNext = { eventCityFocusRequester.requestFocus() }
                 )
             )
-            Column {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .focusRequester(eventCityFocusRequester)
-                        .fillMaxWidth(),
-                    value = najdiMesto,
-                    onValueChange = createEventViewModel::onSearchTextChange,
-                    label = { Text("Najdi mesto") },
-                    placeholder = { Text("Najdi mesto") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { eventPlaceFocusRequester.requestFocus() }
-                    )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+
+            ClockPopup(state = clockState, selection = ClockSelection.HoursMinutes{
+                hours, minutes ->
+
+                //datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
+                //Log.d("CasAkcie" , "stary cas $casAkcie")
+                //Log.d("CasAkcie" , "stary datum a cas $datumACasAkcie")
+                casAkcie = LocalTime.of(hours, minutes)
+
+
+                datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
+                //datumACasAkcie?.format(DateTimeFormatter.ofPattern("DD/MM/uuuu HH:mm",Locale("sk")))
+                Log.d("CasAkcie" , "novy cas $casAkcie")
+                Log.d("CasAkcie" , "datum a cas $datumACasAkcie")
+            })
+
+
+            OutlinedTextField(
+                modifier = Modifier
+                //    .focusRequester(eventDateFocusRequester)
+                    .fillMaxWidth(),
+                value = if (casAkcie != null) casAkcie.toString() else "",
+                onValueChange = {},
+                readOnly = true,
+                leadingIcon = {
+                    IconButton(onClick = { clockState.show() }) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = "time icon"
+                        )
+                    }
+                },
+                placeholder = { Text("Zaciatok akcie") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { eventCityFocusRequester.requestFocus() }
                 )
-                LazyColumn() {
-                    items(mesta) { mesto ->
-                        Text(text = mesto.nazov)
+            )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(createEventViewModel.dynamicSize.value)
+                    .focusRequester(eventCityFocusRequester)
+
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                    //.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        value = searchText,
+                        singleLine = true,
+                        onValueChange = createEventViewModel::onSearchTextChange,
+                        label = {
+                            Text(text = "Vyhladaj mesto")
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { eventPlaceFocusRequester.requestFocus() }
+                        )
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        items(mesta) { mesto ->
+                            Text(
+                                mesto.nazov,
+                                modifier = Modifier
+                                    .padding(6.dp)
+                                    .clickable {
+                                        createEventViewModel.chooseMesto(mesto)
+                                    }
+                            )
+                        }
                     }
                 }
             }
-
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
@@ -252,7 +340,7 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
                     .fillMaxWidth(),
                 value = miestoAkcie,
                 onValueChange = { miestoAkcie = it },
-                label = { Text("Miesto akcie") },
+                label = { Text("Adresa") },
                 placeholder = { Text("Nazov klubu alebo adresa") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -303,7 +391,8 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = { localFocusManager.clearFocus() }
-                )
+                ),
+                isError = popisAkcie.length == maxCharPopis
             )
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
@@ -323,13 +412,26 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
 
                                 val onSuccess = {
                                     navController.popBackStack()
-                                    Toast.makeText(context, "Galiba bola vytvorena !", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Galiba bola vytvorena !",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
 
                                 val onFailure: () -> Unit = {
-                                    Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG)
+                                        .show()
                                 }
-                                firebaseViewModel.createEvent(onSuccess, onFailure, nazovAkcie, miestoAkcie,datumAkcie,popisAkcie)
+                                firebaseViewModel.createEvent(
+                                    onSuccess,
+                                    onFailure,
+                                    nazovAkcie,
+                                    miestoAkcie,
+                                    datumACasAkcie,
+                                    selectedMesto,
+                                    popisAkcie
+                                )
 
                             }
                         ) {
@@ -351,13 +453,18 @@ fun CreateEvent(navController: NavHostController, createEventViewModel: CreateEv
 
             Button(
                 onClick = {
+                    if (casAkcie == null) {
+//                        casAkcie = LocalTime.of(19, 0)
+                        datumACasAkcie = LocalDateTime.of(datumAkcie,LocalTime.of(19, 0))
+                    }
                     showDialogConfirmCreate = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = nazovAkcie.isNotEmpty() && datumAkcie != LocalDate.MIN && miestoAkcie.isNotEmpty()
+                enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(LocalDate.now()) || datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
             ) {
                 Text(text = "Vytvorit galibu")
             }
+
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,9 +46,20 @@ import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.LoginViewModel
+import com.example.galibaapp_semestralka.data.Mesto
 import com.example.galibaapp_semestralka.navigation.Screens
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
+data class Event(
+    var nazovAkcie: String?,
+    var miestoAkcie: String?,
+    var datumACasAkcie: LocalDateTime?,
+    var mesto: Mesto?,
+    var popisakcie: String?
+)
+
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserScreen(
@@ -73,6 +86,7 @@ fun UserScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(all = 10.dp),
+                        //.verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -135,6 +149,25 @@ fun UserScreen(
                     )
 
                 }
+
+               // val eventList : SnapshotStateList<Event?> = firebaseViewModel.getMyMyCreatedEvents() <--- TOTO ZLE
+
+//                LazyColumn {
+//                    itemsIndexed(eventList) {
+//                        index, item ->
+//                        CustomCard(
+//                            navController = navController,
+//                            image = R.drawable.backonlabelpfp,
+//                            title = item?.nazovAkcie.toString(),
+//                            location = item?.miestoAkcie.toString(),
+//                            date = item?.datumACasAkcie?.toLocalDate().toString(),
+//                            text = item?.popisakcie.toString(),
+//                            autor = firebaseViewModel.username.toString(),
+//                            profilePic = R.drawable.backonlabelpfp
+//                        )
+//                    }
+//                }
+
 
                 Column (
                     modifier = Modifier
