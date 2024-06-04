@@ -129,6 +129,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
         firebaseViewModel.getAllEventsCreated()
+        firebaseViewModel.getMyFollowingList()
         //firebaseViewModel.getAllEventsCreated(byCity = firebaseViewModel.chosenCity)
     }
 
@@ -280,8 +281,6 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val eventList = firebaseViewModel.allEvents
-
-                    Log.d("userEvents","posledny event : ${eventList.size}")
 
 
                     Column(
@@ -526,7 +525,7 @@ fun HomeScreenNavigation(
                     )
                 }
                 composable(route = Screens.FOLLOW.name) {
-                    FollowScreen(navController = navController)
+                    FollowScreen(navController = navController,firebaseViewModel)
                 }
                 composable(route = Screens.AUTHROOT.name) {
                     Start()
@@ -822,10 +821,10 @@ fun CustomCard(
 
                     var username by remember { mutableStateOf("") }
 
-                    var firebaseUserReply = firebaseViewModel.getUserName(
+                    firebaseViewModel.getUserData(
                         usedId = event?.userId.toString(),
-                        onSuccess = { fetchedUsername ->
-                            username = fetchedUsername
+                        onSuccess = {
+                            username = it.username.toString()
                         },
                         onFailure = {
 

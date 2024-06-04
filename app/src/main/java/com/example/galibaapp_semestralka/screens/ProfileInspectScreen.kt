@@ -2,7 +2,6 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -34,6 +33,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,17 +59,16 @@ fun ProfileInspectScreen(
 ) {
     val chosenUser = firebaseViewModel.chosenUser
 
+    val isFollowing by firebaseViewModel.isFollowing.observeAsState()
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getAllEventsCreated(byUserId = chosenUser.value?.userId.toString())
-
+        firebaseViewModel.isFollowing(chosenUser.value?.userId.toString())
     }
 
     Surface {
 
-       // Scaffold (
-           // snackbarHost = {SnackbarHost(snackbarHostState)},
-           // content = {
+
                 Column (
                     modifier = Modifier
                         .fillMaxSize()
@@ -123,10 +122,7 @@ fun ProfileInspectScreen(
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
-//                    Text(
-//                        text = email ?: "",
-//                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
-//                    )
+
                     Spacer(modifier = Modifier.padding(all = 10.dp))
                     Text(
                         modifier = Modifier.padding(start = 20.dp, end = 20.dp),
@@ -136,30 +132,27 @@ fun ProfileInspectScreen(
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
-                    var isFollowing by remember { mutableStateOf(false) }
+
+
                     var showDialog by remember { mutableStateOf(false) }
 
                     val onFollowSuccess = {
-                        isFollowing = true
+                        firebaseViewModel.isFollowing.value = true
                     }
 
                     val onFollowFailure = {
-                        // Handle failure
                     }
 
                     val onUnfollowSuccess = {
-                        isFollowing = false
+                        firebaseViewModel.isFollowing.value = false
                         showDialog = false
                     }
 
                     val onUnfollowFailure: ()-> Unit = {
-                        Log.d("unfollow","inside confirm fail")
-                        Log.d("unfollow","${chosenUser.value?.userId.toString()}")
-
-
                     }
 
-                    if (isFollowing) {
+                    if (isFollowing == true) {
+
                         Button(
                             onClick = { showDialog = true },
                             modifier = Modifier.fillMaxWidth()
@@ -175,7 +168,6 @@ fun ProfileInspectScreen(
                                 confirmButton = {
                                     TextButton(
                                         onClick = {
-                                            Log.d("unfollow","inside confirm click")
 
                                             firebaseViewModel.unFollow(onUnfollowSuccess, onUnfollowFailure, chosenUser.value?.userId.toString())
 

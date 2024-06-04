@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
@@ -25,9 +26,13 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,14 +42,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 
 
 @Composable
 fun FollowScreen(
-    navController: NavController
+    navController: NavController,
+    firebaseViewModel: FirebaseViewModel
 ) {
-    Surface (
+
+    LaunchedEffect(Unit) {
+
+        firebaseViewModel.getMyFollowingList()
+
+    }
+
+    Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
@@ -52,77 +66,157 @@ fun FollowScreen(
         Column {
 
             Box {
-                Row (
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
 
                 ) {
 
-                        Text(
-                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
-                            text = "Sleduješ",
-                            fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                            //color = MaterialTheme.colorScheme.onSurface
+                    Text(
+                        modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
+                        text = "Sleduješ",
+                        fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                        //color = MaterialTheme.colorScheme.onSurface
+                    )
+                    IconButton(
+                        modifier = Modifier.padding(end = 20.dp),
+                        onClick = { }) {
+
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "search artists",
                         )
-                        IconButton(
-                            modifier = Modifier.padding(end = 20.dp),
-                            onClick = {  }) {
-
-                            Icon(
-
-
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "search artists",
-                            )
-                        }
-
-
+                    }
                 }
             }
+
+            val userList = firebaseViewModel.myFollowedUsers
 
             Box {
 
-                Column (modifier = Modifier
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
 
-                    .verticalScroll(rememberScrollState())){
+                    for (user in userList) {
+                        //Spacer(modifier = Modifier.height(15.dp))
 
-                    CustomListItem(navController,meno = "Back On Label", profilePic = R.drawable.backonlabelpfp)
+                        var username by remember { mutableStateOf("") }
+                        var bio by remember { mutableStateOf("") }
 
+                        firebaseViewModel.getUserData(
+                            usedId = user.toString(),
+                            onSuccess = {
+                                username = it.username.toString()
+                                bio = it.bio.toString()
+                            },
+                            onFailure = {
 
+                            }
+                        )
 
-
+                        CustomListItem(
+                            navController,
+                            firebaseViewModel,
+                            userId = user.toString(),
+                            meno = username,
+                            popis = bio,
+                            profilePic = R.drawable.backonlabelpfp
+                        )
+                    }
                 }
             }
         }
-
     }
-    
-
 }
 
 @Composable
 fun CustomListItem(
     navController: NavController,
+    firebaseViewModel: FirebaseViewModel,
+    userId: String,
     meno: String,
     popis: String = "",
     @DrawableRes
     profilePic: Int
 ) {
     //TODO - spytaj sa jak mam spravit podmienku aby sa tam bud pridal alebo nepridal parameter
-    Box (Modifier.clickable { navController.navigate(Screens.USER_PROFILE.name) }) {
+    Box(Modifier.clickable {
+            val onSuccess = {
+                navController.navigate(Screens.USER_PROFILE.name) {
+                    launchSingleTop = true
+                }
+
+            }
+
+            val onFailure = {
+
+            }
+
+            firebaseViewModel.selectUser(
+                onSuccess,
+                onFailure,
+                userId.toString()
+            )
+
+    }) {
+
+        var showDialog by remember { mutableStateOf(false) }
+        val checkedState = remember { mutableStateOf(true) }
+
+
+        val onUnfollowSuccess = {
+            firebaseViewModel.isFollowing.value = false
+            showDialog = false
+            firebaseViewModel.getMyFollowingList()
+
+        }
+
+        val onUnfollowFailure: ()-> Unit = {
+        }
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(text = "Zrušiť sledovanie") },
+                    text = { Text(text = "Naozaj chcete zrušiť sledovanie tohto používateľa?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                checkedState.value = false
+                                firebaseViewModel.unFollow(onUnfollowSuccess, onUnfollowFailure, userId.toString())
+
+                            }
+                        ) {
+                            Text(text = "Áno")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showDialog = false }
+                        ) {
+                            Text(text = "Nie")
+                        }
+                    }
+                )
+            }
 
         ListItem(
             //colors = ListItemDefaults.colors(surfaceLight),
-            headlineContent = { Text(text =meno )  },
-            supportingContent = { Text(text = popis)  },
-            trailingContent = { val checkedState = remember { mutableStateOf(true) }
+            headlineContent = { Text("@$meno") },
+            supportingContent = { Text(text = popis) },
+            trailingContent = {
+
                 Checkbox(
                     checked = checkedState.value,
-                    onCheckedChange = { checkedState.value = it },
-                    //colors = CheckboxDefaults.colors(primaryLight)
+                    onCheckedChange = {
+                        //checkedState.value = it
+                        showDialog = true
+                                      },
 
-                ) },
+                )
+            },
 
             leadingContent = {
                 Image(

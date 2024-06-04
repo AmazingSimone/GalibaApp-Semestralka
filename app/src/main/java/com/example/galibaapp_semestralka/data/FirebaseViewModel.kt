@@ -30,7 +30,9 @@ class FirebaseViewModel : ViewModel() {
 
     var chosenUser: MutableLiveData<User?> = MutableLiveData()
 
-    var users = mutableStateListOf<User?>()
+    val isFollowing: MutableLiveData<Boolean> = MutableLiveData()
+
+    var myFollowedUsers = mutableStateListOf<String?>()
 
     //var chosenCity = mutableStateListOf<Mesto?>()
 
@@ -73,25 +75,43 @@ class FirebaseViewModel : ViewModel() {
                         bio.value = document.getString("bio")
                         isArtist.value = document.getBoolean("isArtist")
                         Log.d(TAG, "Username: ${username.value}")
-
                     }
                 }
             }
+
+
     }
 
-    fun getUserName(
-        onSuccess: (String) -> Unit,
+//    fun getUserName(
+//        onSuccess: (String) -> Unit,
+//        onFailure: () -> Unit,
+//        usedId: String
+//    ): String {
+//        var username: String = ""
+//        firebaseFirestore.collection("users").document(usedId).get().addOnSuccessListener {
+//            username = it.get("username").toString()
+//            onSuccess(username)
+//        }.addOnFailureListener {
+//            onFailure()
+//        }
+//        return username
+//    }
+
+    fun getUserData(
+        onSuccess: (User) -> Unit,
         onFailure: () -> Unit,
         usedId: String
-    ): String {
-        var username: String = ""
+    ): User {
+        val user: User = User()
         firebaseFirestore.collection("users").document(usedId).get().addOnSuccessListener {
-            username = it.get("username").toString()
-            onSuccess(username)
+            user.username = it.get("username").toString()
+            user.isArtist = it.get("isArtist") as Boolean?
+            user.bio = it.get("bio").toString()
+            onSuccess(user)
         }.addOnFailureListener {
             onFailure()
         }
-        return username
+        return user
     }
 
     fun signUp(onSuccess: () -> Unit, onFailure: () -> Unit, registerViewModel: RegisterViewModel) {
@@ -231,7 +251,6 @@ class FirebaseViewModel : ViewModel() {
             }
 
     }
-
 
 
     fun createEvent(
@@ -399,8 +418,7 @@ class FirebaseViewModel : ViewModel() {
 //            } ?: run {
 //                Log.e("firebaseviewmodel", "User is not logged in.")
             //}
-        }
-        else if (byUserId.isEmpty() && byCity != null) {
+        } else if (byUserId.isEmpty() && byCity != null) {
 
             val currentCityEvents = mutableStateListOf<Event?>()
             val city = HashMap<String, String>()
@@ -459,8 +477,7 @@ class FirebaseViewModel : ViewModel() {
                     }
                 }
 
-        }
-        else {
+        } else {
             val currentEvents = mutableStateListOf<Event?>()
 
             firebaseFirestore.collection("events").get().addOnSuccessListener {
@@ -514,7 +531,7 @@ class FirebaseViewModel : ViewModel() {
                     allEvents = currentEvents
                 } else {
                     allEvents.clear()
-                    Log.d("userEvents","inside else clear ${userEvents.size}")
+                    Log.d("userEvents", "inside else clear ${userEvents.size}")
                 }
             }
         }
@@ -600,7 +617,7 @@ class FirebaseViewModel : ViewModel() {
         location: String?
     ) {
         //Log.d("firebaseviewmodel", "event id : ${eventId.toString()}")
-        Log.d("mestoAkcie" ," v update fun ${city.toString()}")
+        Log.d("mestoAkcie", " v update fun ${city.toString()}")
 
         firebaseFirestore.collection("events").document(eventId.toString())
             .update(
@@ -648,14 +665,19 @@ class FirebaseViewModel : ViewModel() {
         followedUserId: String
     ) {
 
-        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("following").add(
-            mapOf("followedUserId" to followedUserId)
-        ).addOnSuccessListener {
-            onSuccess()
-        }.addOnFailureListener {
-            onFailure()
-        }
-
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+            .collection("followedUsers").document(followedUserId)
+            .set(
+                mapOf(
+                    "userRef" to firebaseFirestore.collection("users").document(followedUserId)
+                )
+            )
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 
     fun unFollow(
@@ -663,14 +685,49 @@ class FirebaseViewModel : ViewModel() {
         onUnfollowFailure: () -> Unit,
         followedUserId: String
     ) {
-        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("following")
-            .document(followedUserId.toString()).delete().addOnFailureListener {
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+            .collection("followedUsers")
+            .document(followedUserId.toString()).delete().addOnSuccessListener {
                 onUnfollowSuccess()
             }.addOnFailureListener {
-                Log.d("unfollow" ,"fail : $it")
                 onUnfollowFailure()
 
             }
+    }
+
+    fun isFollowing(
+        followedUserId: String
+    ) {
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+            .collection("followedUsers").document(followedUserId).get()
+            .addOnSuccessListener {
+                isFollowing.value = it.exists()
+            }
+            .addOnFailureListener {
+                isFollowing.value = false
+            }
+    }
+
+    fun getMyFollowingList() {
+        val currentFollowedUsers = mutableStateListOf<String?>()
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+            .collection("followedUsers").get().addOnSuccessListener {
+            if (!it.isEmpty) {
+                val list = it.documents
+                for (document in list) {
+
+                    val event = document.id.toString()
+
+                    currentFollowedUsers.add(event)
+                }
+
+                myFollowedUsers = currentFollowedUsers
+            } else {
+                myFollowedUsers.clear()
+            }
+        }
     }
 
 }
