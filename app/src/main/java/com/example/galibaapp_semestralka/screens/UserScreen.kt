@@ -53,7 +53,6 @@ import com.example.galibaapp_semestralka.data.LoginViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -73,8 +72,9 @@ fun UserScreen(
     //val eventList = firebaseViewModel.events
 
     LaunchedEffect(Unit) {
-        firebaseViewModel.getUserData()
-        firebaseViewModel.getMyMyCreatedEvents()
+        firebaseViewModel.getCurrentUserData()
+        //firebaseViewModel.getMyCreatedEvents()
+        firebaseViewModel.getAllEventsCreated(byUserId = firebaseViewModel.currentUserId.value.toString())
     }
 
     Surface {
@@ -178,7 +178,7 @@ fun UserScreen(
 
 
 
-                    val eventList = firebaseViewModel.myEvents
+                    val eventList = firebaseViewModel.userEvents
 //                    Column (modifier = Modifier.padding(20.dp)) {
 //                        for (event in eventList) {
 //                            CustomCard(
@@ -219,14 +219,7 @@ fun UserScreen(
                                 firebaseViewModel = firebaseViewModel,
                                 navController = navController,
                                 image = R.drawable.backonlabelpfp,
-                                title = event?.nazov.toString(),
-                                location = event?.miesto.toString(),
-                                city = event?.mesto?.nazov.toString(),
-                                cityPrefix = event?.mesto?.skratka.toString(),
-                                date = event?.datumACas?.toLocalDate()?.format(DateTimeFormatter.ofPattern("d MMM")) .toString(),
-                                time = event?.datumACas?.toLocalTime().toString(),
-                                text = event?.popis.toString(),
-                                author = firebaseViewModel.username.value.toString(),
+                                event = event,
                                 profilePic = R.drawable.backonlabelpfp
                             )
                         }

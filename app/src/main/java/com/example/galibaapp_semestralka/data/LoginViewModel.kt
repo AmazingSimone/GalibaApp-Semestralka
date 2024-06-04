@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.galibaapp_semestralka.data.constrains.Validator
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 class LoginViewModel : ViewModel() {
 
@@ -61,41 +59,41 @@ class LoginViewModel : ViewModel() {
         return emailResult.status || passwordResult.status
     }
 
-    fun login(onSuccess: () -> Unit, onFailure: () -> Unit) {
-        Log.d(TAG, "Inside_login()")
-        Log.d(TAG, loginUIState.value.toString())
-        loginInProgress.value = true
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(loginUIState.value.email,loginUIState.value.password).addOnCompleteListener {
-            Log.d(TAG, "${it.isSuccessful}")
-            if (it.isSuccessful) {
-                loginInProgress.value = false
-                onSuccess()
-            }
-        }.addOnFailureListener{
-            Log.d(TAG, "login fail")
-            loginInProgress.value = false
-            onFailure()
-        }
-
-    }
-
-    fun logout(onSuccess: () -> Unit, onFailure: () -> Unit) {
-        val firebaseAuth = FirebaseAuth.getInstance()
-
-        firebaseAuth.signOut()
-
-        val authStateListener = AuthStateListener {
-            if (it.currentUser == null) {
-                Log.d(TAG, "Signed out ")
-                onSuccess()
-            } else {
-                Log.d(TAG, "Signed out failed")
-                onFailure()
-            }
-        }
-
-        firebaseAuth.addAuthStateListener(authStateListener)
-    }
+//    fun login(onSuccess: () -> Unit, onFailure: () -> Unit) {
+//        Log.d(TAG, "Inside_login()")
+//        Log.d(TAG, loginUIState.value.toString())
+//        loginInProgress.value = true
+//        FirebaseAuth.getInstance().signInWithEmailAndPassword(loginUIState.value.email,loginUIState.value.password).addOnCompleteListener {
+//            Log.d(TAG, "${it.isSuccessful}")
+//            if (it.isSuccessful) {
+//                loginInProgress.value = false
+//                onSuccess()
+//            }
+//        }.addOnFailureListener{
+//            Log.d(TAG, "login fail")
+//            loginInProgress.value = false
+//            onFailure()
+//        }
+//
+//    }
+//
+//    fun logout(onSuccess: () -> Unit, onFailure: () -> Unit) {
+//        val firebaseAuth = FirebaseAuth.getInstance()
+//
+//        firebaseAuth.signOut()
+//
+//        val authStateListener = AuthStateListener {
+//            if (it.currentUser == null) {
+//                Log.d(TAG, "Signed out ")
+//                onSuccess()
+//            } else {
+//                Log.d(TAG, "Signed out failed")
+//                onFailure()
+//            }
+//        }
+//
+//        firebaseAuth.addAuthStateListener(authStateListener)
+//    }
 
 }
 

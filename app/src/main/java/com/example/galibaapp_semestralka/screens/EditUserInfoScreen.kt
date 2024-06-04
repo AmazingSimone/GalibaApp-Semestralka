@@ -82,7 +82,7 @@ fun EditUserInfoScreen(
     val isArtist by firebaseViewModel.isArtist.observeAsState()
 
     LaunchedEffect(Unit) {
-        firebaseViewModel.getUserData()
+        firebaseViewModel.getCurrentUserData()
     }
 
     Log.d("EditUserInfo", "$username , $bio, $isArtist")
@@ -230,6 +230,16 @@ fun EditUserInfoScreen(
                         Button(
                             onClick = {
                                 showDialog = false
+                                val onSuccess = {
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.navigate(Screens.AUTHROOT.name)
+
+                                }
+                                val onFailure = {}
+
+                                firebaseViewModel.deleteUser(onSuccess,onFailure,firebaseViewModel.currentUserId.value.toString())
+                                //Log.d("userDelete", "id : ${firebaseViewModel.currentUserId.toString()}")
 //                                navController.navigate(Screens.AUTHROOT.name) {
 //                                    popUpTo(Screens.HOME.name) { inclusive = true }
 //                                }
@@ -282,7 +292,7 @@ fun EditUserInfoScreen(
                     val onFailure: () -> Unit = {
                         Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG).show()
                     }
-                    firebaseViewModel.updateData(onSuccess,onFailure,usernameChanged.value,userBioChanged.value,isArtistChanged.value)
+                    firebaseViewModel.updateUserData(onSuccess,onFailure,usernameChanged.value,userBioChanged.value,isArtistChanged.value)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = (usernameChanged.value?.isNotEmpty() ?: false && (username != usernameChanged.value || bio != userBioChanged.value || isArtist != isArtistChanged.value))

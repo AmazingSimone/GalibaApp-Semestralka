@@ -5,6 +5,7 @@ package com.example.galibaapp_semestralka.screens.HomeScreen
 //import com.example.galibaapp_semestralka.navigation.listOfNavItems
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
@@ -96,6 +97,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.galibaapp_semestralka.R
+import com.example.galibaapp_semestralka.data.Event
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.navigation.Start
@@ -106,6 +109,7 @@ import com.example.galibaapp_semestralka.screens.FollowScreen
 import com.example.galibaapp_semestralka.screens.ProfileInspectScreen
 import com.example.galibaapp_semestralka.screens.UserScreen
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -120,9 +124,12 @@ fun HomeScreen(
 
     val username by firebaseViewModel.username.observeAsState()
 
+
+
     LaunchedEffect(Unit) {
-        firebaseViewModel.getUserData()
-        //firebaseViewModel.getAllEventsCreated()
+        firebaseViewModel.getCurrentUserData()
+        firebaseViewModel.getAllEventsCreated()
+        //firebaseViewModel.getAllEventsCreated(byCity = firebaseViewModel.chosenCity)
     }
 
 
@@ -248,7 +255,6 @@ fun HomeScreen(
                                     contentDescription = "Search"
                                 )
                             }
-
                         }
                     ) {
                         items.forEach {
@@ -273,49 +279,31 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-//                    Column(
-//                        modifier = Modifier
-//                            .clip(RoundedCornerShape(20.dp))
-//                            .verticalScroll(rememberScrollState())
-//                    ) {
-//
-//                        //Spacer(modifier = Modifier.height(15.dp))
-//
-//                        CustomCard(
-//                            firebaseViewModel,
-//                            navController,
-//                            image = R.drawable.backtooldschoolposter,
-//                            title = "Back To Oldschool",
-//                            location = "Klub 77",
-//                            city = "Banska Bystrica",
-//                            cityPrefix = "BB",
-//                            date = "6.5.2023",
-//                            time = "19:00",
-//                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
-//                                    ".\n" +
-//                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
-//                            author = "Back On Label",
-//                            profilePic = R.drawable.backonlabelpfp
-//                        )
-//
-//                        CustomCard(
-//                            firebaseViewModel,
-//                            navController,
-//                            image = R.drawable.backtooldschoolposter,
-//                            title = "Back To Oldschool",
-//                            location = "Klub 77",
-//                            city = "Banska Bystrica",
-//                            cityPrefix = "BB",
-//                            date = "6.5.2023",
-//                            time = "19:00",
-//                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
-//                                    ".\n" +
-//                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
-//                            author = "Back On Label",
-//                            profilePic = R.drawable.backonlabelpfp
-//                        )
-//                    }
+                    val eventList = firebaseViewModel.allEvents
 
+                    Log.d("userEvents","posledny event : ${eventList.size}")
+
+
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .verticalScroll(rememberScrollState())
+                    ) {
+
+                        //Spacer(modifier = Modifier.height(15.dp))
+
+                        for (event in eventList) {
+                            //Spacer(modifier = Modifier.height(15.dp))
+
+                            CustomCard(
+                                firebaseViewModel = firebaseViewModel,
+                                navController = navController,
+                                image = R.drawable.backonlabelpfp,
+                                event = event,
+                                profilePic = R.drawable.backonlabelpfp
+                            )
+                        }
+                    }
 
 
                     // FIREBASE ///
@@ -382,7 +370,7 @@ fun HomeScreenNavigation(
     val isArtist by firebaseViewModel.isArtist.observeAsState()
 
     LaunchedEffect(Unit) {
-        firebaseViewModel.getUserData()
+        firebaseViewModel.getCurrentUserData()
     }
     val scope = rememberCoroutineScope()
     // icons to mimic drawer destinations
@@ -544,7 +532,7 @@ fun HomeScreenNavigation(
                     Start()
                 }
                 composable(route = Screens.USER_PROFILE.name) {
-                    ProfileInspectScreen(firebaseViewModel, navController, "9")
+                    ProfileInspectScreen(firebaseViewModel, navController)
                     //tuto pozor aby sa to vymazalo z backstacku...
                 }
                 composable(route = Screens.CREATE_EVENT.name) {
@@ -552,7 +540,7 @@ fun HomeScreenNavigation(
                     //aj toto
                 }
                 composable(route = Screens.EDIT_EVENT.name) {
-                    EditEvent(navController)
+                    EditEvent(navController, firebaseViewModel = firebaseViewModel)
                     //a toto
                 }
                 navigation(
@@ -572,26 +560,20 @@ fun HomeScreenNavigation(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomCard(
     //modifier: Modifier = Modifier,
     firebaseViewModel: FirebaseViewModel,
     navController: NavController,
     @DrawableRes image: Int,
-    title: String?,
-    location: String,
-    city: String,
-    cityPrefix: String,
-    date: String,
-    time: String,
-    text: String,
-    author: String,
+    event: Event?,
     @DrawableRes profilePic: Int
 ) {
     var showFullContent by remember {
         mutableStateOf(false)
     }
-    if (text.length < 50) {
+    if ((event?.eventDetails?.length ?: 0) < 50) {
         showFullContent = true
     }
     Spacer(modifier = Modifier.height(10.dp))
@@ -601,7 +583,7 @@ fun CustomCard(
         modifier = Modifier
             .animateContentSize()
             .clickable {
-                if (text.length >= 50) {
+                if ((event?.eventDetails?.length ?: 0) >= 50) {
                     showFullContent = !showFullContent
                 }
             },
@@ -646,7 +628,7 @@ fun CustomCard(
                                     .padding(horizontal = 7.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = ("#$cityPrefix"),
+                                    text = ("#${event?.city?.skratka}"),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -656,7 +638,7 @@ fun CustomCard(
                             Spacer(modifier = Modifier.height(5.dp))
 
                             Text(
-                                text = title.toString(),
+                                text = event?.eventName.toString(),
                                 //fontSize = 24.sp,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold
@@ -664,18 +646,18 @@ fun CustomCard(
 
                             Spacer(modifier = Modifier.height(2.dp))
 
-                            Row (
+                            Row(
                                 verticalAlignment = Alignment.CenterVertically
-                            ){
+                            ) {
                                 ClickableLink(
-                                    text = location,
+                                    text = event?.location.toString(),
                                     color = MaterialTheme.colorScheme.secondary,
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
                                 Text(
-                                    text = ", $city",
+                                    text = ", ${event?.city?.nazov}",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -684,16 +666,17 @@ fun CustomCard(
                             Spacer(modifier = Modifier.height(2.dp))
 
                             Text(
-                                text = date,
-                                style = MaterialTheme.typography.headlineSmall
+                                text = event?.dateAndTime?.toLocalDate()
+                                    ?.format(DateTimeFormatter.ofPattern("d MMM")).toString(),
+                                style = MaterialTheme.typography.headlineMedium
                                 //fontWeight = FontWeight.Bold
                             )
 
                             Spacer(modifier = Modifier.height(2.dp))
 
                             Text(
-                                text = "Dvere: $time",
-                                style = MaterialTheme.typography.bodyMedium
+                                text = "Dvere: ${event?.dateAndTime?.toLocalTime()}",
+                                style = MaterialTheme.typography.bodySmall
                                 //fontWeight = FontWeight.Bold
                             )
 
@@ -720,7 +703,7 @@ fun CustomCard(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
 
-                        text = text,
+                        text = event?.eventDetails.toString(),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = if (showFullContent) 100 else 3
                     )
@@ -737,7 +720,7 @@ fun CustomCard(
                     } else {
 
 
-                        if (firebaseViewModel.username.value != author) {
+                        if (firebaseViewModel.currentUserId.value != event?.userId) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 OutlinedButton(
                                     modifier = Modifier.padding(end = 10.dp),
@@ -757,9 +740,31 @@ fun CustomCard(
                         } else {
                             Button(
                                 onClick = {
-                                    navController.navigate(Screens.EDIT_EVENT.name) {
-                                        launchSingleTop = true
+                                    //firebaseViewModel.currentEventForEdit = event.eventId
+                                    Log.d("firebaseviewmodel", event?.eventId.toString())
+
+                                    val onSuccess = {
+                                        navController.navigate(Screens.EDIT_EVENT.name) {
+                                            launchSingleTop = true
+                                        }
+
                                     }
+
+                                    val onFailure: () -> Unit = {
+
+                                    }
+                                    firebaseViewModel.getEventData(
+                                        onSuccess,
+                                        onFailure,
+                                        eventId = event?.eventId.toString()
+                                    )
+
+
+                                    //          TODO 000 UROB VSADE TIETO NACITAVACE
+
+                                    //           if(registerViewModel.registerInProgress.value) {
+//                                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//                                    }
                                 },
                                 //colors = ButtonDefaults.buttonColors(primaryLight)
                             ) {
@@ -779,8 +784,28 @@ fun CustomCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable(
                         onClick = {
-                            navController.navigate(Screens.USER_PROFILE.name) {
-                                launchSingleTop = true
+
+                            if (firebaseViewModel.currentUserId.value.toString() != event?.userId.toString()) {
+                                val onSuccess = {
+                                    navController.navigate(Screens.USER_PROFILE.name) {
+                                        launchSingleTop = true
+                                    }
+
+                                }
+
+                                val onFailure = {
+
+                                }
+
+                                firebaseViewModel.selectUser(
+                                    onSuccess,
+                                    onFailure,
+                                    event?.userId.toString()
+                                )
+                            } else {
+                                navController.navigate(Screens.PERSONAL_USER_PROFILE.name) {
+                                    launchSingleTop = true
+                                }
                             }
                         }
                     )
@@ -795,24 +820,40 @@ fun CustomCard(
                     )
 
 
+                    var username by remember { mutableStateOf("") }
+
+                    var firebaseUserReply = firebaseViewModel.getUserName(
+                        usedId = event?.userId.toString(),
+                        onSuccess = { fetchedUsername ->
+                            username = fetchedUsername
+                        },
+                        onFailure = {
+
+                        }
+                    )
+
                     Text(
                         modifier = Modifier.padding(start = 6.dp),
-                        text = "@$author",
+                        text = "@${username}",
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
+
                 }
+
             }
         }
     }
 }
 
 @Composable
-fun ClickableLink(text: String, style: TextStyle = TextStyle.Default,
-                  color: Color = TextStyle.Default.color,
-                  fontSize: TextUnit = TextUnit.Unspecified,
-                  fontWeight: FontWeight? = null) {
+fun ClickableLink(
+    text: String, style: TextStyle = TextStyle.Default,
+    color: Color = TextStyle.Default.color,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontWeight: FontWeight? = null
+) {
     val formattedText = text.replace(" ", "+")
     val url = "http://maps.google.com/?q=$formattedText"
 
