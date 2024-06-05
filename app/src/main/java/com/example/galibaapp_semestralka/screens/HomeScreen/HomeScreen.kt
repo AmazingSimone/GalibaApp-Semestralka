@@ -36,8 +36,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -138,7 +136,7 @@ fun HomeScreen(
     val mesta by searchCityViewModel.mestaForSearch.collectAsState()
     //val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
-    val eventList = firebaseViewModel.allEvents.collectAsState()
+    val eventList = firebaseViewModel.events.collectAsState()
 
     Log.d("createdEventList", "${eventList.value.size}")
 
@@ -182,7 +180,7 @@ fun HomeScreen(
 
 
                     Text(
-                        text = "Ahoj, $username !",
+                        text = "Ahoj, $username \uD83D\uDC4B",
                         fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -776,14 +774,14 @@ fun CustomCard(
                                                 //modifier = Modifier.fillMaxWidth(),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Check,
-                                                    contentDescription = "interested",
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(modifier = Modifier.padding(2.dp))
+//                                                Icon(
+//                                                    imageVector = Icons.Filled.Check,
+//                                                    contentDescription = "interested",
+//                                                    modifier = Modifier.size(20.dp)
+//                                                )
+//                                                Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
-                                                    text = (event?.interested.toString()),
+                                                    text = ("\uD83E\uDD19 ${ event?.interested.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
                                                     color = MaterialTheme.colorScheme.secondary,
                                                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -809,14 +807,14 @@ fun CustomCard(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
 
-                                                Icon(
-                                                    imageVector = Icons.Filled.CheckCircle,
-                                                    contentDescription = "coming",
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(modifier = Modifier.padding(2.dp))
+//                                                Icon(
+//                                                    imageVector = Icons.Filled.CheckCircle,
+//                                                    contentDescription = "coming",
+//                                                    modifier = Modifier.size(20.dp)
+//                                                )
+//                                                Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
-                                                    text = (event?.coming.toString()),
+                                                    text = ("\uD83D\uDEB6 ${ event?.coming.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
                                                     color = MaterialTheme.colorScheme.secondary,
                                                     fontSize = MaterialTheme.typography.titleMedium.fontSize,

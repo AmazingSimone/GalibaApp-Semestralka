@@ -51,7 +51,7 @@ import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun ProfileInspectScreen(
     firebaseViewModel: FirebaseViewModel,
@@ -199,7 +199,7 @@ fun ProfileInspectScreen(
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
-                    val eventList = firebaseViewModel.userEvents
+                    val eventList = firebaseViewModel.events
 
 
                     Column(
@@ -208,7 +208,7 @@ fun ProfileInspectScreen(
                     ) {
 
 
-                        for (event in eventList) {
+                        for (event in eventList.value) {
                             //Spacer(modifier = Modifier.height(15.dp))
 
                             CustomCard(

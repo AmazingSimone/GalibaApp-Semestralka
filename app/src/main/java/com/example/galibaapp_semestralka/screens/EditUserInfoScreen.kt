@@ -105,7 +105,7 @@ fun EditUserInfoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Uprav profil",
+                    text = "Uprav profil \uD83D\uDC85",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(onClick = {

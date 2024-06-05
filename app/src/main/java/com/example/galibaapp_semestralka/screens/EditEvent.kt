@@ -175,7 +175,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Uprav Galibu",
+                    text = "Uprav Galibu \uD83E\uDE9B",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(

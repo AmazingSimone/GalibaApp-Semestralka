@@ -93,4 +93,7 @@ dependencies {
 
     implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.2.1")
 
+    implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
+
+
 }

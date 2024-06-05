@@ -158,7 +158,7 @@ fun CreateEvent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Vytvor Galibu",
+                    text = "Vytvor Galibu \uD83D\uDEE0\uFE0F",
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(

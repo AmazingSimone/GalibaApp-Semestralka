@@ -34,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
@@ -85,33 +87,48 @@ fun FollowScreen(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
+                    if (userList.isNotEmpty()) {
+                        for (user in userList) {
+                            //Spacer(modifier = Modifier.height(15.dp))
 
-                    for (user in userList) {
-                        //Spacer(modifier = Modifier.height(15.dp))
+                            var username by remember { mutableStateOf("") }
+                            var bio by remember { mutableStateOf("") }
 
-                        var username by remember { mutableStateOf("") }
-                        var bio by remember { mutableStateOf("") }
+                            firebaseViewModel.getUserData(
+                                usedId = user.toString(),
+                                onSuccess = {
+                                    username = it.username.toString()
+                                    bio = it.bio.toString()
+                                },
+                                onFailure = {
 
-                        firebaseViewModel.getUserData(
-                            usedId = user.toString(),
-                            onSuccess = {
-                                username = it.username.toString()
-                                bio = it.bio.toString()
-                            },
-                            onFailure = {
+                                }
+                            )
 
-                            }
-                        )
-
-                        CustomListItem(
-                            navController,
-                            firebaseViewModel,
-                            userId = user.toString(),
-                            meno = username,
-                            popis = bio,
-                            profilePic = R.drawable.backonlabelpfp
-                        )
+                            CustomListItem(
+                                navController,
+                                firebaseViewModel,
+                                userId = user.toString(),
+                                meno = username,
+                                popis = bio,
+                                profilePic = R.drawable.backonlabelpfp
+                            )
+                        }
                     }
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(25.dp),
+                    contentAlignment = Alignment.Center
+
+                ) {
+                    Text(
+                        text = "Je tu celkom ticho... skus niekomu hodit follow \uD83D\uDC40",
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 40.sp
+                    )
                 }
             }
         }
