@@ -1,7 +1,7 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
-import android.os.Build
+import android.os. Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
@@ -253,14 +254,12 @@ fun UserScreen(
                         Button(onClick = {
 
 
-                            val onSuccess = {
-
-                                navController.popBackStack()
-                                navController.popBackStack()
+                            navController.popBackStack()
+                            navController.popBackStack()
+                            if (navController.currentBackStackEntry?.lifecycle?.currentState?.isAtLeast(
+                                    Lifecycle.State.CREATED) != false
+                            ) {
                                 navController.navigate(Screens.AUTHROOT.name)
-//                            {
-//                                popUpTo(Screens.REGISTER.name)
-//                            }
                             }
 
                             val onFailure: () -> Unit = {

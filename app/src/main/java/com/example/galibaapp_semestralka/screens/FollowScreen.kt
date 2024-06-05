@@ -14,14 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -79,15 +75,6 @@ fun FollowScreen(
                         fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                         //color = MaterialTheme.colorScheme.onSurface
                     )
-                    IconButton(
-                        modifier = Modifier.padding(end = 20.dp),
-                        onClick = { }) {
-
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "search artists",
-                        )
-                    }
                 }
             }
 

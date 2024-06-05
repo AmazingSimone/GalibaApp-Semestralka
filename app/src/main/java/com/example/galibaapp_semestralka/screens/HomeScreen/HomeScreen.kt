@@ -36,6 +36,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -69,6 +71,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -137,7 +140,7 @@ fun HomeScreen(
 
     val eventList = firebaseViewModel.allEvents.collectAsState()
 
-    Log.d("createdEventList","${eventList.value.size}")
+    Log.d("createdEventList", "${eventList.value.size}")
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -225,7 +228,8 @@ fun HomeScreen(
                             homeScreenViewModel.active.value = false
                             searchCityViewModel._searchText.value = ""
                             scope.launch { drawerState.close() }
-                            homeScreenViewModel.selectedCityName.value = searchCityViewModel.selectedMesto.value?.nazov.toString()
+                            homeScreenViewModel.selectedCityName.value =
+                                searchCityViewModel.selectedMesto.value?.nazov.toString()
                             firebaseViewModel.getAllEventsCreated(byCity = searchCityViewModel.selectedMesto.value)
                         },
                         active = homeScreenViewModel.active.value,
@@ -272,7 +276,7 @@ fun HomeScreen(
                         ) {
                             items(mesta) { mesto ->
 
-                                Row (
+                                Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
@@ -311,9 +315,17 @@ fun HomeScreen(
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
-                                        firebaseViewModel.addToMyFavouriteCities(onSuccess,onFailure,onExists, city = mesto)
+                                        firebaseViewModel.addToMyFavouriteCities(
+                                            onSuccess,
+                                            onFailure,
+                                            onExists,
+                                            city = mesto
+                                        )
                                     }) {
-                                        Icon(imageVector = Icons.Default.Add, contentDescription = "fav icon")
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "fav icon"
+                                        )
                                     }
                                 }
                             }
@@ -535,9 +547,16 @@ fun HomeScreenNavigation(
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
-                                        firebaseViewModel.removeFromMyFavouriteCities(onSuccess,onFailure,item)
+                                        firebaseViewModel.removeFromMyFavouriteCities(
+                                            onSuccess,
+                                            onFailure,
+                                            item
+                                        )
                                     }) {
-                                        Icon(imageVector = Icons.Default.Favorite, contentDescription = "icon fav")
+                                        Icon(
+                                            imageVector = Icons.Default.Favorite,
+                                            contentDescription = "icon fav"
+                                        )
                                     }
                                 },
                                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -676,6 +695,9 @@ fun CustomCard(
     var showFullContent by remember {
         mutableStateOf(false)
     }
+
+    var isOwner = firebaseViewModel.currentUserId.value == event?.userId
+
     if ((event?.eventDetails?.length ?: 0) < 50) {
         showFullContent = true
     }
@@ -702,12 +724,6 @@ fun CustomCard(
 
                 modifier = Modifier.fillMaxSize(),
             ) {
-//                Surface(
-//                    shape = RoundedCornerShape(24.dp),
-//                    modifier = Modifier.wrapContentSize(),
-//                ) {
-//
-//                }
                 Box {
                     Row(
                         modifier = Modifier.fillMaxSize(),
@@ -722,22 +738,96 @@ fun CustomCard(
                                 .width(200.dp)
                                 .padding(end = 10.dp)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                        shape = RoundedCornerShape(50)
-                                    )
-                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = ("#${event?.city?.skratka}"),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                        .padding(horizontal = 7.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = ("#${event?.city?.skratka}"),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                if (isOwner) {
+                                    if (event?.interested != 0.toLong()) {
+                                        Spacer(modifier = Modifier.padding(2.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.secondary.copy(
+                                                        alpha = 0.1f
+                                                    ),
+                                                    shape = RoundedCornerShape(50)
+                                                )
+                                                .padding(horizontal = 7.dp, vertical = 4.dp)
+                                        ) {
+
+                                            Row(
+                                                //modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Check,
+                                                    contentDescription = "interested",
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.padding(2.dp))
+                                                Text(
+                                                    text = (event?.interested.toString()),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    color = MaterialTheme.colorScheme.secondary,
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                    if (event?.coming != 0.toLong()) {
+                                        Spacer(modifier = Modifier.padding(2.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.secondary.copy(
+                                                        alpha = 0.1f
+                                                    ),
+                                                    shape = RoundedCornerShape(50)
+                                                )
+                                                .padding(horizontal = 7.dp, vertical = 4.dp)
+                                        ) {
+                                            Row(
+                                                //modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+
+                                                Icon(
+                                                    imageVector = Icons.Filled.CheckCircle,
+                                                    contentDescription = "coming",
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.padding(2.dp))
+                                                Text(
+                                                    text = (event?.coming.toString()),
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    color = MaterialTheme.colorScheme.secondary,
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
+
                             Spacer(modifier = Modifier.height(5.dp))
 
                             Text(
@@ -822,34 +912,122 @@ fun CustomCard(
                         )
                     } else {
 
-
-                        if (firebaseViewModel.currentUserId.value != event?.userId) {
+                        var interestedState by remember { mutableIntStateOf(0) }
+                        if (!isOwner) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                OutlinedButton(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    onClick = {
-                                        val onSuccess = {
+                                if (interestedState == 1) {
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = {
+                                            val onSuccess = {
+                                                interestedState = 0
+                                            }
 
-                                        }
+                                            val onFailure = {
 
-                                        val onFailure = {
+                                            }
+                                            firebaseViewModel.removeInterested(
+                                                onSuccess,
+                                                onFailure,
+                                                event?.eventId.toString()
+                                            )
+                                        },
+                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
-                                        }
-                                              firebaseViewModel.addInterested(onSuccess,onFailure,event?.eventId.toString())
-                                              },
-                                    //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
-                                ) {
-                                    Text("Mam zaujem")
+                                    ) {
+                                        Text("Mam zaujem")
+                                    }
+                                } else if (interestedState == 2) {
+                                    Button(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = {
+                                            val onSuccess = {
+                                                interestedState = 0
+                                            }
+
+                                            val onFailure = {
+
+                                            }
+                                            firebaseViewModel.removeComming(
+                                                onSuccess,
+                                                onFailure,
+                                                event?.eventId.toString()
+                                            )
+                                        },
+                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+
+                                    ) {
+                                        Text("Pridem")
+                                    }
+                                } else {
+                                    OutlinedButton(
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        onClick = {
+                                            val onSuccess = {
+                                                interestedState = 1
+
+                                            }
+
+                                            val onFailure = {
+
+                                            }
+                                            firebaseViewModel.addInterested(
+                                                onSuccess,
+                                                onFailure,
+                                                event?.eventId.toString()
+                                            )
+                                        },
+                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+
+                                    ) {
+                                        Text("Mam zaujem")
+                                    }
+
+                                    Button(
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        onClick = {
+                                            val onSuccess = {
+                                                interestedState = 2
+
+                                            }
+
+                                            val onFailure = {
+
+                                            }
+                                            firebaseViewModel.addComming(
+                                                onSuccess,
+                                                onFailure,
+                                                event?.eventId.toString()
+                                            )
+                                        },
+                                        //colors = ButtonDefaults.buttonColors(primaryLight)
+                                    ) {
+                                        Text(text = "Pridem")
+                                    }
                                 }
-                                Button(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    onClick = { /*TODO*/ },
-                                    //colors = ButtonDefaults.buttonColors(primaryLight)
-                                ) {
-                                    Text(text = "Pridem")
+
+
+                                val isNotInterested = {
+                                    interestedState = 0
+
                                 }
+                                val isInterested = {
+                                    interestedState = 1
+
+                                }
+                                val isComing = {
+                                    interestedState = 2
+                                }
+                                firebaseViewModel.interestState(
+                                    isNotInterested = isNotInterested,
+                                    isInterested = isInterested,
+                                    isComing = isComing,
+                                    event?.eventId.toString()
+                                )
                             }
                         } else {
+
+
                             Button(
                                 onClick = {
                                     //firebaseViewModel.currentEventForEdit = event.eventId
@@ -885,6 +1063,7 @@ fun CustomCard(
                                     //fontSize = MaterialTheme.typography.bodySmall.fontSize
                                 )
                             }
+
                         }
                     }
                 }

@@ -296,6 +296,41 @@ class FirebaseViewModel : ViewModel() {
 
     }
 
+    fun interestState(
+        isNotInterested: () -> Unit,
+        isInterested: () -> Unit,
+        isComing: () -> Unit,
+        eventId: String
+    ) {
+        //val currentUserUid = firebaseAuth.currentUser?.uid
+        if (firebaseAuth.currentUser?.uid != null) {
+            firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+                .collection("interestedEvents")
+                .document(eventId).get().addOnSuccessListener { interestedEventDoc ->
+                if (interestedEventDoc.exists()) {
+                    isInterested()
+                } else {
+                    firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+                        .collection("comingEvents")
+                        .document(eventId).get().addOnSuccessListener { comingEventDoc ->
+                        if (comingEventDoc.exists()) {
+                            isComing()
+                        } else {
+                            isNotInterested()
+                        }
+                    }.addOnFailureListener {
+                        isNotInterested()
+                    }
+                }
+            }.addOnFailureListener {
+                isNotInterested()
+            }
+        } else {
+            isNotInterested()
+        }
+    }
+
+
     fun addInterested(
         onSuccess: () -> Unit,
         onFailure: () -> Unit,
@@ -363,7 +398,30 @@ class FirebaseViewModel : ViewModel() {
         onFailure: () -> Unit,
         eventId: String
     ) {
+        val eventRef = firebaseFirestore.collection("events").document(eventId)
+        firebaseFirestore.runTransaction { transaction ->
+            val event = transaction.get(eventRef)
+            val currentInterested = event.getLong("coming") ?: 0
+            transaction.update(eventRef, "coming", currentInterested + 1)
+        }.addOnSuccessListener {
+            // Ak sa aktualizácia úspešne vykonala, pridaj referenciu na event do kolekcie "interestedEvents" používateľa
 
+
+            firebaseFirestore.collection("users").document(firebaseAuth.uid.toString())
+                .collection("comingEvents").document(eventId).set(
+                    mapOf(
+                        "eventRef" to firebaseFirestore.collection("events").document(eventId)
+                    )
+                )
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener {
+                    onFailure()
+                }
+        }.addOnFailureListener {
+            onFailure()
+        }
     }
 
     fun removeComming(
@@ -371,7 +429,25 @@ class FirebaseViewModel : ViewModel() {
         onFailure: () -> Unit,
         eventId: String
     ) {
+        val eventRef = firebaseFirestore.collection("events").document(eventId)
 
+        firebaseFirestore.runTransaction { transaction ->
+            val event = transaction.get(eventRef)
+            val currentInterested = event.getLong("coming") ?: 0
+            transaction.update(eventRef, "coming", currentInterested - 1)
+        }.addOnSuccessListener {
+
+            firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("comingEvents").document(eventId).delete()
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener {
+                    onFailure()
+                }
+
+        }.addOnFailureListener {
+            onFailure()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -483,12 +559,15 @@ class FirebaseViewModel : ViewModel() {
 
                             val event = Event(
                                 city = mesto,
+                                coming = document.get("coming") as Long?,
                                 dateAndTime = dateAndTime,
                                 eventDetails = document.get("eventDetails").toString(),
                                 eventName = document.get("eventName").toString(),
+                                interested = document.get("interested") as Long?,
                                 location = document.get("location").toString(),
                                 userId = document.get("userId").toString(),
                                 eventId = document.id.toString()
+
 
                             )
 
@@ -558,12 +637,15 @@ class FirebaseViewModel : ViewModel() {
 
                             val event = Event(
                                 city = mesto,
+                                coming = document.get("coming") as Long?,
                                 dateAndTime = dateAndTime,
                                 eventDetails = document.get("eventDetails").toString(),
                                 eventName = document.get("eventName").toString(),
+                                interested = document.get("interested") as Long?,
                                 location = document.get("location").toString(),
                                 userId = document.get("userId").toString(),
                                 eventId = document.id.toString()
+
                             )
 
                             currentCityEvents.add(event)
@@ -619,9 +701,11 @@ class FirebaseViewModel : ViewModel() {
 
                         val event = Event(
                             city = mesto,
+                            coming = document.get("coming") as Long?,
                             dateAndTime = dateAndTime,
                             eventDetails = document.get("eventDetails").toString(),
                             eventName = document.get("eventName").toString(),
+                            interested = document.get("interested") as Long?,
                             location = document.get("location").toString(),
                             userId = document.get("userId").toString(),
                             eventId = document.id.toString()
@@ -672,9 +756,11 @@ class FirebaseViewModel : ViewModel() {
 
             val event = Event(
                 city = mesto,
+                coming = it.get("coming") as Long?,
                 dateAndTime = dateAndTime,
                 eventDetails = it.get("eventDetails").toString(),
                 eventName = it.get("eventName").toString(),
+                interested = it.get("interested") as Long?,
                 location = it.get("location").toString(),
                 userId = it.get("userId").toString(),
                 eventId = it.id.toString()
