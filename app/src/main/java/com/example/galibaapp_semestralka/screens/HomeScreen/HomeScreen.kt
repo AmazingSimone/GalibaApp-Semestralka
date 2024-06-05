@@ -6,6 +6,7 @@ package com.example.galibaapp_semestralka.screens.HomeScreen
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
@@ -25,6 +26,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +41,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -64,9 +66,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,6 +80,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -88,6 +91,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -100,6 +104,8 @@ import androidx.navigation.navigation
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.Event
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
+import com.example.galibaapp_semestralka.data.Home.HomeViewModel
+import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.navigation.Start
 import com.example.galibaapp_semestralka.screens.CreateEvent
@@ -119,24 +125,35 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     navController: NavController,
     drawerState: DrawerState,// = rememberDrawerState(initialValue = DrawerValue.Closed),
-    firebaseViewModel: FirebaseViewModel// = viewModel()
+    firebaseViewModel: FirebaseViewModel,// = viewModel()
+    homeScreenViewModel: HomeViewModel,
+    searchCityViewModel: SearchCityViewModel = viewModel()
 ) {
 
     val username by firebaseViewModel.username.observeAsState()
+    val searchText by searchCityViewModel.searchText.collectAsState()
+    val mesta by searchCityViewModel.mestaForSearch.collectAsState()
+    //val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
+    val eventList = firebaseViewModel.allEvents.collectAsState()
 
+    Log.d("createdEventList","${eventList.value.size}")
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
+
         firebaseViewModel.getAllEventsCreated()
+
         firebaseViewModel.getMyFollowingList()
+        firebaseViewModel.getMyFavouriteCities()
+        //homeScreenViewModel.oblubeneMesta = firebaseViewModel.myFavouriteCities
         //firebaseViewModel.getAllEventsCreated(byCity = firebaseViewModel.chosenCity)
     }
 
 
     val scope = rememberCoroutineScope()
 
-
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -146,9 +163,6 @@ fun HomeScreen(
         Scaffold(
 
             topBar = {
-
-//                    Surface(
-//                    ) {
 
 
                 Column(
@@ -163,13 +177,6 @@ fun HomeScreen(
 
                     ) {
 
-//                    Column(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(start = 20.dp, top = 20.dp)
-//                            .verticalScroll(rememberScrollState()),
-//
-//                        ) {
 
                     Text(
                         text = "Ahoj, $username !",
@@ -179,51 +186,51 @@ fun HomeScreen(
                         //color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Box(Modifier.clickable {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    }) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Banska Bystrica, Slovensko",
-                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                            )
-                            IconButton(
-
-                                onClick = { /*TODO*/ }) {
-
-                                Icon(
-                                    imageVector = Icons.Default.LocationOn,
-                                    contentDescription = ""
-                                )
-                            }
-                        }
-                    }
-
-
-                    var text by remember { mutableStateOf("") }
-                    var active by remember { mutableStateOf(false) }
-                    var items = remember {
-                        mutableStateListOf(
-                            ""
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = homeScreenViewModel.selectedCityName.value,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         )
+
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = ""
+                        )
+
                     }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    //var text by remember { mutableStateOf("") }
+                    var active by remember { mutableStateOf(false) }
+//                    var favouriteIcon by remember {
+//                        mutableStateOf(Icons.Default.FavoriteBorder)
+//                    }
+//                    var items = remember {
+//                        mutableStateListOf(
+//                            ""
+//                        )
+//                    }
                     SearchBar(
 
                         //colors = SearchBarDefaults.colors(surfaceContainerLight),
-                        query = text,
-                        onQueryChange = {
-                            text = it
-                        },
+                        query = searchText,
+                        onQueryChange = searchCityViewModel::onSearchTextChange,
                         onSearch = {
-                            items.add(text)
-                            active = false
-                            text = ""
+                            //items.add(text)
+                            homeScreenViewModel.active.value = false
+                            searchCityViewModel._searchText.value = ""
+                            scope.launch { drawerState.close() }
+                            homeScreenViewModel.selectedCityName.value = searchCityViewModel.selectedMesto.value?.nazov.toString()
+                            firebaseViewModel.getAllEventsCreated(byCity = searchCityViewModel.selectedMesto.value)
                         },
-                        active = active,
+                        active = homeScreenViewModel.active.value,
                         onActiveChange = {
-                            active = it
+                            homeScreenViewModel.active.value = it
                         },
                         placeholder = { Text(text = "Hladaj Galibu") },
                         leadingIcon = {
@@ -238,13 +245,13 @@ fun HomeScreen(
                             }
                         },
                         trailingIcon = {
-                            if (active) {
+                            if (homeScreenViewModel.active.value) {
                                 Icon(
                                     modifier = Modifier.clickable {
-                                        if (text.isNotEmpty()) {
-                                            text = ""
+                                        if (searchCityViewModel._searchText.value.isNotEmpty()) {
+                                            searchCityViewModel._searchText.value = ""
                                         } else {
-                                            active = false
+                                            homeScreenViewModel.active.value = false
                                         }
                                     },
                                     imageVector = Icons.Default.Close,
@@ -258,14 +265,57 @@ fun HomeScreen(
                             }
                         }
                     ) {
-                        items.forEach {
-                            Row(modifier = Modifier.padding(all = 14.dp)) {
-                                Icon(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "history icon"
-                                )
-                                Text(text = it)
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            items(mesta) { mesto ->
+
+                                Row (
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        mesto.nazov,
+                                        modifier = Modifier
+                                            .padding(10.dp)
+                                            .clickable {
+                                                searchCityViewModel.chooseMesto(mesto)
+                                                Log.d(
+                                                    "mestoAkcie",
+                                                    "${searchCityViewModel.selectedMesto.value}"
+                                                )
+                                            },
+                                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                                    )
+                                    IconButton(onClick = {
+                                        val onSuccess = {
+                                            Toast.makeText(
+                                                context,
+                                                "Mesto bolo pridane medzi oblubene",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        val onFailure = {
+                                            Toast.makeText(
+                                                context,
+                                                "Nastala chyba pri pridavani do oblubenych",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        val onExists = {
+                                            Toast.makeText(
+                                                context,
+                                                "Mesto uz je pridane do oblubenych",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        firebaseViewModel.addToMyFavouriteCities(onSuccess,onFailure,onExists, city = mesto)
+                                    }) {
+                                        Icon(imageVector = Icons.Default.Add, contentDescription = "fav icon")
+                                    }
+                                }
                             }
                         }
                     }
@@ -280,7 +330,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    val eventList = firebaseViewModel.allEvents
+
 
 
                     Column(
@@ -291,7 +341,7 @@ fun HomeScreen(
 
                         //Spacer(modifier = Modifier.height(15.dp))
 
-                        for (event in eventList) {
+                        for (event in eventList.value) {
                             //Spacer(modifier = Modifier.height(15.dp))
 
                             CustomCard(
@@ -355,13 +405,16 @@ fun HomeScreen(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun HomeScreenNavigation(
     navController: NavHostController = rememberNavController(),
     //oldNavController: NavHostController,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    firebaseViewModel: FirebaseViewModel
+    firebaseViewModel: FirebaseViewModel,
+    homeScreenViewModel: HomeViewModel = viewModel()
+
+
 ) {
 
 
@@ -372,13 +425,8 @@ fun HomeScreenNavigation(
         firebaseViewModel.getCurrentUserData()
     }
     val scope = rememberCoroutineScope()
-    // icons to mimic drawer destinations
-    val items = listOf(
-        Icons.Default.LocationOn,
-        Icons.Default.LocationOn,
-        Icons.Default.LocationOn,
-    )
-    var selectedItem by rememberSaveable { mutableStateOf(0) }
+
+    val context = LocalContext.current
 
 
     ModalNavigationDrawer(
@@ -420,26 +468,81 @@ fun HomeScreenNavigation(
                     )
 
 
-                    HorizontalDivider()
-                    items.forEachIndexed { index, item ->
+                    firebaseViewModel.getMyFavouriteCities()
+                    val oblubeneMesta by firebaseViewModel.myFavouriteCities.collectAsState()
+                    var selectedItem by rememberSaveable { mutableStateOf(-1) }
+
+
+                    Column {
+                        HorizontalDivider()
                         Spacer(Modifier.height(16.dp))
+
                         NavigationDrawerItem(
-                            label = { Text(text = item.name) },
-                            selected = index == selectedItem,
+                            label = { Text(text = "Rovno za nosom") },
+                            selected = if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") (selectedItem == -1) else false,
                             onClick = {
-                                selectedItem = index
+                                selectedItem = -1
+                                homeScreenViewModel.selectedCityName.value = "Rovno za nosom"
+                                firebaseViewModel.getAllEventsCreated()
+                                homeScreenViewModel.active.value = false
                                 scope.launch {
                                     drawerState.close()
                                 }
                             },
                             icon = {
                                 Icon(
-                                    imageVector = item,
+                                    imageVector = Icons.Default.Home,
                                     contentDescription = "icon"
                                 )
                             },
                             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                         )
+                        Spacer(Modifier.height(16.dp))
+
+                        HorizontalDivider()
+
+                        oblubeneMesta.forEachIndexed { index, item ->
+                            Spacer(Modifier.height(16.dp))
+
+                            NavigationDrawerItem(
+                                label = {
+                                    Text(text = item.nazov)
+                                },
+                                selected = if (homeScreenViewModel.selectedCityName.value == item.nazov) true else index == selectedItem,
+                                onClick = {
+                                    selectedItem = index
+                                    homeScreenViewModel.selectedCityName.value = item.nazov
+                                    firebaseViewModel.getAllEventsCreated(byCity = item)
+                                    homeScreenViewModel.active.value = false
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                },
+                                icon = {
+                                    IconButton(onClick = {
+                                        //homeScreenViewModel.removeCityFromFavorites(item)
+                                        val onSuccess = {
+                                            Toast.makeText(
+                                                context,
+                                                "Mesto bolo odstranene z oblubenych",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        val onFailure = {
+                                            Toast.makeText(
+                                                context,
+                                                "Nastala chyba pri odstranovani z oblubenych",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                        firebaseViewModel.removeFromMyFavouriteCities(onSuccess,onFailure,item)
+                                    }) {
+                                        Icon(imageVector = Icons.Default.Favorite, contentDescription = "icon fav")
+                                    }
+                                },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            )
+                        }
                     }
                 }
             }
@@ -521,11 +624,12 @@ fun HomeScreenNavigation(
                     HomeScreen(
                         navController = navController,
                         drawerState = drawerState,
-                        firebaseViewModel = firebaseViewModel
+                        firebaseViewModel = firebaseViewModel,
+                        homeScreenViewModel = homeScreenViewModel
                     )
                 }
                 composable(route = Screens.FOLLOW.name) {
-                    FollowScreen(navController = navController,firebaseViewModel)
+                    FollowScreen(navController = navController, firebaseViewModel)
                 }
                 composable(route = Screens.AUTHROOT.name) {
                     Start()
@@ -723,7 +827,16 @@ fun CustomCard(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 OutlinedButton(
                                     modifier = Modifier.padding(end = 10.dp),
-                                    onClick = { /*TODO*/ },
+                                    onClick = {
+                                        val onSuccess = {
+
+                                        }
+
+                                        val onFailure = {
+
+                                        }
+                                              firebaseViewModel.addInterested(onSuccess,onFailure,event?.eventId.toString())
+                                              },
                                     //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
                                 ) {
                                     Text("Mam zaujem")

@@ -1,8 +1,11 @@
-package com.example.galibaapp_semestralka.data
+package com.example.galibaapp_semestralka.data.Search
 
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.galibaapp_semestralka.data.FirebaseViewModel
+import com.example.galibaapp_semestralka.data.MestaNaSlovensku
+import com.example.galibaapp_semestralka.data.Mesto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +36,7 @@ class SearchCityViewModel : ViewModel() {
 
     private val mesto: MestaNaSlovensku = MestaNaSlovensku()
     private val _mesta = MutableStateFlow(mesto.getMesta())
-    val mesta = searchText.combine(_mesta) { text, mesta ->
+    val mestaForEditCreateEvent = searchText.combine(_mesta) { text, mesta ->
 
         if (text.isNotBlank() && _isSearching.value) {
             val normalizedText = normalize(text)
@@ -44,6 +47,23 @@ class SearchCityViewModel : ViewModel() {
             dynamicSize.value = 65.dp
             emptyList()
         }
+    }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _mesta.value
+        )
+
+    val mestaForSearch = searchText.combine(_mesta) { text, mesta ->
+
+        //if (text.isNotBlank() && _isSearching.value) {
+            val normalizedText = normalize(text)
+            mesta.filter {
+                normalize(it.nazov).contains(normalizedText, ignoreCase = true)
+            }
+//        } else {
+//            emptyList()
+//        }
     }
         .stateIn(
             viewModelScope,

@@ -1,8 +1,10 @@
-package com.example.galibaapp_semestralka.data
+package com.example.galibaapp_semestralka.data.CreateEvent
 
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.galibaapp_semestralka.data.MestaNaSlovensku
+import com.example.galibaapp_semestralka.data.Mesto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

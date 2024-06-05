@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.CreateEventViewModel
+import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog

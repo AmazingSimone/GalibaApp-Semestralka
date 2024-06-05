@@ -61,9 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.CreateEventViewModel
+import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.data.SearchCityViewModel
+import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -118,7 +118,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
             val searchText by searchCityViewModel.searchText.collectAsState()
 
-            val mesta by searchCityViewModel.mesta.collectAsState()
+            val mesta by searchCityViewModel.mestaForEditCreateEvent.collectAsState()
 
             var eventLocation by rememberSaveable { mutableStateOf("") }
 

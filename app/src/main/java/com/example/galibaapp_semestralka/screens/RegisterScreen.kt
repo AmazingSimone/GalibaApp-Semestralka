@@ -59,14 +59,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.data.RegisterUIevent
-import com.example.galibaapp_semestralka.data.RegisterViewModel
+import com.example.galibaapp_semestralka.data.Register.RegisterUIevent
+import com.example.galibaapp_semestralka.data.Register.RegisterViewModel
 
 @ExperimentalMaterial3Api
 @SuppressLint("UnrememberedMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, registerViewModel: RegisterViewModel = viewModel(),firebaseViewModel: FirebaseViewModel) {
+fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, registerViewModel: RegisterViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
 
     var username by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }

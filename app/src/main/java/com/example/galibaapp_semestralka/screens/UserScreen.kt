@@ -49,7 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.data.LoginViewModel
+import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
 import kotlinx.coroutines.launch

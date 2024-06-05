@@ -51,13 +51,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.data.LoginUIevent
-import com.example.galibaapp_semestralka.data.LoginViewModel
+import com.example.galibaapp_semestralka.data.Login.LoginUIevent
+import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit,loginViewModel: LoginViewModel = viewModel(),firebaseViewModel: FirebaseViewModel) {
+fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginViewModel: LoginViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 

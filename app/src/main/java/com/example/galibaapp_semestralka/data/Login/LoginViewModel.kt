@@ -1,4 +1,4 @@
-package com.example.galibaapp_semestralka.data
+package com.example.galibaapp_semestralka.data.Login
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +15,7 @@ class LoginViewModel : ViewModel() {
     var badLogin = mutableStateOf(false)
 
 
-    fun onLoginEvent(event:LoginUIevent) {
+    fun onLoginEvent(event: LoginUIevent) {
         when(event) {
             is LoginUIevent.emailChanged -> {
                 loginUIState.value = loginUIState.value.copy(email = event.email)

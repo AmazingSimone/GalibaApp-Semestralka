@@ -1,4 +1,4 @@
-package com.example.galibaapp_semestralka.data
+package com.example.galibaapp_semestralka.data.Login
 
 sealed class LoginUIevent {
 

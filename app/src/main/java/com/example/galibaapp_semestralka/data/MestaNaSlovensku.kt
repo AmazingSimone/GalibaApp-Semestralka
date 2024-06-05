@@ -2,8 +2,8 @@ package com.example.galibaapp_semestralka.data
 
 
 data class Mesto(
-    val nazov: String,
-    val skratka: String
+    val nazov: String = "",
+    val skratka: String = ""
 ) {
     fun isMatchingQuery(query: String) : Boolean {
         val matching = listOf(

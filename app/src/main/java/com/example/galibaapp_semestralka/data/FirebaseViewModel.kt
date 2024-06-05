@@ -6,8 +6,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.galibaapp_semestralka.data.Login.LoginViewModel
+import com.example.galibaapp_semestralka.data.Register.RegisterViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDateTime
 
 class FirebaseViewModel : ViewModel() {
@@ -22,9 +26,10 @@ class FirebaseViewModel : ViewModel() {
 
     var userEvents = mutableStateListOf<Event?>()
 
-    var allEvents = mutableStateListOf<Event?>()
+    private val _allEvents = MutableStateFlow<List<Event?>>(emptyList())
+    val allEvents: StateFlow<List<Event?>> = _allEvents
 
-    var eventsByCity = mutableStateListOf<Event?>()
+    //var eventsByCity = mutableStateListOf<Event?>()
 
     var chosenEvent: MutableLiveData<Event?> = MutableLiveData()
 
@@ -35,6 +40,11 @@ class FirebaseViewModel : ViewModel() {
     var myFollowedUsers = mutableStateListOf<String?>()
 
     //var chosenCity = mutableStateListOf<Mesto?>()
+
+    //var myFavouriteCities = mutableStateListOf<Mesto?>()
+
+    private val _myFavouriteCities = MutableStateFlow<List<Mesto>>(emptyList())
+    val myFavouriteCities: StateFlow<List<Mesto>> = _myFavouriteCities
 
     val isUserLoggedIn: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -269,7 +279,9 @@ class FirebaseViewModel : ViewModel() {
                 "dateAndTime" to datumACasAkcie,
                 "city" to mesto,
                 "eventDetails" to popisakcie,
-                "userId" to firebaseAuth.currentUser?.uid
+                "userId" to firebaseAuth.currentUser?.uid,
+                "interested" to 0,
+                "coming" to 0
 
             )
         )
@@ -281,6 +293,84 @@ class FirebaseViewModel : ViewModel() {
                 Log.d(TAG, "Event failure")
                 onFailure()
             }
+
+    }
+
+    fun addInterested(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        eventId: String
+    ) {
+        // Aktualizuj stĺpec "interested" v dokumente eventu
+        val eventRef = firebaseFirestore.collection("events").document(eventId)
+        firebaseFirestore.runTransaction { transaction ->
+            val event = transaction.get(eventRef)
+            val currentInterested = event.getLong("interested") ?: 0
+            transaction.update(eventRef, "interested", currentInterested + 1)
+        }.addOnSuccessListener {
+            // Ak sa aktualizácia úspešne vykonala, pridaj referenciu na event do kolekcie "interestedEvents" používateľa
+            Log.d(TAG, "interested")
+
+            firebaseFirestore.collection("users").document(firebaseAuth.uid.toString())
+                .collection("interestedEvents").document(eventId).set(
+                    mapOf(
+                        "eventRef" to firebaseFirestore.collection("events").document(eventId)
+                    )
+                )
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener {
+                    onFailure()
+                }
+        }.addOnFailureListener {
+            onFailure()
+        }
+    }
+
+    fun removeInterested(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        eventId: String
+    ) {
+        val eventRef = firebaseFirestore.collection("events").document(eventId)
+
+        // Spustenie transakcie pre aktualizáciu stĺpca "interested" v dokumente eventu
+        firebaseFirestore.runTransaction { transaction ->
+            val event = transaction.get(eventRef)
+            val currentInterested = event.getLong("interested") ?: 0
+            // Odpocitaj 1 od počtu záujemcov
+            transaction.update(eventRef, "interested", currentInterested - 1)
+        }.addOnSuccessListener {
+            // Ak sa aktualizácia úspešne vykonala, odstráň referenciu na event z kolekcie "interestedEvents" používateľa
+
+            firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("interestedEvents").document(eventId).delete()
+                    .addOnSuccessListener {
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        onFailure()
+                    }
+
+        }.addOnFailureListener {
+            onFailure()
+        }
+    }
+
+
+    fun addComming(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        eventId: String
+    ) {
+
+    }
+
+    fun removeComming(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        eventId: String
+    ) {
 
     }
 
@@ -352,10 +442,10 @@ class FirebaseViewModel : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getAllEventsCreated(byUserId: String = "", byCity: Mesto? = null) {
+
         if (byUserId.isNotEmpty() && byCity == null) {
             val currentUserEvents = mutableStateListOf<Event?>()
 
-            //currentUser?.let { user ->
             Log.d("firebaseviewmodel", "$byUserId")
 
             firebaseFirestore.collection("events")
@@ -405,28 +495,33 @@ class FirebaseViewModel : ViewModel() {
                             currentUserEvents.add(event)
                         }
                         userEvents = currentUserEvents
+                        _allEvents.value = currentUserEvents
                     } else {
                         Log.d("firebaseviewmodel", "No events found for the current user.")
                         userEvents.clear()
-
+                        _allEvents.value = emptyList()
                     }
                 }
                 .addOnFailureListener {
                     userEvents.clear()
+                    _allEvents.value = emptyList()
 
                 }
-//            } ?: run {
-//                Log.e("firebaseviewmodel", "User is not logged in.")
-            //}
-        } else if (byUserId.isEmpty() && byCity != null) {
+
+        }
+        else if (byUserId.isEmpty() && byCity != null) {
+
+
 
             val currentCityEvents = mutableStateListOf<Event?>()
-            val city = HashMap<String, String>()
-            city[byCity.nazov] = byCity.skratka
 
-            //currentUser?.let { user ->
+            val cityToHash = hashMapOf(
+                "nazov" to byCity.nazov,
+                "skratka" to byCity.skratka
+            )
+
             firebaseFirestore.collection("events")
-                .whereEqualTo("city", city)
+                .whereEqualTo("city", cityToHash)
                 .get()
                 .addOnSuccessListener { querySnapshot ->
                     if (!querySnapshot.isEmpty) {
@@ -438,6 +533,9 @@ class FirebaseViewModel : ViewModel() {
                                 val skratka = it["skratka"] as? String ?: ""
                                 Mesto(nazov, skratka)
                             }
+
+                            Log.d("createdEventList","inside byCity success, mesto ${mesto.toString()}")
+
 
                             val dateMap = document.get("dateAndTime") as? Map<*, *>
                             Log.d("firebaseviewmodel", "dateMap: $dateMap")
@@ -469,11 +567,16 @@ class FirebaseViewModel : ViewModel() {
                             )
 
                             currentCityEvents.add(event)
+                              Log.d("createdEventList","inside byCity end ${event.toString()}")
                         }
-                        eventsByCity = currentCityEvents
-                    } else {
-                        eventsByCity.clear()
+                        //eventsByCity = currentCityEvents
+                        _allEvents.value = currentCityEvents
 
+                    } else {
+                        Log.d("createdEventList","inside byCity failure")
+
+                        //eventsByCity.clear()
+                        _allEvents.value = emptyList()
                     }
                 }
 
@@ -528,9 +631,9 @@ class FirebaseViewModel : ViewModel() {
                         currentEvents.add(event)
 
                     }
-                    allEvents = currentEvents
+                    _allEvents.value = currentEvents
                 } else {
-                    allEvents.clear()
+                    _allEvents.value = emptyList()
                     Log.d("userEvents", "inside else clear ${userEvents.size}")
                 }
             }
@@ -718,9 +821,9 @@ class FirebaseViewModel : ViewModel() {
                 val list = it.documents
                 for (document in list) {
 
-                    val event = document.id.toString()
+                    val followerId = document.id.toString()
 
-                    currentFollowedUsers.add(event)
+                    currentFollowedUsers.add(followerId)
                 }
 
                 myFollowedUsers = currentFollowedUsers
@@ -728,6 +831,92 @@ class FirebaseViewModel : ViewModel() {
                 myFollowedUsers.clear()
             }
         }
+    }
+
+    fun addToMyFavouriteCities(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        onExists: () -> Unit,
+        city: Mesto
+    ) {
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("favouriteCities")
+            .whereEqualTo("city.nazov", city.nazov).get().addOnSuccessListener {
+            if (it.isEmpty) {
+                firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("favouriteCities").document()
+                    .set(mapOf("city" to city))
+                    .addOnSuccessListener {
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        onFailure()
+                    }
+            } else {
+                onExists() // Or you can show a message indicating the city is already in the list
+            }
+        }.addOnFailureListener {
+            onFailure()
+        }
+
+    }
+
+
+    fun getMyFavouriteCities() {
+        val currentFavouriteCities = mutableStateListOf<Mesto>()
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+            .collection("favouriteCities").get().addOnSuccessListener {
+                if (!it.isEmpty) {
+                    val list = it.documents
+                    for (document in list) {
+
+                        val cityMap = document.get("city") as HashMap<*, *>
+                        val mesto = cityMap.let {
+                            val nazov = it["nazov"] as String
+                            val skratka = it["skratka"] as String
+                            Mesto(nazov, skratka)
+                        }
+                        currentFavouriteCities.add(mesto)
+                    }
+
+                    _myFavouriteCities.value = currentFavouriteCities
+                    Log.d("favCities","${myFavouriteCities.value.size}")
+                } else {
+                    _myFavouriteCities.value = emptyList()
+                }
+            }
+    }
+
+    fun removeFromMyFavouriteCities(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        cityToRemove: Mesto
+    ) {
+        val cityToHash = hashMapOf(
+            "nazov" to cityToRemove.nazov,
+            "skratka" to cityToRemove.skratka
+        )
+
+        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString()).collection("favouriteCities").whereEqualTo("city", cityToHash).get()
+            .addOnSuccessListener {
+                if (!it.isEmpty) {
+                    for (document in it.documents) {
+                        firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+                            .collection("favouriteCities").document(document.id).delete()
+                            .addOnSuccessListener {
+                                onSuccess()
+                            }
+                            .addOnFailureListener {
+                                onFailure()
+                            }
+                    }
+                } else {
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 
 }
