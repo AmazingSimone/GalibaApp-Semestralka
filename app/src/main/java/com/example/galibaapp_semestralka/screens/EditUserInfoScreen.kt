@@ -1,9 +1,15 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
@@ -81,6 +90,10 @@ fun EditUserInfoScreen(
     val username by firebaseViewModel.username.observeAsState()
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
+    val profilePic by firebaseViewModel.profilePic.observeAsState()
+
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -89,7 +102,9 @@ fun EditUserInfoScreen(
     Log.d("EditUserInfo", "$username , $bio, $isArtist")
 
     Surface (
-        modifier = Modifier.fillMaxSize().statusBarsPadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -120,15 +135,76 @@ fun EditUserInfoScreen(
                 }
             }
 
-            Surface(
+            var selectedImageUri by remember {
+                mutableStateOf<Uri?>(null)
+            }
+
+            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = {
+                    selectedImageUri = it
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        singlePhotoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+
+                    }
             ) {
-                Image(
+
+                if (profilePic?.isEmpty() == true && selectedImageUri == null) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_profile),
+                        contentDescription = "empty profile",
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                } else if (selectedImageUri != null) {
+
+                    AsyncImage(
+                        model =selectedImageUri,
+                        contentDescription =null,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    AsyncImage(
+                        model = profilePic,
+                        contentDescription =null,
+                        modifier = Modifier
+                            .matchParentSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                }
+
+
+
+                Box(
                     modifier = Modifier
-                        .size(200.dp)
-                        .clip(CircleShape),
-                    painter = painterResource(id = R.drawable.empty_profile),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
+                        .matchParentSize()
+                        .background(Color(0x80000000))
+                )
+
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.Center)
                 )
             }
 
@@ -268,8 +344,7 @@ fun EditUserInfoScreen(
                 )
             }
 
-            val context = LocalContext.current
-            OutlinedButton(
+                        OutlinedButton(
                 onClick = {
                     showDialog = true
 
@@ -289,9 +364,12 @@ fun EditUserInfoScreen(
 
                     val data = Data(usernameChanged.value,userBioChanged.value,isArtistChanged.value)
 
+
+
                     val onSuccess = {
-                        navController.popBackStack()
+
                         Toast.makeText(context, "Zmeny boli ulozene", Toast.LENGTH_LONG).show()
+                        firebaseViewModel.getCurrentUserData()
 
                     }
 
@@ -299,12 +377,34 @@ fun EditUserInfoScreen(
                         Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG).show()
                     }
                     firebaseViewModel.updateUserData(onSuccess,onFailure,usernameChanged.value,userBioChanged.value,isArtistChanged.value)
+
+                    if (selectedImageUri != null) {
+                        val onSuccessUpload = {
+                            Toast.makeText(context, "Obrazok bol nahraty", Toast.LENGTH_LONG).show()
+                            selectedImageUri = null
+                        }
+                        val onFailureUpload = {
+                            Toast.makeText(context, "Nastala chyba pri nahravani obrazku", Toast.LENGTH_LONG).show()
+
+                        }
+                        firebaseViewModel.saveToUserProfilePictures(onSuccessUpload,onFailureUpload,
+                            selectedImageUri!!
+                        )
+                    }
+
                 },
+
                 modifier = Modifier.fillMaxWidth(),
-                enabled = (usernameChanged.value?.isNotEmpty() ?: false && (username != usernameChanged.value || bio != userBioChanged.value || isArtist != isArtistChanged.value))
+                enabled = (usernameChanged.value?.isNotEmpty() ?: false && (username != usernameChanged.value ||
+                        bio != userBioChanged.value ||
+                        isArtist != isArtistChanged.value ||
+                        selectedImageUri != null
+                        ))
             ) {
                 Text(text = "Ulozit zmeny")
             }
+            Log.d("neuveritelnyVyberacFotiek", "isArtist ${isArtist}")
+            Log.d("neuveritelnyVyberacFotiek", "isArtistChanged ${isArtistChanged}")
         }
     }
 }

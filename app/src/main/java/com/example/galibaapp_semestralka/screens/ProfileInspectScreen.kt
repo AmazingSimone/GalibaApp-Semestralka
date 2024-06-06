@@ -2,6 +2,7 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
@@ -98,15 +100,28 @@ fun ProfileInspectScreen(
             }
 
             Spacer(modifier = Modifier.padding(all = 20.dp))
+            Log.d("profilovkaaaaaaa", chosenUser.value?.profilePic.toString())
+            if (chosenUser.value?.profilePic?.isEmpty() == true) {
+                Image(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(id = R.drawable.empty_profile),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null
+                )
+            } else {
+                AsyncImage(
+                    model = chosenUser.value?.profilePic,
+                    contentDescription =null,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-            Image(
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape),
-                painter = painterResource(id = R.drawable.empty_profile),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
+
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
@@ -226,9 +241,7 @@ fun ProfileInspectScreen(
                     CustomCard(
                         firebaseViewModel = firebaseViewModel,
                         navController = navController,
-                        image = R.drawable.backonlabelpfp,
                         event = event,
-                        profilePic = R.drawable.backonlabelpfp
                     )
                 }
             }

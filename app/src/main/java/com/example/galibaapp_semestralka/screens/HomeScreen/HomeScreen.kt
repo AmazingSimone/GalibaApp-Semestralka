@@ -106,6 +106,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.Event
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
@@ -392,9 +393,8 @@ fun HomeScreen(
                                 CustomCard(
                                     firebaseViewModel = firebaseViewModel,
                                     navController = navController,
-                                    image = R.drawable.backonlabelpfp,
                                     event = event,
-                                    profilePic = R.drawable.backonlabelpfp
+                                    //image = R.drawable.backtooldschoolposter
                                 )
                             }
                         }
@@ -484,6 +484,7 @@ fun HomeScreenNavigation(
 
     val username by firebaseViewModel.username.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
+    val profilePic by firebaseViewModel.profilePic.observeAsState()
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -513,10 +514,24 @@ fun HomeScreenNavigation(
 
                     NavigationDrawerItem(
                         icon = {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = null
-                            )
+                            Log.d("profilovka",profilePic.toString())
+                            if (profilePic?.isEmpty() == true) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = null
+                                )
+                            } else {
+                                AsyncImage(
+                                    model = profilePic,
+                                    contentDescription =null,
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+
                         },
                         label = { Text("@" + username) ?: "" },
                         selected = false,
@@ -740,9 +755,9 @@ fun CustomCard(
     //modifier: Modifier = Modifier,
     firebaseViewModel: FirebaseViewModel,
     navController: NavController,
-    @DrawableRes image: Int,
+    @DrawableRes image: Int = 0,
     event: Event?,
-    @DrawableRes profilePic: Int
+    //profilePic: Any? = ""
 ) {
     var showFullContent by remember {
         mutableStateOf(false)
@@ -770,23 +785,19 @@ fun CustomCard(
                 }
             },
         shape = RoundedCornerShape(16.dp),
-        //colors = MaterialTheme.colorScheme.backgroundz,
         border = BorderStroke(1.dp, Color.Black)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-
-                modifier = Modifier.fillMaxSize(),
             ) {
-                Box {
+                Box (
+                ){
                     Row(
                         modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
                         //horizontalArrangement = Arrangement.SpaceEvenly
-
                     )
                     {
 
@@ -833,12 +844,7 @@ fun CustomCard(
                                                 //modifier = Modifier.fillMaxWidth(),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
-//                                                Icon(
-//                                                    imageVector = Icons.Filled.Check,
-//                                                    contentDescription = "interested",
-//                                                    modifier = Modifier.size(20.dp)
-//                                                )
-//                                                Spacer(modifier = Modifier.padding(2.dp))
+                                                Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
                                                     text = ("\uD83E\uDD19 ${ event?.interested.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
@@ -866,12 +872,7 @@ fun CustomCard(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
 
-//                                                Icon(
-//                                                    imageVector = Icons.Filled.CheckCircle,
-//                                                    contentDescription = "coming",
-//                                                    modifier = Modifier.size(20.dp)
-//                                                )
-//                                                Spacer(modifier = Modifier.padding(2.dp))
+                                                Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
                                                     text = ("\uD83D\uDEB6 ${ event?.coming.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
@@ -929,21 +930,21 @@ fun CustomCard(
                                 style = MaterialTheme.typography.bodySmall
                                 //fontWeight = FontWeight.Bold
                             )
-
                         }
 
-                        Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.size(width = 100.dp, height = 140.dp)
-                        ) {
-                            Image(
-                                modifier = Modifier.fillMaxSize(),
-                                painter = painterResource(id = image),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null
-                            )
+                        if (image != 0) {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.size(width = 100.dp, height = 140.dp)
+                            ) {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    painter = painterResource(id = image),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null
+                                )
+                            }
                         }
-
                     }
                 }
 
@@ -1168,22 +1169,39 @@ fun CustomCard(
                         }
                     )
                 ) {
-                    Image(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape),
-                        painter = painterResource(id = profilePic),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null
-                    )
-
 
                     var username by remember { mutableStateOf("") }
+                    var profilePic by remember { mutableStateOf("") }
+
+                    if (profilePic != "null") {
+                        AsyncImage(
+                            model = profilePic,
+                            contentDescription =null,
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape),
+                            painter = painterResource(id = R.drawable.empty_profile ),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null
+                        )
+                    }
+
+
+
+
 
                     firebaseViewModel.getUserData(
                         usedId = event?.userId.toString(),
                         onSuccess = {
                             username = it.username.toString()
+                            profilePic = it.profilePic.toString()
                         },
                         onFailure = {
 

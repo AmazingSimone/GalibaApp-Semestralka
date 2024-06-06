@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Login.LoginViewModel
@@ -81,6 +82,7 @@ fun UserScreen(
     val email by firebaseViewModel.emailId.observeAsState()
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
+    val profilePic by firebaseViewModel.profilePic.observeAsState()
 
     val myEventList = firebaseViewModel.allEventsByUser.collectAsState()
     val interestedEventList = firebaseViewModel.myInterestedEvents.collectAsState()
@@ -141,17 +143,30 @@ fun UserScreen(
                             )
                         }
                     }
-
                     Spacer(modifier = Modifier.padding(all = 20.dp))
+                    if (profilePic?.isEmpty() != true) {
+                        AsyncImage(
+                            model = profilePic,
+                            contentDescription =null,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(CircleShape),
+                            painter = painterResource(id = R.drawable.empty_profile),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null
+                        )
+                    }
 
-                    Image(
-                        modifier = Modifier
-                            .size(200.dp)
-                            .clip(CircleShape),
-                        painter = painterResource(id = R.drawable.empty_profile),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null
-                    )
+
+
+
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
                     Text(
@@ -302,9 +317,7 @@ fun UserScreen(
                                 CustomCard(
                                     firebaseViewModel = firebaseViewModel,
                                     navController = navController,
-                                    image = R.drawable.backonlabelpfp,
                                     event = event,
-                                    profilePic = R.drawable.backonlabelpfp
                                 )
                             }
                         }
@@ -317,9 +330,7 @@ fun UserScreen(
                                 CustomCard(
                                     firebaseViewModel = firebaseViewModel,
                                     navController = navController,
-                                    image = R.drawable.backonlabelpfp,
                                     event = event,
-                                    profilePic = R.drawable.backonlabelpfp
                                 )
                             }
                         }
@@ -331,9 +342,7 @@ fun UserScreen(
                                 CustomCard(
                                     firebaseViewModel = firebaseViewModel,
                                     navController = navController,
-                                    image = R.drawable.backonlabelpfp,
                                     event = event,
-                                    profilePic = R.drawable.backonlabelpfp
                                 )
                             }
                         }

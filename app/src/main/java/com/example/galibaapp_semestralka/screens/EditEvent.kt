@@ -1,11 +1,15 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,15 +59,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.galibaapp_semestralka.R
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
@@ -138,6 +144,9 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
             var eventNameChanged by remember { mutableStateOf(chosenEvent?.eventName) }
 
             var eventLocationChanged by remember { mutableStateOf(chosenEvent?.location) }
+            var eventDetailsChanged by remember { mutableStateOf(chosenEvent?.eventDetails.toString()) }
+
+            var eventCityChanged by remember { mutableStateOf(chosenEvent?.city) }
 
 
 
@@ -186,7 +195,9 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         if ((eventNameChanged?.isNotEmpty() ?: false && eventNameChanged != chosenEvent?.eventName) ||
                             (eventDateChanged != chosenEvent?.dateAndTime?.toLocalDate() && eventDateChanged?.isBefore(LocalDate.now()) == false) ||
                             (searchCityViewModel.selectedMesto.value != null && searchCityViewModel.selectedMesto.value != chosenEvent?.city) ||
-                            (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false)) {
+                            (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false ||
+                                    eventDetailsChanged != chosenEvent?.eventDetails
+                                    )) {
                             showDialogCancelCreate = true
                         } else {
                             navController.popBackStack()
@@ -362,6 +373,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     .padding(6.dp)
                                     .clickable {
                                         searchCityViewModel.chooseMesto(mesto)
+                                        eventCityChanged = searchCityViewModel.selectedMesto.value
                                         Log.d(
                                             "mestoAkcie",
                                             "${searchCityViewModel.selectedMesto.value}"
@@ -394,23 +406,58 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            Surface(
+            var selectedImageUri by remember {
+                mutableStateOf<Uri?>(null)
+            }
 
+            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickVisualMedia(),
+                onResult = {
+                    selectedImageUri = it
+                }
+            )
+
+            Surface(
                 shape = RoundedCornerShape(5.dp),
-                modifier = Modifier.fillMaxWidth()
-                //.size(width = 100.dp, height = 140.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        singlePhotoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
             ) {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(id = R.drawable.backonlabelpfp),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .size(350.dp)
+                ) {
+                    AsyncImage(
+                        model =selectedImageUri,
+                        contentDescription =null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Color(0x80000000))
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .align(Alignment.Center)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            var eventDetailsChanged by remember { mutableStateOf(chosenEvent?.eventDetails.toString()) }
 
             val localFocusManager = LocalFocusManager.current
 
@@ -526,7 +573,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     onSuccess,
                                     onFailure,
                                     eventId = chosenEvent?.eventId.toString(),
-                                    city = searchCityViewModel.selectedMesto.value,
+                                    city = eventCityChanged,
                                     dateAndTime = datumACasAkcieChanged,
                                     eventDetails = eventDetailsChanged,
                                     eventName = eventNameChanged,
@@ -562,7 +609,8 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 enabled = (eventNameChanged?.isNotEmpty() ?: false && eventNameChanged != chosenEvent?.eventName) ||
                           (eventDateChanged != chosenEvent?.dateAndTime?.toLocalDate() && eventDateChanged?.isBefore(LocalDate.now()) == false) ||
                            (searchCityViewModel.selectedMesto.value != null && searchCityViewModel.selectedMesto.value != chosenEvent?.city) ||
-                            (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false)
+                            (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false ||
+                            eventDetailsChanged != chosenEvent?.eventDetails)
 
 
 //                enabled = eventNameChanged?.isNotEmpty() ?: false && (eventDateChanged != LocalDate.MIN && (eventDateChanged?.isAfter(

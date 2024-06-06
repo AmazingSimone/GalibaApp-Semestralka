@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
@@ -94,12 +95,14 @@ fun FollowScreen(
 
                             var username by remember { mutableStateOf("") }
                             var bio by remember { mutableStateOf("") }
+                            var profilePic by remember { mutableStateOf("") }
 
                             firebaseViewModel.getUserData(
                                 usedId = user.toString(),
                                 onSuccess = {
                                     username = it.username.toString()
                                     bio = it.bio.toString()
+                                    profilePic = it.profilePic.toString()
                                 },
                                 onFailure = {
 
@@ -112,7 +115,7 @@ fun FollowScreen(
                                 userId = user.toString(),
                                 meno = username,
                                 popis = bio,
-                                profilePic = R.drawable.backonlabelpfp
+                                profilePic = profilePic
                             )
                         }
                     }
@@ -146,8 +149,7 @@ fun CustomListItem(
     userId: String,
     meno: String,
     popis: String = "",
-    @DrawableRes
-    profilePic: Int
+    profilePic: String?
 ) {
     //TODO - spytaj sa jak mam spravit podmienku aby sa tam bud pridal alebo nepridal parameter
     Box(Modifier.clickable {
@@ -231,14 +233,26 @@ fun CustomListItem(
             },
 
             leadingContent = {
-                Image(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(CircleShape),
-                    painter = painterResource(id = profilePic),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
-                )
+                if (profilePic?.isEmpty() == true) {
+                    Image(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape),
+                        painter = painterResource(id = R.drawable.empty_profile),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null
+                    )
+                } else {
+                    AsyncImage(
+                        model = profilePic,
+                        contentDescription =null,
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
             }
         )
     }

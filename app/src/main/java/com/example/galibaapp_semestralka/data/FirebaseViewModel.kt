@@ -1,5 +1,6 @@
 package com.example.galibaapp_semestralka.data
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -10,6 +11,7 @@ import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 import com.example.galibaapp_semestralka.data.Register.RegisterViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDateTime
@@ -21,6 +23,8 @@ class FirebaseViewModel : ViewModel() {
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     private val firebaseFirestore = FirebaseFirestore.getInstance()
+
+    private val firebaseStorage = FirebaseStorage.getInstance()
 
     var myEvents = mutableStateListOf<Event?>()
 
@@ -70,6 +74,8 @@ class FirebaseViewModel : ViewModel() {
 
     val isArtist: MutableLiveData<Boolean> = MutableLiveData()
 
+    val profilePic: MutableLiveData<String> = MutableLiveData()
+
 
     fun checkForActiveUser() {
         isUserLoggedIn.value = firebaseAuth.currentUser != null
@@ -95,6 +101,7 @@ class FirebaseViewModel : ViewModel() {
                     if (document != null && document.exists()) {
                         username.value = document.getString("username")
                         bio.value = document.getString("bio")
+                        profilePic.value = document.get("profilePic").toString()
                         isArtist.value = document.getBoolean("isArtist")
                         Log.d(TAG, "Username: ${username.value}")
                     }
@@ -128,6 +135,7 @@ class FirebaseViewModel : ViewModel() {
         firebaseFirestore.collection("users").document(usedId).get().addOnSuccessListener {
             user.username = it.get("username").toString()
             user.isArtist = it.get("isArtist") as Boolean?
+            user.profilePic = it.get("profilePic").toString()
             user.bio = it.get("bio").toString()
             onSuccess(user)
         }.addOnFailureListener {
@@ -255,7 +263,7 @@ class FirebaseViewModel : ViewModel() {
     ) {
 
         firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
-            .set(
+            .update(
                 mapOf(
                     "username" to newUsername,
                     "bio" to newBio,
@@ -1146,6 +1154,37 @@ class FirebaseViewModel : ViewModel() {
             }
             .addOnFailureListener {
                 onFailure()
+            }
+    }
+
+
+    fun saveToUserProfilePictures(
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+        uri: Uri
+    ) {
+
+
+        firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg").putFile(uri).addOnSuccessListener {
+            firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
+                firebaseFirestore.collection("users").document(firebaseAuth.uid.toString()).update("profilePic", it.toString())
+                        .addOnSuccessListener {
+                            onSuccess()
+                            Log.d("neuveritelnyVyberacFotiek", "success")
+                        }
+                        .addOnFailureListener {
+                            onFailure()
+                            Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
+                        }
+                }.addOnFailureListener {
+                    onFailure()
+                Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
+
+            }
+            }
+            .addOnFailureListener {
+                onFailure()
+                Log.d("neuveritelnyVyberacFotiek", "fail")
             }
     }
 

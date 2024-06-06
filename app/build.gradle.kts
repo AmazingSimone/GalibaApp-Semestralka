@@ -96,5 +96,6 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
 
+    implementation ("io.coil-kt:coil-compose:2.1.0")
 
 }
