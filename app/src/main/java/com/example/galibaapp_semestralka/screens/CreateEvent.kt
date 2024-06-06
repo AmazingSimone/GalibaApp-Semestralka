@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -33,10 +35,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -81,7 +83,9 @@ fun CreateEvent(
     createEventViewModel: CreateEventViewModel = viewModel(),
     firebaseViewModel: FirebaseViewModel
 ) {
-    Surface {
+    Surface (
+        modifier = Modifier.fillMaxSize().statusBarsPadding()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -125,7 +129,7 @@ fun CreateEvent(
                 AlertDialog(
                     onDismissRequest = { showDialogCancelCreate = false },
                     confirmButton = {
-                        Button(
+                        TextButton(
                             onClick = {
                                 showDialogCancelCreate = false
 //                                navController.navigate(Screens.AUTHROOT.name) {
@@ -138,7 +142,7 @@ fun CreateEvent(
                         }
                     },
                     dismissButton = {
-                        OutlinedButton(
+                        TextButton(
                             onClick = { showDialogCancelCreate = false },
 
                             ) {
@@ -163,7 +167,7 @@ fun CreateEvent(
                 )
                 IconButton(
                     onClick = {
-                        if (nazovAkcie.isNotEmpty() || miestoAkcie.isNotEmpty() || datumAkcie != LocalDate.MIN) {
+                        if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
                             showDialogCancelCreate = true
                         } else {
                             navController.popBackStack()
@@ -174,6 +178,13 @@ fun CreateEvent(
                 }
             }
 
+            BackHandler {
+                if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
+                    showDialogCancelCreate = true
+                } else {
+                    navController.popBackStack()
+                }
+            }
 
             val (eventNameFocusRequester, eventDateFocusRequester, eventCityFocusRequester, eventPlaceFocusRequester, eventBioFocusRequester) = remember { FocusRequester.createRefs() }
 
@@ -403,7 +414,7 @@ fun CreateEvent(
                 AlertDialog(
                     onDismissRequest = { showDialogConfirmCreate = false },
                     confirmButton = {
-                        Button(
+                        TextButton(
                             onClick = {
                                 showDialogConfirmCreate = false
 //                                navController.navigate(Screens.AUTHROOT.name) {
@@ -439,7 +450,7 @@ fun CreateEvent(
                         }
                     },
                     dismissButton = {
-                        OutlinedButton(
+                        TextButton(
                             onClick = { showDialogConfirmCreate = false },
 
                             ) {

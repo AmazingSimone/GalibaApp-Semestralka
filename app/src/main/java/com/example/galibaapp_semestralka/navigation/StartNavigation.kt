@@ -1,5 +1,7 @@
 package com.example.galibaapp_semestralka.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,6 +16,7 @@ import com.example.galibaapp_semestralka.screens.HomeScreen.HomeScreenNavigation
 import com.example.galibaapp_semestralka.screens.LoginScreen
 import com.example.galibaapp_semestralka.screens.RegisterScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Start(navController : NavHostController = rememberNavController(), firebaseViewModel: FirebaseViewModel = viewModel()) {

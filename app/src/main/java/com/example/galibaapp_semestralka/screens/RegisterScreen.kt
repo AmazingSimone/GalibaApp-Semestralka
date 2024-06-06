@@ -425,7 +425,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                     registerViewModel.registrationUIState.value.passwordErr ||
                                     registerViewModel.registrationUIState.value.passwordMatchErr)
                         ) {
-                            Text(text = "Registracia")
+                            Text(text = "Registrovat")
 
                         }
                     }

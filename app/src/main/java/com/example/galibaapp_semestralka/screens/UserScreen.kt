@@ -1,7 +1,7 @@
 package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
-import android.os. Build
+import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -51,8 +52,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -81,7 +82,7 @@ fun UserScreen(
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
 
-    val eventList = firebaseViewModel.events.collectAsState()
+    val myEventList = firebaseViewModel.allEventsByUser.collectAsState()
     val interestedEventList = firebaseViewModel.myInterestedEvents.collectAsState()
     val comingEventList = firebaseViewModel.myComingEvents.collectAsState()
 
@@ -99,7 +100,11 @@ fun UserScreen(
         firebaseViewModel.getMyComingEvents()
     }
 
-    Surface {
+    Surface (
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ){
 
         Scaffold (
             snackbarHost = {SnackbarHost(snackbarHostState)},
@@ -156,13 +161,31 @@ fun UserScreen(
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
-                    Text(
-                        text = ("@" + (username ?: "")),
-                        fontSize = MaterialTheme.typography.displayMedium.fontSize,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+
+
+
+                        Row {
+                            Text(
+                                text = "@",
+                                fontSize = MaterialTheme.typography.displaySmall.fontSize,
+                                fontWeight = FontWeight.Bold
+                            )
+                            FlowRow {
+                                Text(
+                                    text = username ?: "",
+                                    fontSize = MaterialTheme.typography.displaySmall.fontSize,
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = 40.sp
+
+                                    //   maxLines = 1,
+                                    //overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+
+
+
+
 
 
                     Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -178,7 +201,6 @@ fun UserScreen(
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
-
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -197,7 +219,7 @@ fun UserScreen(
 
 
                         FlowRow {
-                            if (eventList.value.isNotEmpty()) {
+                            if (myEventList.value.isNotEmpty()) {
                                 FilterChip(
                                     onClick = { selectedCreated = !selectedCreated },
                                     label = { Text("Vytvorene") },
@@ -214,86 +236,57 @@ fun UserScreen(
                                         null
                                     },
                                 )
+                                Spacer(modifier = Modifier.padding(all = 5.dp))
+
                             }
 
-                            Spacer(modifier = Modifier.padding(all = 5.dp))
+                                FilterChip(
+                                    onClick = { selectedInterested = !selectedInterested },
+                                    label = { Text("Mas zaujem") },
+                                    selected = selectedInterested,
+                                    leadingIcon = if (selectedInterested) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Done icon",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                                )
+                                Spacer(modifier = Modifier.padding(all = 5.dp))
 
-                            FilterChip(
-                                onClick = { selectedInterested = !selectedInterested },
-                                label = { Text("Mas zaujem") },
-                                selected = selectedInterested,
-                                leadingIcon = if (selectedInterested) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "Done icon",
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                        )
-                                    }
-                                } else {
-                                    null
-                                },
-                            )
-                            Spacer(modifier = Modifier.padding(all = 5.dp))
+                                FilterChip(
+                                    onClick = { selectedComing = !selectedComing },
+                                    label = { Text("Ides") },
+                                    selected = selectedComing,
+                                    leadingIcon = if (selectedComing) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Done icon",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                                )
 
-                            FilterChip(
-                                onClick = { selectedComing = !selectedComing },
-                                label = { Text("Ides") },
-                                selected = selectedComing,
-                                leadingIcon = if (selectedComing) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "Done icon",
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                        )
-                                    }
-                                } else {
-                                    null
-                                },
-                            )
                         }
 
-                    
-                    Spacer(modifier = Modifier.padding(all = 5.dp))
 
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.padding(all = 5.dp))
+                        Spacer(modifier = Modifier.padding(all = 5.dp))
 
-                    //Log.d("FirebaseViewModel", "${eventList.size}")
-
-//                    LazyColumn {
-//                        itemsIndexed(eventList) {
-//                                index, item ->
-//                            CustomCard(
-//                                navController = navController,
-//                                image = R.drawable.backonlabelpfp,
-//                                title = eventList[index]?.nazovAkcie,
-//                                location = eventList[index]?.miestoAkcie.toString(),
-//                                date = eventList[index]?.datumACasAkcie?.toLocalDate().toString(),
-//                                text = eventList[index]?.popisakcie.toString(),
-//                                autor = username.toString(),
-//                                profilePic = R.drawable.backonlabelpfp
-//                            )
-//                        }
-//                    }
+                        HorizontalDivider()
+                        //Spacer(modifier = Modifier.padding(all = 5.dp))
 
 
 
-
-//                    Column (modifier = Modifier.padding(20.dp)) {
-//                        for (event in eventList) {
-//                            CustomCard(
-//                                navController = navController,
-//                                image = R.drawable.backonlabelpfp,
-//                                title = event?.nazov.toString(),
-//                                location = event?.miesto.toString(),
-//                                date = "",
-//                                text = event?.popis.toString(),
-//                                autor = firebaseViewModel.username.toString(),
-//                                profilePic = R.drawable.backonlabelpfp
-//                            )
-//                        }
+//                    } else {
+//                        Spacer(modifier = Modifier.padding(all = 55.dp))
 //                    }
 
                     Column(
@@ -302,21 +295,8 @@ fun UserScreen(
                     ) {
 
 
-//                        CustomCard(
-//                            navController,
-//                            image = R.drawable.backtooldschoolposter,
-//                            title = "Back To Oldschool",
-//                            location = "Klub 77, Banska Bystrica",
-//                            date = "6.5.2023",
-//                            text = "Throwback party pre mladých? Aj to je koncept. BackToOldschool sa vracia vo svojej siedmej edícií\uD83D\uDD7A\n" +
-//                                    ".\n" +
-//                                    "Hráme šialené mashupy trackov z rokov 60’ až 00’. Ako spolu znie Sara Perche Ti Amo a Du Hast? Alebo Rihanna a Meki Žbirka? ",
-//                            autor = "Back On Label",
-//                            profilePic = R.drawable.backonlabelpfp
-//                        )
-
                         if (selectedCreated) {
-                            for (event in eventList.value) {
+                            for (event in myEventList.value) {
                                 //Spacer(modifier = Modifier.height(15.dp))
 
                                 CustomCard(
@@ -359,21 +339,6 @@ fun UserScreen(
                         }
 
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
-
-                    val onSuccess = {
-
-
-                    }
-
-                    val onFailure: () -> Unit = {
-
-                    }
-
-
-
-
-
 
 
 
@@ -385,16 +350,20 @@ fun UserScreen(
                         verticalArrangement = Arrangement.Bottom,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Spacer(modifier = Modifier.padding(all = 10.dp))
+
                         Button(onClick = {
 
-
-                            navController.popBackStack()
-                            navController.popBackStack()
-                            if (navController.currentBackStackEntry?.lifecycle?.currentState?.isAtLeast(
-                                    Lifecycle.State.CREATED) != false
-                            ) {
-                                navController.navigate(Screens.AUTHROOT.name)
+                            val onSuccess = {
+                                navController.popBackStack()
+                                navController.popBackStack()
+                                if (navController.currentBackStackEntry?.lifecycle?.currentState?.isAtLeast(
+                                        Lifecycle.State.CREATED) != false
+                                ) {
+                                    navController.navigate(Screens.AUTHROOT.name)
+                                }
                             }
+
 
                             val onFailure: () -> Unit = {
                                 scope.launch {

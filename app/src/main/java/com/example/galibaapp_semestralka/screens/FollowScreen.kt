@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -57,7 +58,7 @@ fun FollowScreen(
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
 
@@ -83,11 +84,11 @@ fun FollowScreen(
             val userList = firebaseViewModel.myFollowedUsers
 
             Box {
+                if (userList.isNotEmpty()) {
 
-                Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState())
-                ) {
-                    if (userList.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    ) {
                         for (user in userList) {
                             //Spacer(modifier = Modifier.height(15.dp))
 
@@ -115,21 +116,24 @@ fun FollowScreen(
                             )
                         }
                     }
-                }
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(25.dp),
-                    contentAlignment = Alignment.Center
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(25.dp),
+                        contentAlignment = Alignment.Center
 
-                ) {
-                    Text(
-                        text = "Je tu celkom ticho... skus niekomu hodit follow \uD83D\uDC40",
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 40.sp
-                    )
+                    ) {
+                        Text(
+                            text = "Je tu celkom ticho... skus niekomu hodit follow \uD83D\uDC40",
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                            fontWeight = FontWeight.ExtraBold,
+                            lineHeight = 40.sp
+                        )
+                    }
                 }
+
             }
         }
     }
@@ -147,22 +151,22 @@ fun CustomListItem(
 ) {
     //TODO - spytaj sa jak mam spravit podmienku aby sa tam bud pridal alebo nepridal parameter
     Box(Modifier.clickable {
-            val onSuccess = {
-                navController.navigate(Screens.USER_PROFILE.name) {
-                    launchSingleTop = true
-                }
-
+        val onSuccess = {
+            navController.navigate(Screens.USER_PROFILE.name) {
+                launchSingleTop = true
             }
 
-            val onFailure = {
+        }
 
-            }
+        val onFailure = {
 
-            firebaseViewModel.selectUser(
-                onSuccess,
-                onFailure,
-                userId.toString()
-            )
+        }
+
+        firebaseViewModel.selectUser(
+            onSuccess,
+            onFailure,
+            userId.toString()
+        )
 
     }) {
 
@@ -177,34 +181,38 @@ fun CustomListItem(
 
         }
 
-        val onUnfollowFailure: ()-> Unit = {
+        val onUnfollowFailure: () -> Unit = {
         }
 
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Zrušiť sledovanie") },
-                    text = { Text(text = "Naozaj chcete zrušiť sledovanie tohto používateľa?") },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                checkedState.value = false
-                                firebaseViewModel.unFollow(onUnfollowSuccess, onUnfollowFailure, userId.toString())
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text(text = "Zrušiť sledovanie") },
+                text = { Text(text = "Naozaj chcete zrušiť sledovanie tohto používateľa?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            checkedState.value = false
+                            firebaseViewModel.unFollow(
+                                onUnfollowSuccess,
+                                onUnfollowFailure,
+                                userId.toString()
+                            )
 
-                            }
-                        ) {
-                            Text(text = "Áno")
                         }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showDialog = false }
-                        ) {
-                            Text(text = "Nie")
-                        }
+                    ) {
+                        Text(text = "Áno")
                     }
-                )
-            }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text(text = "Nie")
+                    }
+                }
+            )
+        }
 
         ListItem(
             //colors = ListItemDefaults.colors(surfaceLight),
@@ -217,9 +225,9 @@ fun CustomListItem(
                     onCheckedChange = {
                         //checkedState.value = it
                         showDialog = true
-                                      },
+                    },
 
-                )
+                    )
             },
 
             leadingContent = {

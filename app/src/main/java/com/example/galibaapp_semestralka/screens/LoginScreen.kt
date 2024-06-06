@@ -220,7 +220,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                                     )
 
                         ) {
-                            Text(text = "Prihlasenie")
+                            Text(text = "Prihlasit")
                         }
                     }
                 }

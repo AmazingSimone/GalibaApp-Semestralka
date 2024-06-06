@@ -17,6 +17,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -92,6 +95,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -120,8 +124,10 @@ import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation",
+    "UnrememberedMutableState"
+)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -136,20 +142,25 @@ fun HomeScreen(
     val mesta by searchCityViewModel.mestaForSearch.collectAsState()
     //val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
-    val eventList = firebaseViewModel.events.collectAsState()
+    val allEventList = firebaseViewModel.allEvents.collectAsState()
+    val allEventByUserList = firebaseViewModel.allEventsByUser.collectAsState()
+    val allEventByCityList = firebaseViewModel.allEventsByCity.collectAsState()
 
-    Log.d("createdEventList", "${eventList.value.size}")
+    Log.d("createdEventList", "${allEventList.value.size}")
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
 
-        firebaseViewModel.getAllEventsCreated()
-
+        if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") {
+            firebaseViewModel.getAllEventsCreated()
+        }
+        Log.d("homeScr","sel city name launch: ${homeScreenViewModel.selectedCityName.value}")
         firebaseViewModel.getMyFollowingList()
         firebaseViewModel.getMyFavouriteCities()
         //homeScreenViewModel.oblubeneMesta = firebaseViewModel.myFavouriteCities
         //firebaseViewModel.getAllEventsCreated(byCity = firebaseViewModel.chosenCity)
     }
+    Log.d("homeScr","sel city name: ${homeScreenViewModel.selectedCityName.value}")
 
 
     val scope = rememberCoroutineScope()
@@ -157,7 +168,8 @@ fun HomeScreen(
     val context = LocalContext.current
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
 
@@ -178,14 +190,29 @@ fun HomeScreen(
 
                     ) {
 
+                    FlowRow {
+                        Text(
+                            text = "Ahoj, ",
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                            //lineHeight = 40.sp
+                            //maxLines = 1,
+                            //overflow = TextOverflow.Ellipsis
+                            //color = MaterialTheme.colorScheme.onSurface
+                        )
 
-                    Text(
-                        text = "Ahoj, $username \uD83D\uDC4B",
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                        //color = MaterialTheme.colorScheme.onSurface
-                    )
+                        Text(
+                            text = "$username \uD83D\uDC4B",
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 40.sp,
+                            modifier = Modifier.clickable {
+                                navController.navigate(Screens.USER_PROFILE_EDIT_ROOT.name)
+                            }
+                        )
+
+                    }
+
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -234,7 +261,7 @@ fun HomeScreen(
                         onActiveChange = {
                             homeScreenViewModel.active.value = it
                         },
-                        placeholder = { Text(text = "Hladaj Galibu") },
+                        placeholder = { Text(text = "Vyhladaj mesto") },
                         leadingIcon = {
                             IconButton(onClick = {
                                 scope.launch { drawerState.open() }
@@ -340,29 +367,56 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    var eventList = listOf<Event?>()
 
+                    if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") {
+                        eventList = allEventList.value
+                    } else {
+                        eventList = allEventByCityList.value
+                    }
 
+                    if (eventList.isNotEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .verticalScroll(rememberScrollState())
+                        ) {
 
-                    Column(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .verticalScroll(rememberScrollState())
-                    ) {
-
-                        //Spacer(modifier = Modifier.height(15.dp))
-
-                        for (event in eventList.value) {
                             //Spacer(modifier = Modifier.height(15.dp))
 
-                            CustomCard(
-                                firebaseViewModel = firebaseViewModel,
-                                navController = navController,
-                                image = R.drawable.backonlabelpfp,
-                                event = event,
-                                profilePic = R.drawable.backonlabelpfp
+                            //Log.d("homeScr","event size ${allEventList.value.size}")
+
+                            for (event in eventList) {
+                                //Spacer(modifier = Modifier.height(15.dp))
+
+                                CustomCard(
+                                    firebaseViewModel = firebaseViewModel,
+                                    navController = navController,
+                                    image = R.drawable.backonlabelpfp,
+                                    event = event,
+                                    profilePic = R.drawable.backonlabelpfp
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(25.dp),
+                            contentAlignment = Alignment.Center
+
+                        ) {
+                            Text(
+                                text = "Je tu trocha prazdno... skus vyhladat ine mesto \uD83C\uDF10",
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 40.sp
                             )
                         }
                     }
+
+
 
 
                     // FIREBASE ///
@@ -665,7 +719,7 @@ fun HomeScreenNavigation(
                 }
                 navigation(
                     route = Screens.USER_PROFILE_EDIT_ROOT.name,
-                    startDestination = Screens.USER_PROFILE.name
+                    startDestination = Screens.PERSONAL_USER_PROFILE.name
                 ) {
                     composable(route = Screens.PERSONAL_USER_PROFILE.name) {
                         UserScreen(navController, firebaseViewModel = firebaseViewModel)
@@ -696,10 +750,15 @@ fun CustomCard(
 
     var isOwner = firebaseViewModel.currentUserId.value == event?.userId
 
+    val context = LocalContext.current
+
+
     if ((event?.eventDetails?.length ?: 0) < 50) {
         showFullContent = true
     }
     Spacer(modifier = Modifier.height(10.dp))
+
+
 
     Card(
         //colors = CardDefaults.cardColors(surfaceContainerLowLight),
@@ -941,6 +1000,7 @@ fun CustomCard(
                                         onClick = {
                                             val onSuccess = {
                                                 interestedState = 0
+
                                             }
 
                                             val onFailure = {
@@ -963,6 +1023,11 @@ fun CustomCard(
                                         onClick = {
                                             val onSuccess = {
                                                 interestedState = 1
+                                                Toast.makeText(
+                                                    context,
+                                                    "Pridane do tvojich eventov",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
 
                                             }
 
@@ -986,7 +1051,11 @@ fun CustomCard(
                                         onClick = {
                                             val onSuccess = {
                                                 interestedState = 2
-
+                                                Toast.makeText(
+                                                    context,
+                                                    "Pridane do tvojich eventov",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
 
                                             val onFailure = {

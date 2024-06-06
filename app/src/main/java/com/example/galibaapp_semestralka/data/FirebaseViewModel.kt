@@ -26,8 +26,14 @@ class FirebaseViewModel : ViewModel() {
 
     //var userEvents = mutableStateListOf<Event?>()
 
-    private val _events = MutableStateFlow<List<Event?>>(emptyList())
-    val events: StateFlow<List<Event?>> = _events
+    private val _allEvents = MutableStateFlow<List<Event?>>(emptyList())
+    val allEvents: StateFlow<List<Event?>> = _allEvents
+
+    private val _allEventsByCity = MutableStateFlow<List<Event?>>(emptyList())
+    val allEventsByCity: StateFlow<List<Event?>> = _allEventsByCity
+
+    private val _allEventsByUser = MutableStateFlow<List<Event?>>(emptyList())
+    val allEventsByUser: StateFlow<List<Event?>> = _allEventsByUser
 
     private val _myInterestedEvents = MutableStateFlow<List<Event?>>(emptyList())
     val myInterestedEvents: StateFlow<List<Event?>> = _myInterestedEvents
@@ -583,16 +589,19 @@ class FirebaseViewModel : ViewModel() {
                             currentUserEvents.add(event)
                         }
                         //userEvents = currentUserEvents
-                        _events.value = currentUserEvents
+                        _allEventsByUser.value = currentUserEvents
+                        //_allEvents.value = currentUserEvents
                     } else {
                         Log.d("firebaseviewmodel", "No events found for the current user.")
                         //userEvents.clear()
-                        _events.value = emptyList()
+                        _allEventsByUser.value = emptyList()
+                        //_allEvents.value = emptyList()
                     }
                 }
                 .addOnFailureListener {
                     //userEvents.clear()
-                    _events.value = emptyList()
+                    _allEventsByUser.value = emptyList()
+                    //_allEvents.value = emptyList()
 
                 }
 
@@ -662,14 +671,20 @@ class FirebaseViewModel : ViewModel() {
                             Log.d("createdEventList", "inside byCity end ${event.toString()}")
                         }
                         //eventsByCity = currentCityEvents
-                        _events.value = currentCityEvents
+                        //_allEvents.value = currentCityEvents
+                        _allEventsByCity.value = currentCityEvents
 
                     } else {
                         Log.d("createdEventList", "inside byCity failure")
 
                         //eventsByCity.clear()
-                        _events.value = emptyList()
+                        _allEventsByCity.value = emptyList()
+                        //_allEvents.value = emptyList()
                     }
+                }
+                .addOnFailureListener {
+                    _allEventsByCity.value = emptyList()
+
                 }
 
         } else {
@@ -725,11 +740,14 @@ class FirebaseViewModel : ViewModel() {
                         currentEvents.add(event)
 
                     }
-                    _events.value = currentEvents
+                    _allEvents.value = currentEvents
                 } else {
-                    _events.value = emptyList()
+                    _allEvents.value = emptyList()
                 }
             }
+                .addOnFailureListener {
+                    _allEvents.value = emptyList()
+                }
         }
     }
 
