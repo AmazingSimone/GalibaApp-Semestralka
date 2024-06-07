@@ -2,6 +2,7 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -83,6 +86,11 @@ fun UserScreen(
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
     val profilePic by firebaseViewModel.profilePic.observeAsState()
+    val instagramUsername by firebaseViewModel.instagramUsername.observeAsState()
+    val facebookUsername by firebaseViewModel.facebookUsername.observeAsState()
+    val youtubeUsername by firebaseViewModel.youtubeUsername.observeAsState()
+    val tiktokUsername by firebaseViewModel.tiktokUsername.observeAsState()
+    val website by firebaseViewModel.website.observeAsState()
 
     val myEventList = firebaseViewModel.allEventsByUser.collectAsState()
     val interestedEventList = firebaseViewModel.myInterestedEvents.collectAsState()
@@ -144,16 +152,7 @@ fun UserScreen(
                         }
                     }
                     Spacer(modifier = Modifier.padding(all = 20.dp))
-                    if (profilePic?.isEmpty() != true) {
-                        AsyncImage(
-                            model = profilePic,
-                            contentDescription =null,
-                            modifier = Modifier
-                                .size(200.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
+                    if (profilePic?.toString() == "null") {
                         Image(
                             modifier = Modifier
                                 .size(200.dp)
@@ -162,6 +161,17 @@ fun UserScreen(
                             contentScale = ContentScale.Crop,
                             contentDescription = null
                         )
+                    } else {
+                        AsyncImage(
+                            model = profilePic,
+                            contentDescription =null,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+
+
                     }
 
 
@@ -215,9 +225,64 @@ fun UserScreen(
                         text = bio ?: "",
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
+
+                    FlowRow {
+                        if (instagramUsername != "") {
+                            ClickableSocialMediaChip(
+                                urlPrefix = "https://www.instagram.com/",
+                                text = instagramUsername.toString(),
+                                socialMediaName = "Instagram",
+                                socialMediaIcon = R.drawable.instagram_icon
+                            )
+                            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                        }
+
+                        if (facebookUsername != "") {
+                            ClickableSocialMediaChip(
+                                urlPrefix = "https://www.facebook.com/",
+                                text = facebookUsername.toString(),
+                                socialMediaName = "Facebook",
+                                socialMediaIcon = R.drawable.facebook_icon
+                            )
+                            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                        }
+
+                        if (youtubeUsername != "") {
+                            ClickableSocialMediaChip(
+                                urlPrefix = "https://www.youtube.com/@",
+                                text = youtubeUsername.toString(),
+                                socialMediaName = "Youtube",
+                                socialMediaIcon = R.drawable.youtube_icon
+                            )
+                            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                        }
+                        if (tiktokUsername != "") {
+                            ClickableSocialMediaChip(
+                                urlPrefix = "https://www.tiktok.com/@",
+                                text = tiktokUsername.toString(),
+                                socialMediaName = "Tiktok",
+                                socialMediaIcon = R.drawable.tiktok_icon
+                            )
+                            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                        }
+                        if (website != "") {
+                            ClickableSocialMediaChip(
+                                urlPrefix = website.toString(),
+                                socialMediaName = "Stranka",
+                                socialMediaIcon = R.drawable.web_icon_default
+                            )
+                        }
+
+                    }
+                    
                     Spacer(modifier = Modifier.padding(all = 10.dp))
 
-                        Row(
+
+                    Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Start
                         ) {
@@ -404,6 +469,68 @@ fun UserScreen(
 
 
     }
+}
+
+
+@Composable
+fun ClickableSocialMediaChip(
+    urlPrefix: String,
+    text: String = "",
+    //style: TextStyle = TextStyle.Default,
+    socialMediaName: String,
+    socialMediaIcon: Int = R.drawable.web_icon_default
+//    color: Color = TextStyle.Default.color,
+//    fontSize: TextUnit = TextUnit.Unspecified,
+//    fontWeight: FontWeight? = null
+) {
+    //val formattedText = text.replace(" ", "+")
+    var url = ""
+    if (text == "") {
+        url = "https://www.$urlPrefix"
+    } else {
+        url = urlPrefix + text
+
+    }
+    Log.d("vlastneUrl",url)
+
+//    val annotatedString = buildAnnotatedString {
+//        withStyle(style = SpanStyle(color = color, fontSize = fontSize, fontWeight = fontWeight)) {
+//            append(text)
+//        }
+//        addStringAnnotation(
+//            tag = "URL",
+//            annotation = url,
+//            start = 0,
+//            end = text.length
+//        )
+//    }
+
+    val uriHandler = LocalUriHandler.current
+
+    SuggestionChip(
+        onClick = { uriHandler.openUri(url) },
+        label = {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
+            ) {
+                Icon(painter = painterResource(id = socialMediaIcon), contentDescription = "socialMediaIcon", modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.padding(2.dp))
+                Text(socialMediaName)
+            }
+
+        }
+    )
+
+//    ClickableText(
+//        text = url,
+//        onClick = { offset ->
+//            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+//                .firstOrNull()?.let { annotation ->
+//                    uriHandler.openUri(annotation.item)
+//                }
+//        }
+//    )
 }
 
 //@Composable

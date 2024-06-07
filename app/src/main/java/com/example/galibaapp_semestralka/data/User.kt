@@ -5,5 +5,10 @@ data class User(
     var isArtist: Boolean? = false,
     var profilePic: String? = "",
     var username: String? = "",
+    var instagramUsername: String? = "",
+    var facebookUsername: String? = "",
+    var youtubeUsername: String? = "",
+    var tiktokUsername: String? = "",
+    var website: String? = "",
     var userId: String? = ""
 )
