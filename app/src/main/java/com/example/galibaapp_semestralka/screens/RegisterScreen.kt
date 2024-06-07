@@ -140,9 +140,10 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             trailingIcon = {
                                 Icon(imageVector = Icons.Default.Person, contentDescription = "accBoxIcon")
                             },
-                            prefix = {
-                                Text(text = "@")
-                            },
+//                            prefix = {
+//                                Text(text = "@")
+//                            },
+
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next
                             ),

@@ -81,18 +81,37 @@ fun EditUserInfoScreen(
 //    val bio = "omg omg omg omg omg omg omg"
 //    val isArtist = false
 
-    data class Data(
-        var username: String? = "",
-        var bio: String? = "",
-        var isArtist: Boolean? = false
-    )
 
     val username by firebaseViewModel.username.observeAsState()
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
     val profilePic by firebaseViewModel.profilePic.observeAsState()
+    val instagramUsername by firebaseViewModel.instagramUsername.observeAsState()
+    val facebookUsername by firebaseViewModel.facebookUsername.observeAsState()
+    val youtubeUsername by firebaseViewModel.youtubeUsername.observeAsState()
+    val tiktokUsername by firebaseViewModel.tiktokUsername.observeAsState()
+    val website by firebaseViewModel.website.observeAsState()
+
 
     val context = LocalContext.current
+    val usernameChanged = remember { mutableStateOf(username) }
+
+    var userBioChanged = remember { mutableStateOf(bio) }
+
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val instagramUsernameChanged = remember { mutableStateOf(instagramUsername) }
+
+    val facebookUsernameChanged = remember { mutableStateOf(facebookUsername) }
+
+    val youtubeUsernameChanged = remember { mutableStateOf(youtubeUsername) }
+
+    val tiktokUsernameChanged = remember { mutableStateOf(tiktokUsername) }
+
+    val websiteChanged = remember { mutableStateOf(website) }
+
 
 
     LaunchedEffect(Unit) {
@@ -135,9 +154,7 @@ fun EditUserInfoScreen(
                 }
             }
 
-            var selectedImageUri by remember {
-                mutableStateOf<Uri?>(null)
-            }
+
 
             val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.PickVisualMedia(),
@@ -158,7 +175,7 @@ fun EditUserInfoScreen(
                     }
             ) {
 
-                if (profilePic?.isEmpty() == true && selectedImageUri == null) {
+                if (profilePic?.toString() == "null" && selectedImageUri == null) {
                     Image(
                         painter = painterResource(id = R.drawable.empty_profile),
                         contentDescription = "empty profile",
@@ -210,9 +227,15 @@ fun EditUserInfoScreen(
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            val usernameChanged = remember { mutableStateOf(username) }
 
-            val (usernameFocusRequester, realNameFocusRequester, realSurnameFocusRequester, userEmailFocusRequester, userBioFocusRequester) = remember { FocusRequester.createRefs() }
+            val (usernameFocusRequester,
+                userBioFocusRequester,
+                usernameInstagramFocusRequester,
+                usernameFacebookFocusRequester,
+                usernameYoutubeFocusRequester,
+                usernameTiktokFocusRequester,
+                websiteFocusRequester
+                ) = remember { FocusRequester.createRefs() }
             val localFocusManager = LocalFocusManager.current
 
             val maxChar = 15
@@ -241,7 +264,6 @@ fun EditUserInfoScreen(
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            var userBioChanged = remember { mutableStateOf(bio) }
 
             val maxCharBio = 150
             OutlinedTextField(
@@ -258,12 +280,137 @@ fun EditUserInfoScreen(
                 minLines = 5,
                 maxLines = 5,
                 keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        localFocusManager.clearFocus()
                     }
+                )
+            )
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(usernameInstagramFocusRequester)
+                    .fillMaxWidth(),
+                value = instagramUsernameChanged.value.toString(),
+                onValueChange = {
+                        instagramUsernameChanged.value = it
+                },
+                label = { Text("Instagram") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                prefix = {
+                    Text(text = "@")
+                },
+                suffix = {
+                         Icon(painter = painterResource(id = R.drawable.instagram_icon), contentDescription = "ig", modifier = Modifier.size(24.dp))
+                },
+                keyboardActions = KeyboardActions(
+                    onNext = { usernameFacebookFocusRequester.requestFocus() }
+                )
+            )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(usernameFacebookFocusRequester)
+                    .fillMaxWidth(),
+                value = facebookUsernameChanged.value.toString(),
+                onValueChange = {
+                    facebookUsernameChanged.value = it
+                },
+                label = { Text("Facebook") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                prefix = {
+                    Text(text = "@")
+                },
+                suffix = {
+                    Icon(painter = painterResource(id = R.drawable.facebook_icon), contentDescription = "fb", modifier = Modifier.size(24.dp))
+                },
+                keyboardActions = KeyboardActions(
+                    onNext = { usernameYoutubeFocusRequester.requestFocus() }
+                )
+            )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(usernameYoutubeFocusRequester)
+                    .fillMaxWidth(),
+                value = youtubeUsernameChanged.value.toString(),
+                onValueChange = {
+                    youtubeUsernameChanged.value = it
+                },
+                label = { Text("YouTube") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                prefix = {
+                    Text(text = "@")
+                },
+                suffix = {
+                    Icon(painter = painterResource(id = R.drawable.youtube_icon), contentDescription = "yt", modifier = Modifier.size(24.dp))
+                },
+                keyboardActions = KeyboardActions(
+                    onNext = { usernameTiktokFocusRequester.requestFocus() }
+                )
+            )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(usernameTiktokFocusRequester)
+                    .fillMaxWidth(),
+                value = tiktokUsernameChanged.value.toString(),
+                onValueChange = {
+                    tiktokUsernameChanged.value = it
+                },
+                label = { Text("TikTok") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                prefix = {
+                    Text(text = "@")
+                },
+                suffix = {
+                    Icon(painter = painterResource(id = R.drawable.tiktok_icon), contentDescription = "tt")
+                },
+                keyboardActions = KeyboardActions(
+                    onNext = { websiteFocusRequester.requestFocus() }
+                )
+            )
+
+            Spacer(modifier = Modifier.padding(all = 10.dp))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(websiteFocusRequester)
+                    .fillMaxWidth(),
+                value = websiteChanged.value.toString(),
+                onValueChange = {
+                    websiteChanged.value = it
+                },
+                label = { Text("Webstranka") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                suffix = {
+                    Icon(painter = painterResource(id = R.drawable.web_icon_default), contentDescription = "fb")
+                },
+                keyboardActions = KeyboardActions(
+                    onNext = { localFocusManager.clearFocus() }
                 )
             )
 
@@ -309,10 +456,12 @@ fun EditUserInfoScreen(
                         TextButton(
                             onClick = {
                                 showDialog = false
-                                val onSuccess = {
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.navigate(Screens.AUTHROOT.name)
+                                navController.popBackStack()
+                                navController.popBackStack()
+                                navController.navigate(Screens.AUTHROOT.name)
+                                val onSuccess: () -> Unit = {
+                                    Log.d("vymazatUcet", "vymazalo")
+
 
                                 }
                                 val onFailure = {}
@@ -362,7 +511,7 @@ fun EditUserInfoScreen(
                 onClick = {
 
 
-                    val data = Data(usernameChanged.value,userBioChanged.value,isArtistChanged.value)
+                    //val data = Data(usernameChanged.value,userBioChanged.value,isArtistChanged.value)
 
 
 
@@ -376,7 +525,18 @@ fun EditUserInfoScreen(
                     val onFailure: () -> Unit = {
                         Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG).show()
                     }
-                    firebaseViewModel.updateUserData(onSuccess,onFailure,usernameChanged.value,userBioChanged.value,isArtistChanged.value)
+                    firebaseViewModel.updateUserData(
+                        onSuccess,
+                        onFailure,
+                        usernameChanged.value,
+                        userBioChanged.value,
+                        isArtistChanged.value,
+                        instagramUsernameChanged.value,
+                        facebookUsernameChanged.value,
+                        youtubeUsernameChanged.value,
+                        tiktokUsernameChanged.value,
+                        websiteChanged.value
+                    )
 
                     if (selectedImageUri != null) {
                         val onSuccessUpload = {
@@ -398,7 +558,12 @@ fun EditUserInfoScreen(
                 enabled = (usernameChanged.value?.isNotEmpty() ?: false && (username != usernameChanged.value ||
                         bio != userBioChanged.value ||
                         isArtist != isArtistChanged.value ||
-                        selectedImageUri != null
+                        selectedImageUri != null ||
+                        instagramUsername != instagramUsernameChanged.value ||
+                        facebookUsername != facebookUsernameChanged.value ||
+                        youtubeUsername != youtubeUsernameChanged.value ||
+                        tiktokUsername != tiktokUsernameChanged.value ||
+                        website != websiteChanged.value
                         ))
             ) {
                 Text(text = "Ulozit zmeny")
