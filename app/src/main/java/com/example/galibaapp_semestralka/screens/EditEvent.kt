@@ -148,7 +148,9 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
             var eventCityChanged by remember { mutableStateOf(chosenEvent?.city) }
 
-
+            var eventPicChanged by remember {
+                mutableStateOf<Uri?>(null)
+            }
 
             if (showDialogCancelCreate) {
                 AlertDialog(
@@ -196,7 +198,8 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                             (eventDateChanged != chosenEvent?.dateAndTime?.toLocalDate() && eventDateChanged?.isBefore(LocalDate.now()) == false) ||
                             (searchCityViewModel.selectedMesto.value != null && searchCityViewModel.selectedMesto.value != chosenEvent?.city) ||
                             (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false ||
-                                    eventDetailsChanged != chosenEvent?.eventDetails
+                                    eventDetailsChanged != chosenEvent?.eventDetails ||
+                                    eventPicChanged != null
                                     )) {
                             showDialogCancelCreate = true
                         } else {
@@ -406,14 +409,12 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            var selectedImageUri by remember {
-                mutableStateOf<Uri?>(null)
-            }
+
 
             val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.PickVisualMedia(),
                 onResult = {
-                    selectedImageUri = it
+                    eventPicChanged = it
                 }
             )
 
@@ -432,12 +433,29 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         .fillMaxSize()
                         .size(350.dp)
                 ) {
-                    AsyncImage(
-                        model =selectedImageUri,
-                        contentDescription =null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+
+
+                    Log.d("neuveritelnyVyberacFotiek","${chosenEvent?.eventPic}")
+                    if (chosenEvent?.eventPic?.isNotEmpty() == true && eventPicChanged == null) {
+                        AsyncImage(
+                            model =chosenEvent?.eventPic.toString(),
+                            contentDescription =null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                    } else if (eventPicChanged != null) {
+
+                        AsyncImage(
+                            model = eventPicChanged,
+                            contentDescription =null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                    }
+
+
 
                     Box(
                         modifier = Modifier
@@ -577,6 +595,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     dateAndTime = datumACasAkcieChanged,
                                     eventDetails = eventDetailsChanged,
                                     eventName = eventNameChanged,
+                                    eventPic = eventPicChanged,
                                     location = eventLocationChanged
                                 )
 
@@ -610,7 +629,9 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                           (eventDateChanged != chosenEvent?.dateAndTime?.toLocalDate() && eventDateChanged?.isBefore(LocalDate.now()) == false) ||
                            (searchCityViewModel.selectedMesto.value != null && searchCityViewModel.selectedMesto.value != chosenEvent?.city) ||
                             (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false ||
-                            eventDetailsChanged != chosenEvent?.eventDetails)
+                            eventDetailsChanged != chosenEvent?.eventDetails ||
+                                    eventPicChanged != null
+                                    )
 
 
 //                enabled = eventNameChanged?.isNotEmpty() ?: false && (eventDateChanged != LocalDate.MIN && (eventDateChanged?.isAfter(

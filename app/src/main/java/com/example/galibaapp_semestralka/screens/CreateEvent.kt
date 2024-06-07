@@ -468,6 +468,7 @@ fun CreateEvent(
 //                                }
 
                                 val onSuccess = {
+
                                     navController.popBackStack()
                                     Toast.makeText(
                                         context,
@@ -484,6 +485,7 @@ fun CreateEvent(
                                     onSuccess,
                                     onFailure,
                                     nazovAkcie,
+                                    selectedImageUri,
                                     miestoAkcie,
                                     datumACasAkcie,
                                     selectedMesto,
@@ -517,7 +519,8 @@ fun CreateEvent(
                     showDialogConfirmCreate = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(LocalDate.now()) || datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
+                enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(LocalDate.now()) ||
+                        datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
             ) {
                 Text(text = "Vytvorit galibu")
             }

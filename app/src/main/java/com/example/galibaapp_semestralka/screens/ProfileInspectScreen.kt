@@ -69,6 +69,8 @@ fun ProfileInspectScreen(
         firebaseViewModel.isFollowing(chosenUser.value?.userId.toString())
     }
 
+    Log.d("profilovkaaaaaaa", "profile pic : ${chosenUser.value?.profilePic.toString()}")
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -100,7 +102,6 @@ fun ProfileInspectScreen(
             }
 
             Spacer(modifier = Modifier.padding(all = 20.dp))
-            Log.d("profilovkaaaaaaa", chosenUser.value?.profilePic.toString())
             if (chosenUser.value?.profilePic?.isEmpty() == true) {
                 Image(
                     modifier = Modifier

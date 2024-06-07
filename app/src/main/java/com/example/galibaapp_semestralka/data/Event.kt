@@ -8,6 +8,7 @@ data class Event(
     var dateAndTime: LocalDateTime? = null,
     var eventDetails: String? = "",
     var eventName: String? = "",
+    var eventPic: String? = "",
     var interested: Long? = 0,
     var location: String? = "",
     var userId: String? = "",

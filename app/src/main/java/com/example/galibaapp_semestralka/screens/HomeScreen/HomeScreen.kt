@@ -7,7 +7,6 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -169,7 +168,8 @@ fun HomeScreen(
     val context = LocalContext.current
 
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
@@ -752,12 +752,9 @@ fun HomeScreenNavigation(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomCard(
-    //modifier: Modifier = Modifier,
     firebaseViewModel: FirebaseViewModel,
     navController: NavController,
-    @DrawableRes image: Int = 0,
     event: Event?,
-    //profilePic: Any? = ""
 ) {
     var showFullContent by remember {
         mutableStateOf(false)
@@ -932,16 +929,17 @@ fun CustomCard(
                             )
                         }
 
-                        if (image != 0) {
+                        if (event?.eventPic?.isNotEmpty() == true) {
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier.size(width = 100.dp, height = 140.dp)
                             ) {
-                                Image(
+
+                                AsyncImage(
+                                    model =event.eventPic,
+                                    contentDescription =null,
                                     modifier = Modifier.fillMaxSize(),
-                                    painter = painterResource(id = image),
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null
+                                    contentScale = ContentScale.Crop
                                 )
                             }
                         }
