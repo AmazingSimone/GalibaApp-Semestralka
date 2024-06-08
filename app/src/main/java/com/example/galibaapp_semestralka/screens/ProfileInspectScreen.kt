@@ -51,7 +51,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.google.accompanist.flowlayout.FlowRow
+import com.example.galibaapp_semestralka.screens.HomeScreen.CustomCard
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -81,9 +81,9 @@ fun ProfileInspectScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(all = 20.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(all = 20.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -150,51 +150,6 @@ fun ProfileInspectScreen(
                 text = chosenUser.value?.bio ?: "",
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize
             )
-
-            FlowRow {
-                if (chosenUser.value?.instagramUsername != "") {
-                    ClickableSocialMediaChip(
-                        urlPrefix = "https://www.instagram.com/",
-                        text = chosenUser.value?.instagramUsername.toString(),
-                        socialMediaName = "Instagram",
-                        socialMediaIcon = R.drawable.instagram_icon
-                    )
-                }
-
-                if (chosenUser.value?.facebookUsername != "") {
-                    ClickableSocialMediaChip(
-                        urlPrefix = "https://www.facebook.com/",
-                        text = chosenUser.value?.facebookUsername.toString(),
-                        socialMediaName = "Facebook",
-                        socialMediaIcon = R.drawable.facebook_icon
-                    )
-                }
-
-                if (chosenUser.value?.youtubeUsername != "") {
-                    ClickableSocialMediaChip(
-                        urlPrefix = "https://www.youtube.com/@",
-                        text = chosenUser.value?.youtubeUsername.toString(),
-                        socialMediaName = "Youtube",
-                        socialMediaIcon = R.drawable.youtube_icon
-                    )
-                }
-                if (chosenUser.value?.tiktokUsername != "") {
-                    ClickableSocialMediaChip(
-                        urlPrefix = "https://www.tiktok.com/@",
-                        text = chosenUser.value?.tiktokUsername.toString(),
-                        socialMediaName = "Tiktok",
-                        socialMediaIcon = R.drawable.tiktok_icon
-                    )
-                }
-                if (chosenUser.value?.website != "") {
-                    ClickableSocialMediaChip(
-                        urlPrefix = chosenUser.value?.website.toString(),
-                        socialMediaName = "Stranka",
-                        socialMediaIcon = R.drawable.web_icon_default
-                    )
-                }
-
-            }
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
