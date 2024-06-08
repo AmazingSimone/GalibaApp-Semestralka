@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.screens.HomeScreenNavigation
+import com.example.galibaapp_semestralka.screens.HomeScreen.HomeScreenNavigation
 import com.example.galibaapp_semestralka.screens.LoginScreen
 import com.example.galibaapp_semestralka.screens.RegisterScreen
 
