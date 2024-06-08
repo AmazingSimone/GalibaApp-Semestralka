@@ -1,7 +1,8 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.example.galibaapp_semestralka.screens
+package com.example.galibaapp_semestralka.screens.HomeScreen
 
+//import com.example.galibaapp_semestralka.navigation.listOfNavItems
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +38,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -112,34 +113,40 @@ import com.example.galibaapp_semestralka.data.Home.HomeViewModel
 import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.example.galibaapp_semestralka.navigation.Start
+import com.example.galibaapp_semestralka.screens.CreateEvent
+import com.example.galibaapp_semestralka.screens.EditEvent
+import com.example.galibaapp_semestralka.screens.EditUserInfoScreen
+import com.example.galibaapp_semestralka.screens.FollowScreen
+import com.example.galibaapp_semestralka.screens.ProfileInspectScreen
+import com.example.galibaapp_semestralka.screens.UserScreen
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@SuppressLint(
-    "UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation",
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation",
     "UnrememberedMutableState"
 )
 @Composable
 fun HomeScreen(
     navController: NavController,
-    drawerState: DrawerState,
+    drawerState: DrawerState,// = rememberDrawerState(initialValue = DrawerValue.Closed),
     firebaseViewModel: FirebaseViewModel,// = viewModel()
     homeScreenViewModel: HomeViewModel,
-    searchCityViewModel: SearchCityViewModel = viewModel(),
-    modifier: Modifier
+    searchCityViewModel: SearchCityViewModel = viewModel()
 ) {
 
     val username by firebaseViewModel.username.observeAsState()
     val searchText by searchCityViewModel.searchText.collectAsState()
     val mesta by searchCityViewModel.mestaForSearch.collectAsState()
+    //val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
     val allEventList = firebaseViewModel.allEvents.collectAsState()
     val allEventByUserList = firebaseViewModel.allEventsByUser.collectAsState()
     val allEventByCityList = firebaseViewModel.allEventsByCity.collectAsState()
 
+    Log.d("createdEventList", "${allEventList.value.size}")
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -147,10 +154,13 @@ fun HomeScreen(
         if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") {
             firebaseViewModel.getAllEventsCreated()
         }
+        Log.d("homeScr","sel city name launch: ${homeScreenViewModel.selectedCityName.value}")
         firebaseViewModel.getMyFollowingList()
         firebaseViewModel.getMyFavouriteCities()
-
+        //homeScreenViewModel.oblubeneMesta = firebaseViewModel.myFavouriteCities
+        //firebaseViewModel.getAllEventsCreated(byCity = firebaseViewModel.chosenCity)
     }
+    Log.d("homeScr","sel city name: ${homeScreenViewModel.selectedCityName.value}")
 
 
     val scope = rememberCoroutineScope()
@@ -159,21 +169,24 @@ fun HomeScreen(
 
     Surface(
         modifier = Modifier
-            .fillMaxSize(),
-            //.statusBarsPadding(),
+            .fillMaxSize()
+            .statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
 
-        //Scaffold(
+        Scaffold(
 
-            //topBar = {
+            topBar = {
 
 
                 Column(
-                    //modifier = Modifier
-                        //.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = bottomBarPadding)
-                      //  .fillMaxWidth(),
-                    modifier = modifier.padding(20.dp),
+                    modifier = Modifier
+                        //.fillMaxSize()
+                        //
+
+                        .padding(20.dp)
+                        .fillMaxWidth(),
+                    //.verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.Start,
 
                     ) {
@@ -182,8 +195,11 @@ fun HomeScreen(
                         Text(
                             text = "Ahoj, ",
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-
-                            )
+                            //lineHeight = 40.sp
+                            //maxLines = 1,
+                            //overflow = TextOverflow.Ellipsis
+                            //color = MaterialTheme.colorScheme.onSurface
+                        )
 
                         Text(
                             text = "$username \uD83D\uDC4B",
@@ -195,6 +211,7 @@ fun HomeScreen(
                                 navController.navigate(Screens.USER_PROFILE_EDIT_ROOT.name)
                             }
                         )
+
                     }
 
 
@@ -215,10 +232,18 @@ fun HomeScreen(
 
                     }
 
-                    //Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
+                    //var text by remember { mutableStateOf("") }
                     var active by remember { mutableStateOf(false) }
-
+//                    var favouriteIcon by remember {
+//                        mutableStateOf(Icons.Default.FavoriteBorder)
+//                    }
+//                    var items = remember {
+//                        mutableStateListOf(
+//                            ""
+//                        )
+//                    }
                     SearchBar(
 
                         //colors = SearchBarDefaults.colors(surfaceContainerLight),
@@ -390,10 +415,47 @@ fun HomeScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
-                }
 
-            //},
+
+
+
+                    // FIREBASE ///
+
+
+//                    val eventList = firebaseViewModel.allEvents
+//                    Log.d("Firebaseviewmodel", "${eventList.size}")
+//                    Column(
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(20.dp))
+//                    ) {
+//
+//                        for (event in eventList) {
+//                            CustomCard(
+//                                firebaseViewModel = firebaseViewModel,
+//                                navController = navController,
+//                                image = R.drawable.backonlabelpfp,
+//                                title = event?.nazov.toString(),
+//                                location = event?.miesto.toString(),
+//                                city = event?.mesto?.nazov.toString(),
+//                                cityPrefix = event?.mesto?.skratka.toString(),
+//                                date = event?.datumACas?.toLocalDate()?.format(DateTimeFormatter.ofPattern("d MMM")) .toString(),
+//                                time = event?.datumACas?.toLocalTime().toString(),
+//                                text = event?.popis.toString(),
+//                                author = firebaseViewModel.username.value.toString(),
+//                                profilePic = R.drawable.backonlabelpfp
+//                            )
+//                        }
+//                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+
+
+                    //}
+                    //}
+                    //}
+                }
+                //}
+
+            },
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //TODO 0
             // OBRAZOVKY HOME SCREEN A FOLLOW SCREEN SU LEN PREKRYTE SPODNYN MAVIGACNYM BAROM NEDA SA DOSTAT NA UPLNY KONIEC LISTU
@@ -401,7 +463,7 @@ fun HomeScreen(
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-        //) {}
+        ) {}
 
     }
 }
@@ -452,8 +514,8 @@ fun HomeScreenNavigation(
 
                     NavigationDrawerItem(
                         icon = {
-                            Log.d("profilovka", profilePic.toString())
-                            if (profilePic?.toString() == "null") {
+                            Log.d("profilovka",profilePic.toString())
+                            if (profilePic?.isEmpty() == true) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     contentDescription = null
@@ -461,7 +523,7 @@ fun HomeScreenNavigation(
                             } else {
                                 AsyncImage(
                                     model = profilePic,
-                                    contentDescription = null,
+                                    contentDescription =null,
                                     modifier = Modifier
                                         .size(30.dp)
                                         .clip(CircleShape),
@@ -580,6 +642,8 @@ fun HomeScreenNavigation(
 
         Scaffold(
             bottomBar = {
+
+
                 if (navBackStackEntry?.destination?.route == Screens.HOME.name || navBackStackEntry?.destination?.route == Screens.FOLLOW.name) {
 
                     data class NavItem(
@@ -594,6 +658,7 @@ fun HomeScreenNavigation(
                     )
 
                     NavigationBar {
+
                         listOfNavItems.forEach { navItem ->
                             NavigationBarItem(
                                 selected = currentRouteDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -619,52 +684,53 @@ fun HomeScreenNavigation(
                 }
             },
             floatingActionButton = {
+
                 if (navBackStackEntry?.destination?.route == Screens.HOME.name && isArtist == true) {
+
+
                     FloatingActionButton(
                         onClick = {
                             navController.navigate(Screens.CREATE_EVENT.name) {
                                 launchSingleTop = true
                             }
                         },
-                    ) {
+
+                        ) {
                         Icon(Icons.Filled.Add, "Floating action button.")
                     }
                 }
             }
-        ) { paddingValues ->
+        ) {
             NavHost(
                 navController = navController,
                 route = Screens.HOMEROOT.name,
-                startDestination = Screens.HOME.name,
-                //modifier = Modifier.padding(it)
+                startDestination = Screens.HOME.name
             ) {
                 composable(route = Screens.HOME.name) {
                     HomeScreen(
                         navController = navController,
                         drawerState = drawerState,
                         firebaseViewModel = firebaseViewModel,
-                        homeScreenViewModel = homeScreenViewModel,
-                        modifier = Modifier.padding(paddingValues)
+                        homeScreenViewModel = homeScreenViewModel
                     )
                 }
                 composable(route = Screens.FOLLOW.name) {
-                    FollowScreen(
-                        navController = navController,
-                        firebaseViewModel = firebaseViewModel,
-                        modifier = Modifier.padding(paddingValues)
-                    )
+                    FollowScreen(navController = navController, firebaseViewModel)
                 }
                 composable(route = Screens.AUTHROOT.name) {
                     Start()
                 }
                 composable(route = Screens.USER_PROFILE.name) {
                     ProfileInspectScreen(firebaseViewModel, navController)
+                    //tuto pozor aby sa to vymazalo z backstacku...
                 }
                 composable(route = Screens.CREATE_EVENT.name) {
                     CreateEvent(navController, firebaseViewModel = firebaseViewModel)
+                    //aj toto
                 }
                 composable(route = Screens.EDIT_EVENT.name) {
                     EditEvent(navController, firebaseViewModel = firebaseViewModel)
+                    //a toto
                 }
                 navigation(
                     route = Screens.USER_PROFILE_EDIT_ROOT.name,
@@ -675,11 +741,11 @@ fun HomeScreenNavigation(
                     }
                     composable(route = Screens.EDIT_USER_PROFILE.name) {
                         EditUserInfoScreen(navController, firebaseViewModel)
+                        // A AJ TOTO
                     }
                 }
             }
         }
-
     }
 }
 
@@ -724,8 +790,8 @@ fun CustomCard(
         ) {
             Column(
             ) {
-                Box(
-                ) {
+                Box (
+                ){
                     Row(
                         modifier = Modifier.fillMaxSize(),
                         //horizontalArrangement = Arrangement.SpaceEvenly
@@ -777,7 +843,7 @@ fun CustomCard(
                                             ) {
                                                 Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
-                                                    text = ("\uD83E\uDD19 ${event?.interested.toString()}"),
+                                                    text = ("\uD83E\uDD19 ${ event?.interested.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
                                                     color = MaterialTheme.colorScheme.secondary,
                                                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -805,7 +871,7 @@ fun CustomCard(
 
                                                 Spacer(modifier = Modifier.padding(2.dp))
                                                 Text(
-                                                    text = ("\uD83D\uDEB6 ${event?.coming.toString()}"),
+                                                    text = ("\uD83D\uDEB6 ${ event?.coming.toString() }"),
                                                     style = MaterialTheme.typography.labelLarge,
                                                     color = MaterialTheme.colorScheme.secondary,
                                                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
@@ -831,7 +897,7 @@ fun CustomCard(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ClickableGoogleMapsLink(
+                                ClickableLink(
                                     text = event?.location.toString(),
                                     color = MaterialTheme.colorScheme.secondary,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -863,15 +929,15 @@ fun CustomCard(
                             )
                         }
 
-                        if (event?.eventPic != "null") {
+                        if (event?.eventPic?.isNotEmpty() == true) {
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier.size(width = 100.dp, height = 140.dp)
                             ) {
 
                                 AsyncImage(
-                                    model = event?.eventPic,
-                                    contentDescription = null,
+                                    model =event.eventPic,
+                                    contentDescription =null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
@@ -906,7 +972,7 @@ fun CustomCard(
                         if (!isOwner) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 if (interestedState == 1) {
-                                    OutlinedButton(
+                                    Button(
                                         modifier = Modifier.fillMaxWidth(),
                                         onClick = {
                                             val onSuccess = {
@@ -922,11 +988,10 @@ fun CustomCard(
                                                 event?.eventId.toString()
                                             )
                                         },
+                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
                                     ) {
-                                        Text("Mas zaujem")
-                                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                                        Icon(imageVector = Icons.Default.Check, contentDescription = "check")
+                                        Text("Mam zaujem")
                                     }
                                 } else if (interestedState == 2) {
                                     Button(
@@ -949,9 +1014,7 @@ fun CustomCard(
                                         //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
                                     ) {
-                                        Text("Prides")
-                                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                                        Icon(imageVector = Icons.Default.Check, contentDescription = "check")
+                                        Text("Pridem")
                                     }
                                 } else {
                                     OutlinedButton(
@@ -1111,7 +1174,7 @@ fun CustomCard(
                     if (profilePic != "null") {
                         AsyncImage(
                             model = profilePic,
-                            contentDescription = null,
+                            contentDescription =null,
                             modifier = Modifier
                                 .size(42.dp)
                                 .clip(CircleShape),
@@ -1122,7 +1185,7 @@ fun CustomCard(
                             modifier = Modifier
                                 .size(42.dp)
                                 .clip(CircleShape),
-                            painter = painterResource(id = R.drawable.empty_profile),
+                            painter = painterResource(id = R.drawable.empty_profile ),
                             contentScale = ContentScale.Crop,
                             contentDescription = null
                         )
@@ -1159,7 +1222,7 @@ fun CustomCard(
 }
 
 @Composable
-fun ClickableGoogleMapsLink(
+fun ClickableLink(
     text: String, style: TextStyle = TextStyle.Default,
     color: Color = TextStyle.Default.color,
     fontSize: TextUnit = TextUnit.Unspecified,
@@ -1192,3 +1255,11 @@ fun ClickableGoogleMapsLink(
         }
     )
 }
+
+//@Preview
+//@Composable
+//fun HomeScreenPreview() {
+//    HomeScreen(navController = NavController())
+//}
+
+

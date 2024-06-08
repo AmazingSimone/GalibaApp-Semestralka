@@ -76,21 +76,14 @@ class FirebaseViewModel : ViewModel() {
 
     val profilePic: MutableLiveData<String> = MutableLiveData()
 
-    val instagramUsername: MutableLiveData<String> = MutableLiveData()
-
-    val facebookUsername: MutableLiveData<String> = MutableLiveData()
-
-    val youtubeUsername: MutableLiveData<String> = MutableLiveData()
-
-    val tiktokUsername: MutableLiveData<String> = MutableLiveData()
-
-    val website: MutableLiveData<String> = MutableLiveData()
 
     fun checkForActiveUser() {
         isUserLoggedIn.value = firebaseAuth.currentUser != null
         if (isUserLoggedIn.value == true) {
             getCurrentUserData()
         }
+        Log.d(TAG, "inside check for user")
+        Log.d(TAG, "${isUserLoggedIn.value}")
     }
 
     fun getCurrentUserData() {
@@ -110,16 +103,28 @@ class FirebaseViewModel : ViewModel() {
                         bio.value = document.getString("bio")
                         profilePic.value = document.get("profilePic").toString()
                         isArtist.value = document.getBoolean("isArtist")
-                        instagramUsername.value = document.getString("instagramUsername")
-                        facebookUsername.value = document.getString("facebookUsername")
-                        youtubeUsername.value = document.getString("youtubeUsername")
-                        tiktokUsername.value = document.getString("tiktokUsername")
-                        website.value = document.getString("website")
-
+                        Log.d(TAG, "Username: ${username.value}")
                     }
                 }
             }
+
+
     }
+
+//    fun getUserName(
+//        onSuccess: (String) -> Unit,
+//        onFailure: () -> Unit,
+//        usedId: String
+//    ): String {
+//        var username: String = ""
+//        firebaseFirestore.collection("users").document(usedId).get().addOnSuccessListener {
+//            username = it.get("username").toString()
+//            onSuccess(username)
+//        }.addOnFailureListener {
+//            onFailure()
+//        }
+//        return username
+//    }
 
     fun getUserData(
         onSuccess: (User) -> Unit,
@@ -132,11 +137,6 @@ class FirebaseViewModel : ViewModel() {
             user.isArtist = it.get("isArtist") as Boolean?
             user.profilePic = it.get("profilePic").toString()
             user.bio = it.get("bio").toString()
-            user.instagramUsername = it.get("instagramUsername").toString()
-            user.facebookUsername = it.get("facebookUsername").toString()
-            user.youtubeUsername = it.get("youtubeUsername").toString()
-            user.tiktokUsername = it.get("tiktokUsername").toString()
-            user.website = it.get("website").toString()
             onSuccess(user)
         }.addOnFailureListener {
             onFailure()
@@ -146,30 +146,38 @@ class FirebaseViewModel : ViewModel() {
 
     fun signUp(onSuccess: () -> Unit, onFailure: () -> Unit, registerViewModel: RegisterViewModel) {
 
+        //var success = mutableStateOf(true)
+        Log.d(TAG, "Inside signUp()")
+        Log.d(TAG, registerViewModel.registrationUIState.value.toString())
+
         registerViewModel.registerInProgress.value = true
+
+
 
         firebaseAuth.createUserWithEmailAndPassword(
             registerViewModel.registrationUIState.value.email,
             registerViewModel.registrationUIState.value.password
         ).addOnSuccessListener {
-
+            //if (task.isSuccessful) {
+            Log.d(TAG, "User created successfully")
+            //success.value = true
             firebaseFirestore.collection("users").document(firebaseAuth.uid.toString())
                 .set(
                     mapOf(
                         "username" to registerViewModel.registrationUIState.value.username,
                         "bio" to registerViewModel.registrationUIState.value.bio,
-                        "isArtist" to registerViewModel.registrationUIState.value.isArtist,
-                        "instagramUsername" to "",
-                        "facebookUsername" to "",
-                        "youtubeUsername" to "",
-                        "tiktokUsername" to "",
-                        "website" to ""
+                        "isArtist" to registerViewModel.registrationUIState.value.isArtist
                     )
                 )
             onSuccess()
         }.addOnFailureListener {
             onFailure()
+
         }
+        //Log.d(TAG, "Error: ${task.exception?.message}")
+
+        //success.value = false
+
         registerViewModel.registerInProgress.value = false
     }
 
@@ -217,9 +225,6 @@ class FirebaseViewModel : ViewModel() {
         onFailure: () -> Unit,
         userId: String
     ) {
-
-        firebaseAuth.signOut()
-
         firebaseFirestore.collection("events")
             .whereEqualTo("userId", userId)
             .get()
@@ -232,22 +237,6 @@ class FirebaseViewModel : ViewModel() {
                 batch.commit()
             }
 
-
-
-        firebaseFirestore.collection("users").document(userId.toString()).collection("comingEvents")
-            .document().delete()
-
-        firebaseFirestore.collection("users").document(userId.toString())
-            .collection("favouriteEvents").document().delete()
-
-        firebaseFirestore.collection("users").document(userId.toString())
-            .collection("followedUsers").document().delete()
-
-        firebaseFirestore.collection("users").document(userId.toString())
-            .collection("interestedEvents").document().delete()
-
-        firebaseStorage.reference.child("userProfileImages/${firebaseAuth.currentUser?.uid.toString()}.jpg")
-            .delete()
 
         firebaseFirestore.collection("users").document(userId.toString())
             .delete()
@@ -263,14 +252,6 @@ class FirebaseViewModel : ViewModel() {
             }
             .addOnFailureListener { exception ->
             }
-
-        firebaseAuth.currentUser?.delete()
-            ?.addOnSuccessListener {
-                onSuccess()
-            }
-            ?.addOnFailureListener {
-                onFailure()
-            }
     }
 
     fun updateUserData(
@@ -278,12 +259,7 @@ class FirebaseViewModel : ViewModel() {
         onFailure: () -> Unit,
         newUsername: String?,
         newBio: String?,
-        changedIsArtist: Boolean?,
-        newInstagramUsername: String?,
-        newFacebookUsername: String?,
-        newYoutubeUsername: String?,
-        newTiktokUsername: String?,
-        newWebsite: String?
+        changedIsArtist: Boolean?
     ) {
 
         firebaseFirestore.collection("users").document(firebaseAuth.currentUser?.uid.toString())
@@ -291,13 +267,7 @@ class FirebaseViewModel : ViewModel() {
                 mapOf(
                     "username" to newUsername,
                     "bio" to newBio,
-                    "isArtist" to changedIsArtist,
-                    "instagramUsername" to newInstagramUsername,
-                    "facebookUsername" to newFacebookUsername,
-                    "youtubeUsername" to newYoutubeUsername,
-                    "tiktokUsername" to newTiktokUsername,
-                    "website" to newWebsite
-
+                    "isArtist" to changedIsArtist
                 )
             )
             .addOnSuccessListener {
@@ -325,37 +295,36 @@ class FirebaseViewModel : ViewModel() {
     ) {
 
         if (eventPic != null) {
-            firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg")
-                .putFile(eventPic).addOnSuccessListener {
-                    firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
-                        firebaseFirestore.collection("events").add(
-                            mapOf(
-                                "eventName" to nazovAkcie,
-                                "eventPic" to it.toString(),
-                                "location" to miestoAkcie,
-                                "dateAndTime" to datumACasAkcie,
-                                "city" to mesto,
-                                "eventDetails" to popisakcie,
-                                "userId" to firebaseAuth.currentUser?.uid,
-                                "interested" to 0,
-                                "coming" to 0
+            firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").putFile(eventPic).addOnSuccessListener {
+                firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
+                    firebaseFirestore.collection("events").add(
+                        mapOf(
+                            "eventName" to nazovAkcie,
+                            "eventPic" to it.toString(),
+                            "location" to miestoAkcie,
+                            "dateAndTime" to datumACasAkcie,
+                            "city" to mesto,
+                            "eventDetails" to popisakcie,
+                            "userId" to firebaseAuth.currentUser?.uid,
+                            "interested" to 0,
+                            "coming" to 0
 
-                            )
                         )
-                            .addOnSuccessListener {
-                                onSuccess()
-                                Log.d("neuveritelnyVyberacFotiek", "success ${it.toString()}")
-                            }
-                            .addOnFailureListener {
-                                onFailure()
-                                Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
-                            }
-                    }.addOnFailureListener {
-                        onFailure()
-                        Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
+                    )
+                        .addOnSuccessListener {
+                            onSuccess()
+                            Log.d("neuveritelnyVyberacFotiek", "success ${it.toString()}")
+                        }
+                        .addOnFailureListener {
+                            onFailure()
+                            Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
+                        }
+                }.addOnFailureListener {
+                    onFailure()
+                    Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
 
-                    }
                 }
+            }
                 .addOnFailureListener {
                     onFailure()
                     Log.d("neuveritelnyVyberacFotiek", "fail")
@@ -384,6 +353,8 @@ class FirebaseViewModel : ViewModel() {
                     onFailure()
                 }
         }
+
+
 
 
     }
@@ -919,14 +890,7 @@ class FirebaseViewModel : ViewModel() {
                                         val hour = (it["hour"] as? Long)?.toInt() ?: 0
                                         val minute = (it["minute"] as? Long)?.toInt() ?: 0
                                         val second = (it["second"] as? Long)?.toInt() ?: 0
-                                        LocalDateTime.of(
-                                            year,
-                                            monthValue,
-                                            dayOfMonth,
-                                            hour,
-                                            minute,
-                                            second
-                                        )
+                                        LocalDateTime.of(year,monthValue, dayOfMonth, hour, minute, second)
                                     }
 
                                     val event = Event(
@@ -982,14 +946,7 @@ class FirebaseViewModel : ViewModel() {
                                         val hour = (it["hour"] as? Long)?.toInt() ?: 0
                                         val minute = (it["minute"] as? Long)?.toInt() ?: 0
                                         val second = (it["second"] as? Long)?.toInt() ?: 0
-                                        LocalDateTime.of(
-                                            year,
-                                            monthValue,
-                                            dayOfMonth,
-                                            hour,
-                                            minute,
-                                            second
-                                        )
+                                        LocalDateTime.of(year,monthValue, dayOfMonth, hour, minute, second)
                                     }
 
                                     val event = Event(
@@ -1046,33 +1003,32 @@ class FirebaseViewModel : ViewModel() {
         Log.d("mestoAkcie", " v update fun ${city.toString()}")
 
         if (eventPic != null) {
-            firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg")
-                .putFile(eventPic).addOnSuccessListener {
-                    firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
-                        firebaseFirestore.collection("events").document(eventId.toString()).update(
-                            mapOf(
-                                "city" to city,
-                                "dateAndTime" to dateAndTime,
-                                "eventDetails" to eventDetails,
-                                "eventName" to eventName,
-                                "eventPic" to it.toString(),
-                                "location" to location,
-                            )
+            firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").putFile(eventPic).addOnSuccessListener {
+                firebaseStorage.reference.child("userCreatedEventsPictures/${firebaseAuth.currentUser?.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
+                    firebaseFirestore.collection("events").document(eventId.toString()).update(
+                        mapOf(
+                            "city" to city,
+                            "dateAndTime" to dateAndTime,
+                            "eventDetails" to eventDetails,
+                            "eventName" to eventName,
+                            "eventPic" to it.toString(),
+                            "location" to location,
                         )
-                            .addOnSuccessListener {
-                                onSuccess()
-                                Log.d("neuveritelnyVyberacFotiek", "success ${it.toString()}")
-                            }
-                            .addOnFailureListener {
-                                onFailure()
-                                Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
-                            }
-                    }.addOnFailureListener {
-                        onFailure()
-                        Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
+                    )
+                        .addOnSuccessListener {
+                            onSuccess()
+                            Log.d("neuveritelnyVyberacFotiek", "success ${it.toString()}")
+                        }
+                        .addOnFailureListener {
+                            onFailure()
+                            Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
+                        }
+                }.addOnFailureListener {
+                    onFailure()
+                    Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
 
-                    }
                 }
+            }
                 .addOnFailureListener {
                     onFailure()
                     Log.d("neuveritelnyVyberacFotiek", "fail")
@@ -1114,11 +1070,6 @@ class FirebaseViewModel : ViewModel() {
                 isArtist = it.get("isArtist") as Boolean?,
                 profilePic = it.get("profilePic").toString(),
                 username = it.get("username").toString(),
-                instagramUsername = it.getString("instagramUsername"),
-                facebookUsername = it.getString("facebookUsername"),
-                youtubeUsername = it.getString("youtubeUsername"),
-                tiktokUsername = it.getString("tiktokUsername"),
-                website = it.getString("website"),
                 userId = userId.toString()
             )
             onSuccess()
@@ -1297,24 +1248,27 @@ class FirebaseViewModel : ViewModel() {
         uri: Uri
     ) {
 
-        firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg")
-            .putFile(uri).addOnSuccessListener {
-                firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
-                    firebaseFirestore.collection("users").document(firebaseAuth.uid.toString())
-                        .update("profilePic", it.toString())
+
+        firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg").putFile(uri).addOnSuccessListener {
+            firebaseStorage.reference.child("userProfileImages/${firebaseAuth.uid.toString()}.jpg").downloadUrl.addOnSuccessListener {
+                firebaseFirestore.collection("users").document(firebaseAuth.uid.toString()).update("profilePic", it.toString())
                         .addOnSuccessListener {
                             onSuccess()
+                            Log.d("neuveritelnyVyberacFotiek", "success")
                         }
                         .addOnFailureListener {
                             onFailure()
+                            Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
                         }
                 }.addOnFailureListener {
                     onFailure()
+                Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
 
-                }
+            }
             }
             .addOnFailureListener {
                 onFailure()
+                Log.d("neuveritelnyVyberacFotiek", "fail")
             }
     }
 
@@ -1326,25 +1280,23 @@ class FirebaseViewModel : ViewModel() {
     ) {
 
 
-        firebaseStorage.reference.child("userCreatedEventsPictures/${eventId.toString()}.jpg")
-            .putFile(uri).addOnSuccessListener {
-                firebaseStorage.reference.child("userCreatedEventsPictures/${eventId.toString()}.jpg").downloadUrl.addOnSuccessListener {
-                    firebaseFirestore.collection("events").document(eventId.toString())
-                        .update("eventPic", it.toString())
-                        .addOnSuccessListener {
-                            onSuccess()
-                            Log.d("neuveritelnyVyberacFotiek", "success")
-                        }
-                        .addOnFailureListener {
-                            onFailure()
-                            Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
-                        }
-                }.addOnFailureListener {
-                    onFailure()
-                    Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
+        firebaseStorage.reference.child("userCreatedEventsPictures/${eventId.toString()}.jpg").putFile(uri).addOnSuccessListener {
+            firebaseStorage.reference.child("userCreatedEventsPictures/${eventId.toString()}.jpg").downloadUrl.addOnSuccessListener {
+                firebaseFirestore.collection("events").document(eventId.toString()).update("eventPic", it.toString())
+                    .addOnSuccessListener {
+                        onSuccess()
+                        Log.d("neuveritelnyVyberacFotiek", "success")
+                    }
+                    .addOnFailureListener {
+                        onFailure()
+                        Log.d("neuveritelnyVyberacFotiek", "ulozil ale nedal do db")
+                    }
+            }.addOnFailureListener {
+                onFailure()
+                Log.d("neuveritelnyVyberacFotiek", "ulozil ale nanasiel db")
 
-                }
             }
+        }
             .addOnFailureListener {
                 onFailure()
                 Log.d("neuveritelnyVyberacFotiek", "fail")
