@@ -63,7 +63,6 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -516,7 +515,7 @@ fun HomeScreenNavigation(
                     NavigationDrawerItem(
                         icon = {
                             Log.d("profilovka",profilePic.toString())
-                            if (profilePic?.toString() == "null") {
+                            if (profilePic?.isEmpty() == true) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     contentDescription = null
@@ -898,7 +897,7 @@ fun CustomCard(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ClickableGoogleMapsLink(
+                                ClickableLink(
                                     text = event?.location.toString(),
                                     color = MaterialTheme.colorScheme.secondary,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -1223,7 +1222,7 @@ fun CustomCard(
 }
 
 @Composable
-fun ClickableGoogleMapsLink(
+fun ClickableLink(
     text: String, style: TextStyle = TextStyle.Default,
     color: Color = TextStyle.Default.color,
     fontSize: TextUnit = TextUnit.Unspecified,
@@ -1256,9 +1255,6 @@ fun ClickableGoogleMapsLink(
         }
     )
 }
-
-
-
 
 //@Preview
 //@Composable

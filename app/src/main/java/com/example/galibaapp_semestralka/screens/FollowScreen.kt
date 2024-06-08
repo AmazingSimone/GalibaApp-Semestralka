@@ -3,10 +3,8 @@ package com.example.galibaapp_semestralka.screens
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,7 +47,9 @@ import com.example.galibaapp_semestralka.navigation.Screens
 @Composable
 fun FollowScreen(
     navController: NavController,
-    firebaseViewModel: FirebaseViewModel
+    firebaseViewModel: FirebaseViewModel,
+    modifier: Modifier
+
 ) {
 
     LaunchedEffect(Unit) {
@@ -59,28 +59,22 @@ fun FollowScreen(
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize().statusBarsPadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
 
-        Column {
+        Column(
+            modifier
+        ) {
 
-            Box {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            Text(
+                modifier = Modifier.padding(start = 20.dp, bottom = 20.dp),
+                text = "Sleduješ",
+                fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+            )
 
-                ) {
-
-                    Text(
-                        modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp),
-                        text = "Sleduješ",
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize,
-                        //color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
 
             val userList = firebaseViewModel.myFollowedUsers
 
@@ -245,7 +239,7 @@ fun CustomListItem(
                 } else {
                     AsyncImage(
                         model = profilePic,
-                        contentDescription =null,
+                        contentDescription = null,
                         modifier = Modifier
                             .size(42.dp)
                             .clip(CircleShape),
