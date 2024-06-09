@@ -235,7 +235,7 @@ fun EditUserInfoScreen(
                 usernameYoutubeFocusRequester,
                 usernameTiktokFocusRequester,
                 websiteFocusRequester
-                ) = remember { FocusRequester.createRefs() }
+            ) = remember { FocusRequester.createRefs() }
             val localFocusManager = LocalFocusManager.current
 
             val maxChar = 15
@@ -295,7 +295,7 @@ fun EditUserInfoScreen(
                     .fillMaxWidth(),
                 value = instagramUsernameChanged.value.toString(),
                 onValueChange = {
-                        instagramUsernameChanged.value = it
+                    instagramUsernameChanged.value = it
                 },
                 label = { Text("Instagram") },
                 singleLine = true,
@@ -306,7 +306,7 @@ fun EditUserInfoScreen(
                     Text(text = "@")
                 },
                 suffix = {
-                         Icon(painter = painterResource(id = R.drawable.instagram_icon), contentDescription = "ig", modifier = Modifier.size(24.dp))
+                    Icon(painter = painterResource(id = R.drawable.instagram_icon), contentDescription = "ig", modifier = Modifier.size(24.dp))
                 },
                 keyboardActions = KeyboardActions(
                     onNext = { usernameFacebookFocusRequester.requestFocus() }
@@ -484,7 +484,7 @@ fun EditUserInfoScreen(
                         TextButton(
                             onClick = { showDialog = false },
 
-                        ) {
+                            ) {
                             Text("Zrušiť")
                         }
                     },
@@ -493,7 +493,7 @@ fun EditUserInfoScreen(
                 )
             }
 
-                        OutlinedButton(
+            OutlinedButton(
                 onClick = {
                     showDialog = true
 

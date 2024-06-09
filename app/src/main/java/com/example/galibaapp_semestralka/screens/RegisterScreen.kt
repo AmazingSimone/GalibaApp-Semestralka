@@ -115,7 +115,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
                         Text(
 
-                            text = "Vitaj na palube !",
+                            text = "Vitaj na palube 🌟",
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                             fontWeight = FontWeight.Bold
                         )
@@ -403,7 +403,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                     }
 
                                     firebaseViewModel.signUp(onSuccess, onFailure,registerViewModel)
-                                        //)) {
+                                    //)) {
 //                                        scope.launch {
 //                                            snackbarHostState.showSnackbar(
 //                                                message = "Ucet bol uspesne vytvoreny",

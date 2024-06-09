@@ -89,7 +89,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                     ) {
 
                         Text(
-                            text = "Vitaj Spat !",
+                            text = "Vitaj Spat ⚡",
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                             fontWeight = FontWeight.Bold
                         )
