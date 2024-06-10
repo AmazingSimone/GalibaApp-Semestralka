@@ -44,6 +44,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,9 +94,9 @@ fun UserScreen(
     val interestedEventList = firebaseViewModel.myInterestedEvents.collectAsState()
     val comingEventList = firebaseViewModel.myComingEvents.collectAsState()
 
-    var selectedCreated by remember { mutableStateOf(true) }
-    var selectedInterested by remember { mutableStateOf(true) }
-    var selectedComing by remember { mutableStateOf(true) }
+    var selectedCreated by rememberSaveable { mutableStateOf(true) }
+    var selectedInterested by rememberSaveable { mutableStateOf(true) }
+    var selectedComing by rememberSaveable { mutableStateOf(true) }
 
     //val eventList = firebaseViewModel.events
 
@@ -198,9 +199,6 @@ fun UserScreen(
                         fontSize = MaterialTheme.typography.displaySmall.fontSize,
                         fontWeight = FontWeight.Bold,
                         lineHeight = 40.sp
-
-                        //   maxLines = 1,
-                        //overflow = TextOverflow.Ellipsis
                     )
                 }
             }

@@ -4,7 +4,7 @@
     <string name="button_cancel">Zrušiť</string>
     <string name="alert_all_changes_will_be_lost">Všetky vykonané zmeny budú stratené</string>
     <string name="alert_are_you_sure">Si si istý ?</string>
-    <string name="title_create_event">Vytvor Galibu 🛠️</string>
+    <string name="title_create_event">Vytvor Akciu 🛠️</string>
     <string name="text_event_name">Názov akcie</string>
     <string name="text_event_date">Dátum akcie</string>
     <string name="text_event_time">Začiatok akcie</string>
@@ -12,19 +12,19 @@
     <string name="text_event_address">Adresa</string>
     <string name="text_name_or_address_of_event">Názov klubu alebo adresa</string>
     <string name="text_event_bio">Popis akcie</string>
-    <string name="toast_event_was_created">Galiba bola vytvorená !</string>
+    <string name="toast_event_was_created">Akcia bola vytvorená !</string>
     <string name="toast_there_was_error">Nastala chyba</string>
-    <string name="alert_you_are_about_to_create_event">Chystáš sa vytvorit Galibu</string>
+    <string name="alert_you_are_about_to_create_event">Chystáš sa vytvorit koncert</string>
     <string name="alert_is_everything_correct">Sú všetky údaje správne ?</string>
-    <string name="confirmButton_create_event">Vytvoriť galibu</string>
-    <string name="title_edit_event">Uprav Galibu 🪛</string>
+    <string name="confirmButton_create_event">Vytvoriť koncert</string>
+    <string name="title_edit_event">Uprav koncert 🪛</string>
     <string name="text_event_city">Vyhľadaj mesto</string>
-    <string name="toast_event_was_deleted">Galiba bola vymazaná !</string>
-    <string name="alert_you_are_about_to_delete_event">Chystáš sa vymazať Galibu</string>
-    <string name="button_delete_event">Vymazať galibu</string>
-    <string name="toast_event_was_edited">Galiba bola upravená !</string>
-    <string name="alert_you_are_about_to_edit_event">Chystáš sa upravit Galibu</string>
-    <string name="button_edit_event">Upraviť galibu</string>
+    <string name="toast_event_was_deleted">Koncert bol vymazaný !</string>
+    <string name="alert_you_are_about_to_delete_event">Chystáš sa vymazať koncert</string>
+    <string name="button_delete_event">Vymazať koncert</string>
+    <string name="toast_event_was_edited">Koncert bol upravený !</string>
+    <string name="alert_you_are_about_to_edit_event">Chystáš sa upravit koncert</string>
+    <string name="button_edit_event">Upraviť koncert</string>
     <string name="title_edit_profile">Uprav profil 💅</string>
     <string name="text_username">Používateľské meno</string>
     <string name="text_user_bio">Bio</string>
@@ -42,11 +42,11 @@
     <string name="text_its_quet_here_with_following">Je tu celkom ticho... skús niekomu hodiť follow 👀</string>
     <string name="alert_unfollow">Zrušiť sledovanie</string>
     <string name="alert_are_you_really_sure_you_want_unfollow">Naozaj chcete zrušiť sledovanie tohoto používateľa?</string>
-    <string name="title_homescreen">"Ahoj, "</string>
+    <string name="title_homescreen">"Ahoj "</string>
     <string name="toast_city_was_added_to_favourites">Mesto bolo pridane medzi oblubené</string>
     <string name="toast_there_was_error_with_adding_city_to_favourites">Nastala chyba pri pridavaní do oblubených</string>
     <string name="toast_city_is_already_in_favourites">Mesto už je pridané do oblubených</string>
-    <string name="text_events_in_area">Galiby v okolí:</string>
+    <string name="text_events_in_area">Koncerty v okolí:</string>
     <string name="text_its_empty_with_events_here">Je tu trocha prázdno... skús vyhladať iné mesto 🌐</string>
     <string name="toast_city_was_removed_from_favourites">Mesto bolo odstranené z oblubených</string>
     <string name="toast_there_was_error_with_removing_favourite_city">Nastala chyba pri odstraňovaní z oblubených</string>
@@ -59,7 +59,7 @@
     <string name="button_interested">Mám záujem</string>
     <string name="button_coming">Prídem</string>
     <string name="text_edit">Upraviť</string>
-    <string name="title_login">Vitaj Späť ⚡</string>
+    <string name="title_login">Prihásenie ⚡</string>
     <string name="error_email_must_be_valid">Email musí byť validný!</string>
     <string name="text_password">Heslo</string>
     <string name="error_required_field">Povinný údaj!</string>
@@ -85,4 +85,5 @@
     <string name="button_log_out">Odhlásiť sa</string>
     <string name="button_delete_account">Vymazať účet</string>
     <string name="alert_are_you_sure_you_want_to_delete_account">Si si istý? Účet sa natrvalo vymaže.</string>
+    <string name="text_any_location">Slovensko</string>
 </resources>

@@ -237,7 +237,17 @@ class FirebaseViewModel : ViewModel() {
         userId: String
     ) {
 
+        firebaseAuth.currentUser?.delete()
+            ?.addOnSuccessListener {
+                onSuccess()
+            }
+            ?.addOnFailureListener {
+                onFailure()
+            }
+
         firebaseAuth.signOut()
+
+
 
         firebaseFirestore.collection("events")
             .whereEqualTo("userId", userId)
@@ -250,8 +260,6 @@ class FirebaseViewModel : ViewModel() {
                 // Commit the batch
                 batch.commit()
             }
-
-
 
         firebaseFirestore.collection("users").document(userId.toString()).collection("comingEvents")
             .document().delete()
@@ -283,13 +291,7 @@ class FirebaseViewModel : ViewModel() {
             .addOnFailureListener { exception ->
             }
 
-        firebaseAuth.currentUser?.delete()
-            ?.addOnSuccessListener {
-                onSuccess()
-            }
-            ?.addOnFailureListener {
-                onFailure()
-            }
+
     }
 
     fun updateUserData(

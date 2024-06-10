@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 
 class HomeViewModel : ViewModel() {
 
-    var selectedCityName = mutableStateOf("Rovno za nosom")
+
+    var selectedCityName = mutableStateOf("")
 
     var active = mutableStateOf(false)
+
 
 }

@@ -42,7 +42,7 @@
     <string name="text_its_quet_here_with_following">It\'s pretty quiet here... try hitting that follow button 👀</string>
     <string name="alert_unfollow">Unfollow</string>
     <string name="alert_are_you_really_sure_you_want_unfollow">Are you sure you want to unfollow this user?</string>
-    <string name="title_homescreen">"Hi, "</string>
+    <string name="title_homescreen">"Hi "</string>
     <string name="toast_city_was_added_to_favourites">The city has been added to favorites</string>
     <string name="toast_there_was_error_with_adding_city_to_favourites">There was an error adding to favorites</string>
     <string name="toast_city_is_already_in_favourites">The city is already added to favorites</string>
@@ -53,11 +53,11 @@
     <string name="navbar_home">Home</string>
     <string name="navbar_follow">Following</string>
     <string name="text_read_more">Read more</string>
-    <string name="button_is_interested">Interested</string>
-    <string name="button_is_coming">Want to come</string>
+    <string name="button_is_interested">You are interested</string>
+    <string name="button_is_coming">You will come</string>
     <string name="toast_added_to_your_events">Added to your events</string>
-    <string name="button_interested">You are interested</string>
-    <string name="button_coming">You are coming</string>
+    <string name="button_interested">Interested</string>
+    <string name="button_coming">Coming</string>
     <string name="text_edit">Edit</string>
     <string name="title_login">Welcome Back ⚡</string>
     <string name="error_email_must_be_valid">Email must be valid!</string>
@@ -85,4 +85,5 @@
     <string name="button_log_out">Log out</string>
     <string name="button_delete_account">Delete account</string>
     <string name="alert_are_you_sure_you_want_to_delete_account">Are you sure? The account has been permanently deleted.</string>
+    <string name="text_any_location">Slovakia</string>
 </resources>

@@ -121,7 +121,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint(
     "UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation",
-    "UnrememberedMutableState"
+    "UnrememberedMutableState", "ResourceType"
 )
 @Composable
 fun HomeScreen(
@@ -138,14 +138,14 @@ fun HomeScreen(
     val mesta by searchCityViewModel.mestaForSearch.collectAsState()
 
     val allEventList = firebaseViewModel.allEvents.collectAsState()
-    val allEventByUserList = firebaseViewModel.allEventsByUser.collectAsState()
     val allEventByCityList = firebaseViewModel.allEventsByCity.collectAsState()
 
+    val anyCityText = stringResource(R.string.text_any_location)
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
 
-        if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") {
+        if (homeScreenViewModel.selectedCityName.value == anyCityText || homeScreenViewModel.selectedCityName.value == "") {
             firebaseViewModel.getAllEventsCreated()
         }
         firebaseViewModel.getMyFollowingList()
@@ -199,7 +199,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = homeScreenViewModel.selectedCityName.value,
+                    text = if (homeScreenViewModel.selectedCityName.value == "") anyCityText else homeScreenViewModel.selectedCityName.value,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 )
 
@@ -334,7 +334,7 @@ fun HomeScreen(
 
             var eventList = listOf<Event?>()
 
-            if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") {
+            if (homeScreenViewModel.selectedCityName.value == anyCityText || homeScreenViewModel.selectedCityName.value == "") {
                 eventList = allEventList.value
             } else {
                 eventList = allEventByCityList.value
@@ -401,6 +401,8 @@ fun HomeScreenNavigation(
     val username by firebaseViewModel.username.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
     val profilePic by firebaseViewModel.profilePic.observeAsState()
+
+
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -472,11 +474,11 @@ fun HomeScreenNavigation(
                         Spacer(Modifier.height(16.dp))
 
                         NavigationDrawerItem(
-                            label = { Text(text = "Rovno za nosom") },
-                            selected = if (homeScreenViewModel.selectedCityName.value == "Rovno za nosom") (selectedItem == -1) else false,
+                            label = { Text(text = stringResource(R.string.text_any_location)) },
+                            selected = if (homeScreenViewModel.selectedCityName.value == context.getString(R.string.text_any_location) || homeScreenViewModel.selectedCityName.value == "") (selectedItem == -1) else false,
                             onClick = {
                                 selectedItem = -1
-                                homeScreenViewModel.selectedCityName.value = "Rovno za nosom"
+                                homeScreenViewModel.selectedCityName.value = context.getString(R.string.text_any_location)
                                 firebaseViewModel.getAllEventsCreated()
                                 homeScreenViewModel.active.value = false
                                 scope.launch {
@@ -1036,11 +1038,9 @@ fun CustomCard(
 //                                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 //                                    }
                                 },
-                                //colors = ButtonDefaults.buttonColors(primaryLight)
                             ) {
                                 Text(
                                     text = stringResource(R.string.text_edit),
-                                    //fontSize = MaterialTheme.typography.bodySmall.fontSize
                                 )
                             }
 

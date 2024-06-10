@@ -3,7 +3,7 @@ package com.example.galibaapp_semestralka.data.constrains
 object Validator {
 
     fun validateUsername(username : String) : Result {
-        return Result(username.length > 15)
+        return Result(username.length > 25)
     }
 
     fun usernameIsEmpty(username : String) : Result {

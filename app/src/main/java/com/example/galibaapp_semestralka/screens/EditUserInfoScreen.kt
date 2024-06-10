@@ -2,6 +2,7 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -109,7 +110,9 @@ fun EditUserInfoScreen(
 
     val websiteChanged = rememberSaveable { mutableStateOf(website) }
 
-
+    val imageChosen = rememberSaveable() {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
@@ -156,6 +159,7 @@ fun EditUserInfoScreen(
                 contract = ActivityResultContracts.PickVisualMedia(),
                 onResult = {
                     selectedImageUri = it
+                    imageChosen.value = true
                 }
             )
 
@@ -171,7 +175,11 @@ fun EditUserInfoScreen(
                     }
             ) {
 
-                if (profilePic?.toString() == "null" && selectedImageUri == null) {
+                if (profilePic?.toString() == "null"
+                    && selectedImageUri == null
+                    ) {
+                    Log.d("profilovecka","if 1 $profilePic.toString()")
+
                     Image(
                         painter = painterResource(id = R.drawable.empty_profile),
                         contentDescription = "empty profile",
@@ -182,7 +190,7 @@ fun EditUserInfoScreen(
                     )
 
                 } else if (selectedImageUri != null) {
-
+                    Log.d("profilovecka","if 2 $profilePic.toString()")
                     AsyncImage(
                         model = selectedImageUri,
                         contentDescription =null,
@@ -192,6 +200,7 @@ fun EditUserInfoScreen(
                         contentScale = ContentScale.Crop
                     )
                 } else {
+                    Log.d("profilovecka","if 3 $profilePic.toString()")
                     AsyncImage(
                         model = profilePic,
                         contentDescription =null,
@@ -462,13 +471,12 @@ fun EditUserInfoScreen(
 
 
                                 }
-                                val onFailure = {}
+                                val onFailure = {
+
+                                }
 
                                 firebaseViewModel.deleteUser(onSuccess,onFailure,firebaseViewModel.currentUserId.value.toString())
                                 //Log.d("userDelete", "id : ${firebaseViewModel.currentUserId.toString()}")
-//                                navController.navigate(Screens.AUTHROOT.name) {
-//                                    popUpTo(Screens.HOME.name) { inclusive = true }
-//                                }
                             },
                             //colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
@@ -539,7 +547,8 @@ fun EditUserInfoScreen(
                     if (selectedImageUri != null) {
                         val onSuccessUpload = {
                             Toast.makeText(context, context.getString(R.string.toast_image_was_uploaded), Toast.LENGTH_LONG).show()
-                            selectedImageUri = null
+                            //selectedImageUri = null
+                            imageChosen.value = false
                         }
                         val onFailureUpload = {
                             Toast.makeText(context, context.getString(R.string.toast_there_was_error_with_uploading_image), Toast.LENGTH_LONG).show()
@@ -555,7 +564,7 @@ fun EditUserInfoScreen(
                 enabled = (usernameChanged.value?.isNotEmpty() ?: false && (username != usernameChanged.value ||
                         bio != userBioChanged.value ||
                         isArtist != isArtistChanged.value ||
-                        selectedImageUri != null ||
+                        imageChosen.value ||
                         instagramUsername != instagramUsernameChanged.value ||
                         facebookUsername != facebookUsernameChanged.value ||
                         youtubeUsername != youtubeUsernameChanged.value ||

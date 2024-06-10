@@ -43,8 +43,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
@@ -123,19 +123,29 @@ fun ProfileInspectScreen(
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
-                text = if (chosenUser.value?.isArtist == true) "Umelec/Kapela" else "Posluchac",
+                text = if (chosenUser.value?.isArtist == true) stringResource(R.string.text_artist) else stringResource(
+                    id = R.string.text_listener
+                ),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize
             )
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            Text(
-                text = ("@" + (chosenUser.value?.username ?: "")),
-                fontSize = MaterialTheme.typography.displayMedium.fontSize,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row {
+                Text(
+                    text = "@",
+                    fontSize = MaterialTheme.typography.displaySmall.fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+                FlowRow {
+                    Text(
+                        text = chosenUser.value?.username ?: "",
+                        fontSize = MaterialTheme.typography.displaySmall.fontSize,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 40.sp
+                    )
+                }
+            }
 
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -190,7 +200,6 @@ fun ProfileInspectScreen(
                         socialMediaIcon = R.drawable.web_icon_default
                     )
                 }
-
             }
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -279,7 +288,6 @@ fun ProfileInspectScreen(
 
 
                 for (event in eventList.value) {
-                    //Spacer(modifier = Modifier.height(15.dp))
 
                     CustomCard(
                         firebaseViewModel = firebaseViewModel,
@@ -289,7 +297,6 @@ fun ProfileInspectScreen(
                 }
             }
             Spacer(modifier = Modifier.height(15.dp))
-
         }
     }
 }

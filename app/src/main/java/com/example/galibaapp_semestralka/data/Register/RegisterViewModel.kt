@@ -70,43 +70,6 @@ class RegisterViewModel : ViewModel() {
         }
     }
 
-//    fun signUp(onSuccess: () -> Unit, onFailure: () -> Unit) {
-//
-//        //var success = mutableStateOf(true)
-//        Log.d(TAG, "Inside signUp()")
-//        Log.d(TAG, registrationUIState.value.toString())
-//
-//        registerInProgress.value = true
-//
-//
-//
-//        firebaseAuth.createUserWithEmailAndPassword(
-//            registrationUIState.value.email,
-//            registrationUIState.value.password
-//        ).addOnCompleteListener { task ->
-//            if (task.isSuccessful) {
-//                Log.d(TAG, "User created successfully")
-//                //success.value = true
-//                firebaseFirestore.collection("users").document(task.result.user?.uid.toString()).set(mapOf(
-//                    "username" to registrationUIState.value.username,
-//                    "bio" to registrationUIState.value.bio,
-//                    "isArtist" to registrationUIState.value.isArtist
-//                ))
-//                onSuccess()
-//            } else {
-//                onFailure()
-//                //Log.d(TAG, "Error: ${task.exception?.message}")
-//
-//                //success.value = false
-//            }
-//
-//
-//            registerInProgress.value = false
-//        }
-//        //Log.d(TAG, "return success val: ${success.value}")
-//        //return success.value
-//    }
-
 
     fun isAnyUserInputError(): Boolean {
         val usernameResult = Validator.validateUsername(registrationUIState.value.username)
@@ -114,11 +77,7 @@ class RegisterViewModel : ViewModel() {
         val emailResult = Validator.validateEmail(registrationUIState.value.email)
         val passwordResult = Validator.validatePassword(registrationUIState.value.password)
         val password2Result = Validator.passwordMatch(registrationUIState.value.password, registrationUIState.value.confirmPassword)
-//        Log.d(TAG, "Validation")
-//        Log.d(TAG, "$usernameResult")
-//        Log.d(TAG, "$emailResult")
-//        Log.d(TAG, "$passwordResult")
-//        Log.d(TAG, "$password2Result")
+
 
         registrationUIState.value = registrationUIState.value.copy(
             usernameErr = usernameResult.status,
