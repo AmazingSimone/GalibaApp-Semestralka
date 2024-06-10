@@ -2,7 +2,6 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -49,6 +48,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -78,11 +78,6 @@ fun EditUserInfoScreen(
     firebaseViewModel: FirebaseViewModel
 ) {
 
-//    val username = "amazingsimone"
-//    val bio = "omg omg omg omg omg omg omg"
-//    val isArtist = false
-
-
     val username by firebaseViewModel.username.observeAsState()
     val bio by firebaseViewModel.bio.observeAsState()
     val isArtist by firebaseViewModel.isArtist.observeAsState()
@@ -95,29 +90,31 @@ fun EditUserInfoScreen(
 
 
     val context = LocalContext.current
-    val usernameChanged = remember { mutableStateOf(username) }
 
-    var userBioChanged = remember { mutableStateOf(bio) }
+    val usernameChanged = rememberSaveable { mutableStateOf(username) }
 
-    var selectedImageUri by remember {
+    var userBioChanged = rememberSaveable { mutableStateOf(bio) }
+
+    var selectedImageUri by rememberSaveable {
         mutableStateOf<Uri?>(null)
     }
 
-    val instagramUsernameChanged = remember { mutableStateOf(instagramUsername) }
+    val instagramUsernameChanged = rememberSaveable { mutableStateOf(instagramUsername) }
 
-    val facebookUsernameChanged = remember { mutableStateOf(facebookUsername) }
+    val facebookUsernameChanged = rememberSaveable { mutableStateOf(facebookUsername) }
 
-    val youtubeUsernameChanged = remember { mutableStateOf(youtubeUsername) }
+    val youtubeUsernameChanged = rememberSaveable { mutableStateOf(youtubeUsername) }
 
-    val tiktokUsernameChanged = remember { mutableStateOf(tiktokUsername) }
+    val tiktokUsernameChanged = rememberSaveable { mutableStateOf(tiktokUsername) }
 
-    val websiteChanged = remember { mutableStateOf(website) }
+    val websiteChanged = rememberSaveable { mutableStateOf(website) }
 
 
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
     }
+
 
     Surface (
         modifier = Modifier
@@ -187,7 +184,7 @@ fun EditUserInfoScreen(
                 } else if (selectedImageUri != null) {
 
                     AsyncImage(
-                        model =selectedImageUri,
+                        model = selectedImageUri,
                         contentDescription =null,
                         modifier = Modifier
                             .matchParentSize()
@@ -405,8 +402,11 @@ fun EditUserInfoScreen(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
+                prefix = {
+                    Text(text = "https://www.")
+                },
                 suffix = {
-                    Icon(painter = painterResource(id = R.drawable.web_icon_default), contentDescription = "fb")
+                    Icon(painter = painterResource(id = R.drawable.web_icon_default), contentDescription = "web")
                 },
                 keyboardActions = KeyboardActions(
                     onNext = { localFocusManager.clearFocus() }
@@ -415,12 +415,9 @@ fun EditUserInfoScreen(
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            var options = mutableStateListOf(stringResource(R.string.text_listener), stringResource(
-                R.string.text_artist
-            )
-            )
-            var selectedIndex by remember { mutableStateOf(if (isArtist == true) 1 else 0) }
-            var isArtistChanged = remember { mutableStateOf(isArtist) }
+            var options = mutableStateListOf(stringResource(R.string.text_listener), stringResource(R.string.text_listener))
+            var selectedIndex by rememberSaveable { mutableStateOf(if (isArtist == true) 1 else 0) }
+            var isArtistChanged = rememberSaveable { mutableStateOf(isArtist) }
 
             Spacer(modifier = Modifier.padding(10.dp))
 
@@ -449,7 +446,7 @@ fun EditUserInfoScreen(
 
             Spacer(modifier = Modifier.padding(10.dp))
 
-            var showDialog by remember { mutableStateOf(false) }
+            var showDialog by rememberSaveable { mutableStateOf(false) }
 
             if (showDialog) {
                 AlertDialog(
@@ -463,6 +460,7 @@ fun EditUserInfoScreen(
                                 navController.navigate(Screens.AUTHROOT.name)
                                 val onSuccess: () -> Unit = {
 
+
                                 }
                                 val onFailure = {}
 
@@ -475,7 +473,7 @@ fun EditUserInfoScreen(
                             //colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text(
-                                stringResource(R.string.text_delete_profile),
+                                stringResource(R.string.button_delete_account),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -489,7 +487,7 @@ fun EditUserInfoScreen(
                         }
                     },
                     title = { Text(stringResource(R.string.alert_attention)) },
-                    text = { Text(stringResource(R.string.alert_are_you_sure_delete)) }
+                    text = { Text(stringResource(R.string.alert_are_you_sure_you_want_to_delete_account)) }
                 )
             }
 
@@ -500,7 +498,7 @@ fun EditUserInfoScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Vymazat ucet", color = MaterialTheme.colorScheme.error)
+                Text(text = stringResource(R.string.button_delete_account), color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(modifier = Modifier.padding(10.dp))
@@ -510,10 +508,14 @@ fun EditUserInfoScreen(
             Button(
                 onClick = {
 
+
+                    //val data = Data(usernameChanged.value,userBioChanged.value,isArtistChanged.value)
+
+
+
                     val onSuccess = {
 
-                        Toast.makeText(context,
-                            context.getString(R.string.toast_changes_were_saved), Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.toast_changes_were_saved), Toast.LENGTH_LONG).show()
                         firebaseViewModel.getCurrentUserData()
 
                     }
@@ -536,20 +538,17 @@ fun EditUserInfoScreen(
 
                     if (selectedImageUri != null) {
                         val onSuccessUpload = {
-                            Toast.makeText(context,
-                                context.getString(R.string.toast_image_was_uploaded), Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, context.getString(R.string.toast_image_was_uploaded), Toast.LENGTH_LONG).show()
                             selectedImageUri = null
                         }
                         val onFailureUpload = {
-                            Toast.makeText(context,
-                                context.getString(R.string.toast_there_was_error_with_uploading_image), Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, context.getString(R.string.toast_there_was_error_with_uploading_image), Toast.LENGTH_LONG).show()
 
                         }
                         firebaseViewModel.saveToUserProfilePictures(onSuccessUpload,onFailureUpload,
                             selectedImageUri!!
                         )
                     }
-
                 },
 
                 modifier = Modifier.fillMaxWidth(),

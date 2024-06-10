@@ -161,19 +161,13 @@ fun HomeScreen(
     Surface(
         modifier = Modifier
             .fillMaxSize(),
-        //.statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
 
-        //Scaffold(
-
-        //topBar = {
 
 
         Column(
-            //modifier = Modifier
-            //.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = bottomBarPadding)
-            //  .fillMaxWidth(),
+
             modifier = modifier.padding(20.dp),
             horizontalAlignment = Alignment.Start,
 
@@ -216,17 +210,15 @@ fun HomeScreen(
 
             }
 
-            //Spacer(modifier = Modifier.height(10.dp))
 
             var active by remember { mutableStateOf(false) }
 
             SearchBar(
-
-                //colors = SearchBarDefaults.colors(surfaceContainerLight),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp)),
                 query = searchText,
                 onQueryChange = searchCityViewModel::onSearchTextChange,
                 onSearch = {
-                    //items.add(text)
                     homeScreenViewModel.active.value = false
                     searchCityViewModel._searchText.value = ""
                     scope.launch { drawerState.close() }
@@ -243,7 +235,6 @@ fun HomeScreen(
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }
                     }) {
-                        //M3SearchNavDrawer()
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = "Menu"

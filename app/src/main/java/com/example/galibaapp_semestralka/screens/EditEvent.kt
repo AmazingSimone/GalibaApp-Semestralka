@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,7 +71,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -89,7 +89,7 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun EditEvent(navController: NavHostController, createEventViewModel: CreateEventViewModel = viewModel(), firebaseViewModel: FirebaseViewModel, searchCityViewModel: SearchCityViewModel = viewModel()) {
+fun EditEvent(navController: NavHostController, firebaseViewModel: FirebaseViewModel, searchCityViewModel: SearchCityViewModel = viewModel()) {
 
     LaunchedEffect(Unit) {
         searchCityViewModel._searchText.value = firebaseViewModel.chosenEvent.value?.city?.nazov ?: ""
@@ -111,61 +111,44 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
             val chosenEvent by firebaseViewModel.chosenEvent.observeAsState()
 
-            var nazovAkcie by rememberSaveable { mutableStateOf("") }
-            //var datumAkcie by rememberSaveable { mutableStateOf("") }
-//            var eventDateChanged by rememberSaveable {
-//                mutableStateOf(LocalDate.MIN)
-//            }
+            var eventDateChanged by rememberSaveable { mutableStateOf(chosenEvent?.dateAndTime?.toLocalDate()) }
 
-            var eventDateChanged by remember { mutableStateOf(chosenEvent?.dateAndTime?.toLocalDate()) }
-
-            var eventTimeChanged by remember { mutableStateOf(chosenEvent?.dateAndTime?.toLocalTime()) }
-
-
-            //var eventTimeChanged: LocalTime? by rememberSaveable { mutableStateOf(null) }
-
+            var eventTimeChanged by rememberSaveable { mutableStateOf(chosenEvent?.dateAndTime?.toLocalTime()) }
 
             var datumACasAkcieChanged: LocalDateTime? by rememberSaveable { mutableStateOf(null) }
-
-            val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
             val searchText by searchCityViewModel.searchText.collectAsState()
 
             val mesta by searchCityViewModel.mestaForEditCreateEvent.collectAsState()
 
-            var eventLocation by rememberSaveable { mutableStateOf("") }
-
-            //var eventDetailsChanged by rememberSaveable { mutableStateOf("") }
-
-
-            var showDialogCancelCreate by remember { mutableStateOf(false) }
+            var showDialogCancelCreate by rememberSaveable { mutableStateOf(false) }
 
             val calendarState = rememberUseCaseState()
 
             val clockState = rememberUseCaseState()
 
+            var eventNameChanged by rememberSaveable { mutableStateOf(chosenEvent?.eventName) }
 
-            var eventNameChanged by remember { mutableStateOf(chosenEvent?.eventName) }
+            var eventLocationChanged by rememberSaveable { mutableStateOf(chosenEvent?.location) }
 
-            var eventLocationChanged by remember { mutableStateOf(chosenEvent?.location) }
-            var eventDetailsChanged by remember { mutableStateOf(chosenEvent?.eventDetails.toString()) }
+            var eventDetailsChanged by rememberSaveable { mutableStateOf(chosenEvent?.eventDetails.toString()) }
 
             var eventCityChanged by remember { mutableStateOf(chosenEvent?.city) }
 
-            var eventPicChanged by remember {
+            var eventPicChanged by rememberSaveable {
                 mutableStateOf<Uri?>(null)
             }
+
+
 
             if (showDialogCancelCreate) {
                 AlertDialog(
                     onDismissRequest = { showDialogCancelCreate = false },
                     confirmButton = {
-                        Button(
+                        TextButton(
                             onClick = {
                                 showDialogCancelCreate = false
-//                                navController.navigate(Screens.AUTHROOT.name) {
-//                                    popUpTo(Screens.HOME.name) { inclusive = true }
-//                                }
+
                                 navController.popBackStack()
                             }
                         ) {
@@ -173,7 +156,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         }
                     },
                     dismissButton = {
-                        OutlinedButton(
+                        TextButton(
                             onClick = { showDialogCancelCreate = false },
 
                             ) {
@@ -215,6 +198,20 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 }
             }
 
+            BackHandler {
+                if ((eventNameChanged?.isNotEmpty() ?: false && eventNameChanged != chosenEvent?.eventName) ||
+                    (eventDateChanged != chosenEvent?.dateAndTime?.toLocalDate() && eventDateChanged?.isBefore(LocalDate.now()) == false) ||
+                    (searchCityViewModel.selectedMesto.value != null && searchCityViewModel.selectedMesto.value != chosenEvent?.city) ||
+                    (eventLocationChanged != chosenEvent?.location && eventLocationChanged?.isNotEmpty() ?: false ||
+                            eventDetailsChanged != chosenEvent?.eventDetails ||
+                            eventPicChanged != null
+                            )) {
+                    showDialogCancelCreate = true
+                } else {
+                    navController.popBackStack()
+                }
+            }
+
 
             val (eventNameFocusRequester, eventDateFocusRequester, eventCityFocusRequester, eventPlaceFocusRequester, eventBioFocusRequester) = remember { FocusRequester.createRefs() }
 
@@ -248,7 +245,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                     eventDateChanged = it
                 },
                 config = CalendarConfig(
-                    locale = Locale("sk")
+                    locale = Locale(Locale.getDefault().toLanguageTag())
                 )
 
             )
@@ -352,7 +349,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         singleLine = true,
                         onValueChange = searchCityViewModel::onSearchTextChange,
                         label = {
-                            Text(text = stringResource(R.string.text_search_event_city))
+                            Text(text = stringResource(R.string.text_event_city))
                         },
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next
@@ -375,7 +372,10 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     .clickable {
                                         searchCityViewModel.chooseMesto(mesto)
                                         eventCityChanged = searchCityViewModel.selectedMesto.value
-
+                                        Log.d(
+                                            "mestoAkcie",
+                                            "${searchCityViewModel.selectedMesto.value}"
+                                        )
                                     }
                             )
                         }
@@ -527,10 +527,8 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                 firebaseViewModel.deleteEvent(onSuccess,onFailure,chosenEvent?.eventId.toString())
 
                             },
-                            //colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
                         ) {
-                            Text(
-                                stringResource(R.string.button_confirm),
+                            Text(stringResource(R.string.button_confirm),
                                 color = MaterialTheme.colorScheme.error)
                         }
                     },
@@ -557,7 +555,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 )
             }
 
-            var showDialogConfirmCreate by remember { mutableStateOf(false) }
+            var showDialogConfirmCreate by rememberSaveable { mutableStateOf(false) }
             if (showDialogConfirmCreate) {
                 AlertDialog(
                     onDismissRequest = { showDialogConfirmCreate = false },
@@ -573,7 +571,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     navController.popBackStack()
                                     Toast.makeText(
                                         context,
-                                        context.getString(R.string.toast_event_was_edited),
+                                        context.getString(R.string.button_edit_event),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }

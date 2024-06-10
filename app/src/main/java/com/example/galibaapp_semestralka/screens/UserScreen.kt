@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -176,7 +177,7 @@ fun UserScreen(
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
-                text = if (isArtist == true) "Umelec/Kapela" else "Posluchac",
+                text = if (isArtist == true) stringResource(R.string.text_artist) else stringResource(R.string.text_listener),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize
             )
 
@@ -204,11 +205,6 @@ fun UserScreen(
                 }
             }
 
-
-
-
-
-
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
@@ -227,7 +223,7 @@ fun UserScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.instagram.com/",
                         text = instagramUsername.toString(),
-                        socialMediaName = "Instagram",
+                        socialMediaName = stringResource(R.string.text_instagram),
                         socialMediaIcon = R.drawable.instagram_icon
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -238,7 +234,7 @@ fun UserScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.facebook.com/",
                         text = facebookUsername.toString(),
-                        socialMediaName = "Facebook",
+                        socialMediaName = stringResource(R.string.text_facebook),
                         socialMediaIcon = R.drawable.facebook_icon
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -249,7 +245,7 @@ fun UserScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.youtube.com/@",
                         text = youtubeUsername.toString(),
-                        socialMediaName = "Youtube",
+                        socialMediaName = stringResource(R.string.text_youtube),
                         socialMediaIcon = R.drawable.youtube_icon
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -259,7 +255,7 @@ fun UserScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.tiktok.com/@",
                         text = tiktokUsername.toString(),
-                        socialMediaName = "Tiktok",
+                        socialMediaName = stringResource(R.string.text_tiktok),
                         socialMediaIcon = R.drawable.tiktok_icon
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -268,7 +264,7 @@ fun UserScreen(
                 if (website != "") {
                     ClickableSocialMediaChip(
                         urlPrefix = website.toString(),
-                        socialMediaName = "Stranka",
+                        socialMediaName = stringResource(R.string.text_webpage),
                         socialMediaIcon = R.drawable.web_icon_default
                     )
                 }
@@ -287,7 +283,7 @@ fun UserScreen(
                     contentDescription = "tvojeEventyIcon"
                 )
                 Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "Tvoje eventy")
+                Text(text = stringResource(R.string.text_your_events))
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -298,7 +294,7 @@ fun UserScreen(
                 if (myEventList.value.isNotEmpty()) {
                     FilterChip(
                         onClick = { selectedCreated = !selectedCreated },
-                        label = { Text("Vytvorene") },
+                        label = { Text(stringResource(R.string.chip_created_events)) },
                         selected = selectedCreated,
                         leadingIcon = if (selectedCreated) {
                             {
@@ -318,7 +314,7 @@ fun UserScreen(
 
                 FilterChip(
                     onClick = { selectedInterested = !selectedInterested },
-                    label = { Text("Mas zaujem") },
+                    label = { Text(stringResource(R.string.chip_is_interested)) },
                     selected = selectedInterested,
                     leadingIcon = if (selectedInterested) {
                         {
@@ -336,7 +332,7 @@ fun UserScreen(
 
                 FilterChip(
                     onClick = { selectedComing = !selectedComing },
-                    label = { Text("Ides") },
+                    label = { Text(stringResource(R.string.chip_coming)) },
                     selected = selectedComing,
                     leadingIcon = if (selectedComing) {
                         {
@@ -350,20 +346,11 @@ fun UserScreen(
                         null
                     },
                 )
-
             }
-
 
             Spacer(modifier = Modifier.padding(all = 5.dp))
 
             HorizontalDivider()
-            //Spacer(modifier = Modifier.padding(all = 5.dp))
-
-
-
-//                    } else {
-//                        Spacer(modifier = Modifier.padding(all = 55.dp))
-//                    }
 
             Column(
                 modifier = Modifier
@@ -422,7 +409,9 @@ fun UserScreen(
             ) {
                 Spacer(modifier = Modifier.padding(all = 10.dp))
 
-                Button(onClick = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
 
                     val onSuccess = {
                         navController.popBackStack()
@@ -441,8 +430,9 @@ fun UserScreen(
 
                     firebaseViewModel.logout(onSuccess, onFailure)
                 }
+
                 ) {
-                    Text(text = "Odhlasit sa")
+                    Text(text = stringResource(R.string.button_log_out))
                 }
                 Spacer(modifier = Modifier.padding(all = 10.dp))
                 HorizontalDivider()
@@ -450,7 +440,7 @@ fun UserScreen(
 
 
                 Text(
-                    text = "Šimon Bartánus 2024",
+                    text = stringResource(R.string.footer_creator_name),
                     fontSize = MaterialTheme.typography.labelMedium.fontSize
                 )
             }
@@ -461,7 +451,6 @@ fun UserScreen(
 
     }
 }
-
 
 @Composable
 fun ClickableSocialMediaChip(
@@ -483,13 +472,13 @@ fun ClickableSocialMediaChip(
 
     var chipColor: Color = MaterialTheme.colorScheme.secondary
 
-    if (socialMediaName == "Instagram") {
+    if (socialMediaName == stringResource(R.string.text_instagram)) {
         chipColor = Color(0xFFC13584)
-    } else if (socialMediaName == "Facebook") {
+    } else if (socialMediaName == stringResource(R.string.text_facebook)) {
         chipColor = Color(0xFF1877F2)
-    } else if (socialMediaName == "Youtube") {
+    } else if (socialMediaName == stringResource(R.string.text_youtube)) {
         chipColor = Color(0xFFFF0000)
-    } else if (socialMediaName == "Tiktok") {
+    } else if (socialMediaName == stringResource(R.string.text_tiktok)) {
         chipColor = Color(0xFFff0050)
     }
 
@@ -497,19 +486,9 @@ fun ClickableSocialMediaChip(
         colors = SuggestionChipDefaults.suggestionChipColors(iconContentColor = chipColor),
         onClick = { uriHandler.openUri(url) },
         label = {
-            //Row (
-            //verticalAlignment = Alignment.CenterVertically,
-            //  modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
-            //) {
-            //Icon(painter = painterResource(id = socialMediaIcon), contentDescription = "socialMediaIcon", modifier = Modifier.size(24.dp))
-            //Spacer(modifier = Modifier.padding(2.dp))
             Text(socialMediaName)
-            //}
-
         },
         icon = { Icon(painter = painterResource(id = socialMediaIcon), contentDescription = "socialMediaIcon", modifier = Modifier.size(20.dp))
         }
     )
-
-
 }

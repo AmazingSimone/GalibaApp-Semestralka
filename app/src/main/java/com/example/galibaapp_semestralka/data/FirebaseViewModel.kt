@@ -4,7 +4,9 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.galibaapp_semestralka.data.Login.LoginViewModel
@@ -20,15 +22,15 @@ class FirebaseViewModel : ViewModel() {
 
     private val TAG = FirebaseViewModel::class.simpleName
 
+    // Firebase instances
+
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     private val firebaseFirestore = FirebaseFirestore.getInstance()
 
     private val firebaseStorage = FirebaseStorage.getInstance()
 
-    var myEvents = mutableStateListOf<Event?>()
-
-    //var userEvents = mutableStateListOf<Event?>()
+    //Events
 
     private val _allEvents = MutableStateFlow<List<Event?>>(emptyList())
     val allEvents: StateFlow<List<Event?>> = _allEvents
@@ -36,8 +38,18 @@ class FirebaseViewModel : ViewModel() {
     private val _allEventsByCity = MutableStateFlow<List<Event?>>(emptyList())
     val allEventsByCity: StateFlow<List<Event?>> = _allEventsByCity
 
+    var chosenEvent: MutableLiveData<Event?> = MutableLiveData()
+
+    //Chosen user atributes
+
     private val _allEventsByUser = MutableStateFlow<List<Event?>>(emptyList())
     val allEventsByUser: StateFlow<List<Event?>> = _allEventsByUser
+
+    var chosenUser: MutableLiveData<User?> = MutableLiveData()
+
+    // Current User atributes
+
+    var myEvents = mutableStateListOf<Event?>()
 
     private val _myInterestedEvents = MutableStateFlow<List<Event?>>(emptyList())
     val myInterestedEvents: StateFlow<List<Event?>> = _myInterestedEvents
@@ -45,19 +57,9 @@ class FirebaseViewModel : ViewModel() {
     private val _myComingEvents = MutableStateFlow<List<Event?>>(emptyList())
     val myComingEvents: StateFlow<List<Event?>> = _myComingEvents
 
-    //var eventsByCity = mutableStateListOf<Event?>()
-
-    var chosenEvent: MutableLiveData<Event?> = MutableLiveData()
-
-    var chosenUser: MutableLiveData<User?> = MutableLiveData()
-
     val isFollowing: MutableLiveData<Boolean> = MutableLiveData()
 
     var myFollowedUsers = mutableStateListOf<String?>()
-
-    //var chosenCity = mutableStateListOf<Mesto?>()
-
-    //var myFavouriteCities = mutableStateListOf<Mesto?>()
 
     private val _myFavouriteCities = MutableStateFlow<List<Mesto>>(emptyList())
     val myFavouriteCities: StateFlow<List<Mesto>> = _myFavouriteCities
@@ -68,9 +70,9 @@ class FirebaseViewModel : ViewModel() {
 
     val emailId: MutableLiveData<String> = MutableLiveData()
 
-    val bio: MutableLiveData<String> = MutableLiveData()
-
     val username: MutableLiveData<String> = MutableLiveData()
+
+    val bio: MutableLiveData<String> = MutableLiveData()
 
     val isArtist: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -85,6 +87,23 @@ class FirebaseViewModel : ViewModel() {
     val tiktokUsername: MutableLiveData<String> = MutableLiveData()
 
     val website: MutableLiveData<String> = MutableLiveData()
+
+    val usernameChanged by  mutableStateOf(username)
+
+    var userBioChanged = mutableStateOf(bio)
+
+    var selectedImageUri = mutableStateOf<Uri?>(null)
+
+    val instagramUsernameChanged = mutableStateOf(instagramUsername)
+
+    val facebookUsernameChanged = mutableStateOf(facebookUsername)
+
+    val youtubeUsernameChanged = mutableStateOf(youtubeUsername)
+
+    val tiktokUsernameChanged = mutableStateOf(tiktokUsername)
+
+    val websiteChanged = mutableStateOf(website)
+
 
     fun checkForActiveUser() {
         isUserLoggedIn.value = firebaseAuth.currentUser != null
@@ -1075,7 +1094,7 @@ class FirebaseViewModel : ViewModel() {
                 }
                 .addOnFailureListener {
                     onFailure()
-                    Log.d("neuveritelnyVyberacFotiek", "fail")
+                    Log.d("neuveritelnyVyberacFotiek", "fail $it")
                 }
         } else {
             firebaseFirestore.collection("events").document(eventId.toString())
@@ -1086,15 +1105,12 @@ class FirebaseViewModel : ViewModel() {
                         "dateAndTime" to dateAndTime,
                         "eventDetails" to eventDetails,
                         "eventName" to eventName,
-                        "eventPic" to eventPic,
+                        //"eventPic" to eventPic,
                         "location" to location,
                     )
                 ).addOnSuccessListener {
-                    Log.d("firebaseviewmodel", "inside update")
                     onSuccess()
                 }.addOnFailureListener {
-                    Log.d("firebaseviewmodel", "inside update failure")
-
                     onFailure()
                 }
         }

@@ -63,14 +63,14 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
-    val isFieldsEmpty = email.isNotEmpty() && heslo.isNotEmpty()
-
-    var loginBeenClicked by remember {
-        mutableStateOf(false)
-    }
-    var passwordBeenClicked by remember {
-        mutableStateOf(false)
-    }
+//    val isFieldsEmpty = email.isNotEmpty() && heslo.isNotEmpty()
+//
+//    var loginBeenClicked by remember {
+//        mutableStateOf(false)
+//    }
+//    var passwordBeenClicked by remember {
+//        mutableStateOf(false)
+//    }
 
     Box {
         Surface (modifier = Modifier
@@ -109,7 +109,6 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                             onValueChange = {
                                 email = it
                                 loginViewModel.onLoginEvent(LoginUIevent.emailChanged(it))
-                                //loginBeenClicked = true
                             },
                             label = { Text(stringResource(R.string.text_email)) },
                             singleLine = true,
@@ -128,7 +127,6 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                                 onNext = { passwordFocusRequester.requestFocus() }
                             ),
                             supportingText = {
-                                //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (loginViewModel.loginUIState.value.emailErr) {
                                     Text(text = stringResource(R.string.error_email_must_be_valid))
                                 }

@@ -56,14 +56,10 @@ class SearchCityViewModel : ViewModel() {
 
     val mestaForSearch = searchText.combine(_mesta) { text, mesta ->
 
-        //if (text.isNotBlank() && _isSearching.value) {
             val normalizedText = normalize(text)
             mesta.filter {
                 normalize(it.nazov).contains(normalizedText, ignoreCase = true)
             }
-//        } else {
-//            emptyList()
-//        }
     }
         .stateIn(
             viewModelScope,

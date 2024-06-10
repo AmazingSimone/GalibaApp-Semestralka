@@ -36,7 +36,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +50,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Register.RegisterUIevent
 import com.example.galibaapp_semestralka.data.Register.RegisterViewModel
@@ -115,7 +116,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
                         Text(
 
-                            text = "Vitaj na palube 🌟",
+                            text = stringResource(R.string.title_register),
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                             fontWeight = FontWeight.Bold
                         )
@@ -135,7 +136,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 registerViewModel.onRegisterEvent(RegisterUIevent.usernameChanged(it))
                                 loginBeenClicked = true
                             },
-                            label = { Text("Pouzivatelske Meno") },
+                            label = { Text(stringResource(R.string.text_username)) },
                             singleLine = true,
                             trailingIcon = {
                                 Icon(imageVector = Icons.Default.Person, contentDescription = "accBoxIcon")
@@ -153,11 +154,10 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 }
                             ),
                             supportingText = {
-                                //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (registerViewModel.registrationUIState.value.usernameIsEmpty) {
-                                    Text(text = "Povinny udaj!")
+                                    Text(text = stringResource(R.string.error_required_field))
                                 } else if (registerViewModel.registrationUIState.value.usernameErr) {
-                                    Text(text = "Prekroceny limit znakov!")
+                                    Text(text = stringResource(R.string.error_max_limit_reached))
                                 }
                             },
 
@@ -176,7 +176,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 registerViewModel.onRegisterEvent(RegisterUIevent.emailChanged(it))
                                 emailBeenClicked = true
                             },
-                            label = { Text("Email") },
+                            label = { Text(stringResource(R.string.text_email)) },
                             singleLine = true,
                             trailingIcon = {
                                 Icon(imageVector = Icons.Default.Mail, contentDescription = "mailBoxIcon")
@@ -194,7 +194,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             supportingText = {
                                 //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (registerViewModel.registrationUIState.value.emailErr) {
-                                    Text(text = "Email musi byt validny!")
+                                    Text(text = stringResource(R.string.error_email_must_be_valid))
                                 }
                             },
 
@@ -217,7 +217,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 registerViewModel.onRegisterEvent(RegisterUIevent.passwordChanged(it))
                                 passwordBeenClicked = true
                             },
-                            label = { Text("Heslo") },
+                            label = { Text(stringResource(R.string.text_password)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
@@ -245,7 +245,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             supportingText = {
                                 //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (registerViewModel.registrationUIState.value.passwordErr) {
-                                    Text(text = "Heslo musi mat aspon 6 znakov!")
+                                    Text(text = stringResource(R.string.error_password_must_be_long_enough))
                                 }
                             },
                             isError = registerViewModel.registrationUIState.value.passwordErr,  //passwordBeenClicked && ((password2BeenClicked && isPasswordSame) || heslo.isEmpty()),
@@ -270,7 +270,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 registerViewModel.onRegisterEvent(RegisterUIevent.confirmPasswordChanged(it))
                                 password2BeenClicked = true
                             },
-                            label = { Text("Potvrd heslo") },
+                            label = { Text(stringResource(R.string.text_confirm_password)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
@@ -295,7 +295,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             },
                             supportingText = {
                                 if (registerViewModel.registrationUIState.value.passwordMatchErr) {
-                                    Text(text = "Hesla sa nezhoduju")
+                                    Text(text = stringResource(R.string.error_passwords_arent_matching))
                                 }
                             },
                             isError = registerViewModel.registrationUIState.value.passwordMatchErr, //password2BeenClicked && ((passwordBeenClicked && isPasswordSame) || heslo2.isEmpty()),
@@ -303,7 +303,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
                         )
 
-                        var options = mutableStateListOf<String>("Posluchac", "Umelec")
+                        var options = mutableStateListOf<String>(stringResource(R.string.text_listener), stringResource(R.string.text_artist))
                         var selectedIndex by remember {
                             mutableStateOf(0)
                         }
@@ -352,7 +352,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             //navController.navigate(Screens.LOGIN.name)
                             onLoginClick
                         ) {
-                            Text(text = "Uz mas ucet ?")
+                            Text(text = stringResource(R.string.text_already_have_account))
                         }
 
 
@@ -388,7 +388,8 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 //                                                duration = SnackbarDuration.Short
 //                                            )
 //                                        }
-                                        Toast.makeText(context, "Konto bolo uspesne vytvorene", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context,
+                                            context.getString(R.string.toast_account_was_created), Toast.LENGTH_LONG).show()
                                         onRegisterClick()
                                     }
 
@@ -399,23 +400,11 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 //                                                duration = SnackbarDuration.Short
 //                                            )
 //                                        }
-                                        Toast.makeText(context, "Pri registracii nasala chyba", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context,
+                                            context.getString(R.string.toast_there_was_error_with_registration), Toast.LENGTH_LONG).show()
                                     }
 
                                     firebaseViewModel.signUp(onSuccess, onFailure,registerViewModel)
-                                    //)) {
-//                                        scope.launch {
-//                                            snackbarHostState.showSnackbar(
-//                                                message = "Ucet bol uspesne vytvoreny",
-//                                                duration = SnackbarDuration.Short
-//                                            )
-//                                        }
-
-                                    //} else {
-
-
-                                    //}
-
                                 }
 
                             },
@@ -426,7 +415,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                     registerViewModel.registrationUIState.value.passwordErr ||
                                     registerViewModel.registrationUIState.value.passwordMatchErr)
                         ) {
-                            Text(text = "Registrovat")
+                            Text(text = stringResource(R.string.text_register))
 
                         }
                     }
@@ -439,32 +428,6 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
         if(registerViewModel.registerInProgress.value) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    }
-}
-
-@Composable
-fun CustomSnackBar() {
-    var showError by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(showError) {
-        if (showError) {
-            snackbarHostState.showSnackbar("Pri vytváraní účtu sa stala chyba")
-            showError = false // Reset error state after showing the snackbar
-        }
-    }
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Tlačidlo na simuláciu chyby
         }
     }
 }

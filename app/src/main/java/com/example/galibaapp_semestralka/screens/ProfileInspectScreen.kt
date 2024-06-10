@@ -2,8 +2,6 @@ package com.example.galibaapp_semestralka.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -69,7 +67,6 @@ fun ProfileInspectScreen(
         firebaseViewModel.isFollowing(chosenUser.value?.userId.toString())
     }
 
-    Log.d("profilovkaaaaaaa", "profile pic : ${chosenUser.value?.profilePic.toString()}")
 
     Surface(
         modifier = Modifier
@@ -156,7 +153,7 @@ fun ProfileInspectScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.instagram.com/",
                         text = chosenUser.value?.instagramUsername.toString(),
-                        socialMediaName = "Instagram",
+                        socialMediaName = stringResource(R.string.text_instagram),
                         socialMediaIcon = R.drawable.instagram_icon
                     )
                 }
@@ -165,7 +162,7 @@ fun ProfileInspectScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.facebook.com/",
                         text = chosenUser.value?.facebookUsername.toString(),
-                        socialMediaName = "Facebook",
+                        socialMediaName = stringResource(R.string.text_facebook),
                         socialMediaIcon = R.drawable.facebook_icon
                     )
                 }
@@ -174,7 +171,7 @@ fun ProfileInspectScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.youtube.com/@",
                         text = chosenUser.value?.youtubeUsername.toString(),
-                        socialMediaName = "Youtube",
+                        socialMediaName = stringResource(R.string.text_youtube),
                         socialMediaIcon = R.drawable.youtube_icon
                     )
                 }
@@ -182,14 +179,14 @@ fun ProfileInspectScreen(
                     ClickableSocialMediaChip(
                         urlPrefix = "https://www.tiktok.com/@",
                         text = chosenUser.value?.tiktokUsername.toString(),
-                        socialMediaName = "Tiktok",
+                        socialMediaName = stringResource(R.string.text_tiktok),
                         socialMediaIcon = R.drawable.tiktok_icon
                     )
                 }
                 if (chosenUser.value?.website != "") {
                     ClickableSocialMediaChip(
                         urlPrefix = chosenUser.value?.website.toString(),
-                        socialMediaName = "Stranka",
+                        socialMediaName = stringResource(R.string.text_webpage),
                         socialMediaIcon = R.drawable.web_icon_default
                     )
                 }
@@ -222,14 +219,14 @@ fun ProfileInspectScreen(
                     onClick = { showDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Sledovane")
+                    Text(text = stringResource(R.string.button_following))
                 }
 
                 if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
-                        title = { Text(text = "Zrušiť sledovanie") },
-                        text = { Text(text = "Naozaj chcete zrušiť sledovanie tohto používateľa?") },
+                        title = { Text(text = stringResource(R.string.alert_unfollow)) },
+                        text = { Text(text = stringResource(R.string.alert_are_you_really_sure_you_want_unfollow)) },
                         confirmButton = {
                             TextButton(
                                 onClick = {
@@ -242,14 +239,14 @@ fun ProfileInspectScreen(
 
                                 }
                             ) {
-                                Text(text = "Áno")
+                                Text(text = stringResource(R.string.button_confirm))
                             }
                         },
                         dismissButton = {
                             TextButton(
                                 onClick = { showDialog = false }
                             ) {
-                                Text(text = "Nie")
+                                Text(text = stringResource(R.string.button_cancel))
                             }
                         }
                     )
@@ -266,7 +263,7 @@ fun ProfileInspectScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Sledovat")
+                    Text(text = stringResource(R.string.button_follow))
                 }
             }
 
@@ -295,50 +292,6 @@ fun ProfileInspectScreen(
 
         }
     }
-}
-
-@Composable
-fun ProfileInfo(
-    @DrawableRes profilePic: Int = R.drawable.empty_profile,
-    isArtist: Boolean,
-    name: String,
-    bio: String = ""
-
-) {
-
-    Image(
-        modifier = Modifier
-            .size(200.dp)
-            .clip(CircleShape),
-        painter = painterResource(id = profilePic),
-        contentScale = ContentScale.Crop,
-        contentDescription = null
-    )
-    Spacer(modifier = Modifier.padding(all = 10.dp))
-
-    Text(
-        text = "Umelec/Kapela",
-        fontSize = MaterialTheme.typography.bodyLarge.fontSize
-    )
-
-    Spacer(modifier = Modifier.padding(all = 10.dp))
-
-    Text(
-        text = name,
-        fontSize = MaterialTheme.typography.displayMedium.fontSize,
-        fontWeight = FontWeight.Bold
-    )
-
-    Spacer(modifier = Modifier.padding(all = 10.dp))
-
-    Text(
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp),
-        text = bio,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize
-    )
-    Spacer(modifier = Modifier.padding(all = 10.dp))
-
-    HorizontalDivider()
 }
 
 //@Composable

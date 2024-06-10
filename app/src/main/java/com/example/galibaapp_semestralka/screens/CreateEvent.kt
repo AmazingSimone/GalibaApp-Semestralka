@@ -67,8 +67,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
-import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
+import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -87,7 +87,7 @@ import java.util.Locale
 @Composable
 fun CreateEvent(
     navController: NavHostController,
-    createEventViewModel: CreateEventViewModel = viewModel(),
+    searchCityViewModel: SearchCityViewModel = viewModel(),
     firebaseViewModel: FirebaseViewModel
 ) {
     Surface (
@@ -116,18 +116,18 @@ fun CreateEvent(
 
             var datumACasAkcie: LocalDateTime? by rememberSaveable { mutableStateOf(null) }
 
-            val selectedMesto by createEventViewModel.selectedMesto.collectAsState()
+            val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
-            val searchText by createEventViewModel.searchText.collectAsState()
+            val searchText by searchCityViewModel.searchText.collectAsState()
 
-            val mesta by createEventViewModel.mesta.collectAsState()
+            val mesta by searchCityViewModel.mestaForEditCreateEvent.collectAsState()
 
             var miestoAkcie by rememberSaveable { mutableStateOf("") }
 
             var popisAkcie by rememberSaveable { mutableStateOf("") }
 
 
-            var showDialogCancelCreate by remember { mutableStateOf(false) }
+            var showDialogCancelCreate by rememberSaveable { mutableStateOf(false) }
 
             val calendarState = rememberUseCaseState()
 
@@ -222,7 +222,7 @@ fun CreateEvent(
                     datumAkcie = it
                 },
                 config = CalendarConfig(
-                    locale = Locale("sk")
+                    locale = Locale(Locale.getDefault().toLanguageTag())
                 )
 
             )
@@ -305,7 +305,7 @@ fun CreateEvent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .height(createEventViewModel.dynamicSize.value)
+                    .height(searchCityViewModel.dynamicSize.value)
                     .focusRequester(eventCityFocusRequester)
 
             ) {
@@ -319,7 +319,7 @@ fun CreateEvent(
                             .fillMaxWidth(),
                         value = searchText,
                         singleLine = true,
-                        onValueChange = createEventViewModel::onSearchTextChange,
+                        onValueChange = searchCityViewModel::onSearchTextChange,
                         label = {
                             Text(text = stringResource(R.string.text_search_event_city))
                         },
@@ -342,7 +342,7 @@ fun CreateEvent(
                                 modifier = Modifier
                                     .padding(6.dp)
                                     .clickable {
-                                        createEventViewModel.chooseMesto(mesto)
+                                        searchCityViewModel.chooseMesto(mesto)
                                     }
                             )
                         }
