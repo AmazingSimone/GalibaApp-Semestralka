@@ -44,11 +44,3 @@ Vypracoval: Šimon Bartánus
 Študijná skupina: 5ZYS31  
 Predmet: Vývoj aplikácií pre mobilné zariadenia  
 Cvičiaci: doc. Ing. Patrik Hrkút, PhD.
-
-Neváhajte prispieť k projektu alebo poskytnúť spätnú väzbu!
----
-
-Vypracoval: Šimon Bartánus  
-Študijná skupina: 5ZYS31  
-Predmet: Vývoj aplikácií pre mobilné zariadenia  
-Cvičiaci: doc. Ing. Patrik Hrkút, PhD.
