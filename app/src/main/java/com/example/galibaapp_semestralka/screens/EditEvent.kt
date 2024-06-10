@@ -63,11 +63,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Search.SearchCityViewModel
@@ -94,7 +96,9 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
     }
 
     Surface (
-        modifier = Modifier.fillMaxSize().statusBarsPadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
     ){
         Column(
             modifier = Modifier
@@ -165,7 +169,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                 navController.popBackStack()
                             }
                         ) {
-                            Text("Potvrdit")
+                            Text(stringResource(R.string.button_confirm))
                         }
                     },
                     dismissButton = {
@@ -173,11 +177,11 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                             onClick = { showDialogCancelCreate = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Vsetky vykonane zmeny budu stratene") },
-                    text = { Text("Si si isty ?") }
+                    title = { Text(stringResource(R.string.alert_all_changes_will_be_lost)) },
+                    text = { Text(stringResource(R.string.alert_are_you_sure)) }
                 )
             }
 
@@ -189,7 +193,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Uprav Galibu \uD83E\uDE9B",
+                    text = stringResource(R.string.title_edit_event),
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(
@@ -222,7 +226,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                     .fillMaxWidth(),
                 value = eventNameChanged.toString(),
                 onValueChange = { eventNameChanged = it },
-                label = { Text("Nazov akcie") },
+                label = { Text(stringResource(R.string.text_event_name)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -241,7 +245,6 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
                 state = calendarState,
                 selection = CalendarSelection.Date {
-                    Log.d("Date", "$it")
                     eventDateChanged = it
                 },
                 config = CalendarConfig(
@@ -269,7 +272,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         )
                     }
                 },
-                placeholder = { Text("Datum akcie") },
+                placeholder = { Text(stringResource(R.string.text_event_date)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -285,16 +288,11 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
             ClockDialog(state = clockState, selection = ClockSelection.HoursMinutes{
                     hours, minutes ->
 
-                //datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
-                //Log.d("CasAkcie" , "stary cas $casAkcie")
-                //Log.d("CasAkcie" , "stary datum a cas $datumACasAkcie")
                 eventTimeChanged = LocalTime.of(hours, minutes)
 
 
                 datumACasAkcieChanged = LocalDateTime.of(eventDateChanged,eventTimeChanged)
-                //datumACasAkcie?.format(DateTimeFormatter.ofPattern("DD/MM/uuuu HH:mm",Locale("sk")))
-                Log.d("CasAkcie" , "novy cas $eventTimeChanged")
-                Log.d("CasAkcie" , "datum a cas $datumACasAkcieChanged")
+
             })
 
 
@@ -313,7 +311,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         )
                     }
                 },
-                placeholder = { Text("Zaciatok akcie") },
+                placeholder = { Text(stringResource(R.string.text_event_time)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -354,7 +352,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         singleLine = true,
                         onValueChange = searchCityViewModel::onSearchTextChange,
                         label = {
-                            Text(text = "Vyhladaj mesto")
+                            Text(text = stringResource(R.string.text_search_event_city))
                         },
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next
@@ -377,10 +375,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     .clickable {
                                         searchCityViewModel.chooseMesto(mesto)
                                         eventCityChanged = searchCityViewModel.selectedMesto.value
-                                        Log.d(
-                                            "mestoAkcie",
-                                            "${searchCityViewModel.selectedMesto.value}"
-                                        )
+
                                     }
                             )
                         }
@@ -396,8 +391,8 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                     .fillMaxWidth(),
                 value = eventLocationChanged.toString(),
                 onValueChange = { eventLocationChanged = it },
-                label = { Text("Adresa") },
-                placeholder = { Text("Nazov klubu alebo adresa") },
+                label = { Text(stringResource(R.string.text_event_address)) },
+                placeholder = { Text(stringResource(R.string.text_name_or_address_of_event)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -435,7 +430,6 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 ) {
 
 
-                    Log.d("neuveritelnyVyberacFotiek","${chosenEvent?.eventPic}")
                     if (chosenEvent?.eventPic?.isNotEmpty() == true && eventPicChanged == null) {
                         AsyncImage(
                             model =chosenEvent?.eventPic.toString(),
@@ -492,7 +486,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                         eventDetailsChanged = it
                     }
                 },
-                label = { Text("Popis akcie") },
+                label = { Text(stringResource(R.string.text_event_bio)) },
                 minLines = 5,
                 maxLines = 20,
                 keyboardOptions = KeyboardOptions(
@@ -521,13 +515,13 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     navController.popBackStack()
                                     Toast.makeText(
                                         context,
-                                        "Galiba bola vymazana !",
+                                        context.getString(R.string.toast_event_was_deleted),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
 
                                 val onFailure: () -> Unit = {
-                                    Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG)
+                                    Toast.makeText(context, context.getString(R.string.toast_there_was_error), Toast.LENGTH_LONG)
                                         .show()
                                 }
                                 firebaseViewModel.deleteEvent(onSuccess,onFailure,chosenEvent?.eventId.toString())
@@ -535,7 +529,8 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                             },
                             //colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
                         ) {
-                            Text("Potvrdit",
+                            Text(
+                                stringResource(R.string.button_confirm),
                                 color = MaterialTheme.colorScheme.error)
                         }
                     },
@@ -544,11 +539,11 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                             onClick = { showDialogConfirmDelete = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Chystas sa vymazat Galibu") },
-                    text = { Text("Si si naozaj isty ?") }
+                    title = { Text(stringResource(R.string.alert_you_are_about_to_delete_event)) },
+                    text = { Text(stringResource(R.string.alert_are_you_sure)) }
                 )
             }
 
@@ -557,7 +552,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Vymazat galibu",
+                    text = stringResource(R.string.button_delete_event),
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -578,13 +573,13 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                                     navController.popBackStack()
                                     Toast.makeText(
                                         context,
-                                        "Galiba bola upravena !",
+                                        context.getString(R.string.toast_event_was_edited),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
 
                                 val onFailure: () -> Unit = {
-                                    Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG)
+                                    Toast.makeText(context, context.getString(R.string.toast_there_was_error), Toast.LENGTH_LONG)
                                         .show()
                                 }
                                 firebaseViewModel.updateEventInfo(
@@ -601,7 +596,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 
                             }
                         ) {
-                            Text("Potvrdit")
+                            Text(stringResource(R.string.button_confirm))
                         }
                     },
                     dismissButton = {
@@ -609,11 +604,11 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
                             onClick = { showDialogConfirmCreate = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Chystas sa upravit Galibu") },
-                    text = { Text("Su vsetky udaje spravne ?") }
+                    title = { Text(stringResource(R.string.alert_you_are_about_to_edit_event)) },
+                    text = { Text(stringResource(R.string.alert_is_everything_correct)) }
                 )
             }
 
@@ -637,7 +632,7 @@ fun EditEvent(navController: NavHostController, createEventViewModel: CreateEven
 //                enabled = eventNameChanged?.isNotEmpty() ?: false && (eventDateChanged != LocalDate.MIN && (eventDateChanged?.isAfter(
 //                    LocalDate.now()) == false || eventDateChanged?.isEqual(LocalDate.now()) == false)) && selectedMesto != null && eventLocation.isNotEmpty()
             ) {
-                Text(text = "Upravit galibu")
+                Text(text = stringResource(R.string.button_edit_event))
             }
 
         }

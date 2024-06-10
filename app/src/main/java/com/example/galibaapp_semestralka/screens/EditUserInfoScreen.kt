@@ -61,6 +61,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -118,8 +119,6 @@ fun EditUserInfoScreen(
         firebaseViewModel.getCurrentUserData()
     }
 
-    Log.d("EditUserInfo", "$username , $bio, $isArtist")
-
     Surface (
         modifier = Modifier
             .fillMaxSize()
@@ -142,7 +141,7 @@ fun EditUserInfoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Uprav profil \uD83D\uDC85",
+                    text = stringResource(R.string.title_edit_profile),
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(onClick = {
@@ -249,7 +248,7 @@ fun EditUserInfoScreen(
                         usernameChanged.value = it
                     }
                 },
-                label = { Text("Pouzivatelske meno") },
+                label = { Text(stringResource(R.string.text_username)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -276,7 +275,7 @@ fun EditUserInfoScreen(
                         userBioChanged.value = it
                     }
                 },
-                label = { Text("Bio") },
+                label = { Text(stringResource(R.string.text_user_bio)) },
                 minLines = 5,
                 maxLines = 5,
                 keyboardOptions = KeyboardOptions(
@@ -297,7 +296,7 @@ fun EditUserInfoScreen(
                 onValueChange = {
                     instagramUsernameChanged.value = it
                 },
-                label = { Text("Instagram") },
+                label = { Text(stringResource(R.string.text_instagram)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -323,7 +322,7 @@ fun EditUserInfoScreen(
                 onValueChange = {
                     facebookUsernameChanged.value = it
                 },
-                label = { Text("Facebook") },
+                label = { Text(stringResource(R.string.text_facebook)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -349,7 +348,7 @@ fun EditUserInfoScreen(
                 onValueChange = {
                     youtubeUsernameChanged.value = it
                 },
-                label = { Text("YouTube") },
+                label = { Text(stringResource(R.string.text_youtube)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -375,7 +374,7 @@ fun EditUserInfoScreen(
                 onValueChange = {
                     tiktokUsernameChanged.value = it
                 },
-                label = { Text("TikTok") },
+                label = { Text(stringResource(R.string.text_tiktok)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -401,7 +400,7 @@ fun EditUserInfoScreen(
                 onValueChange = {
                     websiteChanged.value = it
                 },
-                label = { Text("Webstranka") },
+                label = { Text(stringResource(R.string.text_webpage)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
@@ -416,7 +415,10 @@ fun EditUserInfoScreen(
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
-            var options = mutableStateListOf("Posluchac", "Umelec")
+            var options = mutableStateListOf(stringResource(R.string.text_listener), stringResource(
+                R.string.text_artist
+            )
+            )
             var selectedIndex by remember { mutableStateOf(if (isArtist == true) 1 else 0) }
             var isArtistChanged = remember { mutableStateOf(isArtist) }
 
@@ -460,8 +462,6 @@ fun EditUserInfoScreen(
                                 navController.popBackStack()
                                 navController.navigate(Screens.AUTHROOT.name)
                                 val onSuccess: () -> Unit = {
-                                    Log.d("vymazatUcet", "vymazalo")
-
 
                                 }
                                 val onFailure = {}
@@ -475,7 +475,7 @@ fun EditUserInfoScreen(
                             //colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text(
-                                "Vymazat ucet",
+                                stringResource(R.string.text_delete_profile),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -485,11 +485,11 @@ fun EditUserInfoScreen(
                             onClick = { showDialog = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Upozornenie") },
-                    text = { Text("Si si isty? Ucet sa natrvalo vymaze.") }
+                    title = { Text(stringResource(R.string.alert_attention)) },
+                    text = { Text(stringResource(R.string.alert_are_you_sure_delete)) }
                 )
             }
 
@@ -510,20 +510,16 @@ fun EditUserInfoScreen(
             Button(
                 onClick = {
 
-
-                    //val data = Data(usernameChanged.value,userBioChanged.value,isArtistChanged.value)
-
-
-
                     val onSuccess = {
 
-                        Toast.makeText(context, "Zmeny boli ulozene", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context,
+                            context.getString(R.string.toast_changes_were_saved), Toast.LENGTH_LONG).show()
                         firebaseViewModel.getCurrentUserData()
 
                     }
 
                     val onFailure: () -> Unit = {
-                        Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.toast_there_was_error), Toast.LENGTH_LONG).show()
                     }
                     firebaseViewModel.updateUserData(
                         onSuccess,
@@ -540,11 +536,13 @@ fun EditUserInfoScreen(
 
                     if (selectedImageUri != null) {
                         val onSuccessUpload = {
-                            Toast.makeText(context, "Obrazok bol nahraty", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context,
+                                context.getString(R.string.toast_image_was_uploaded), Toast.LENGTH_LONG).show()
                             selectedImageUri = null
                         }
                         val onFailureUpload = {
-                            Toast.makeText(context, "Nastala chyba pri nahravani obrazku", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context,
+                                context.getString(R.string.toast_there_was_error_with_uploading_image), Toast.LENGTH_LONG).show()
 
                         }
                         firebaseViewModel.saveToUserProfilePictures(onSuccessUpload,onFailureUpload,
@@ -566,10 +564,8 @@ fun EditUserInfoScreen(
                         website != websiteChanged.value
                         ))
             ) {
-                Text(text = "Ulozit zmeny")
+                Text(text = stringResource(R.string.button_save_changes))
             }
-            Log.d("neuveritelnyVyberacFotiek", "isArtist ${isArtist}")
-            Log.d("neuveritelnyVyberacFotiek", "isArtistChanged ${isArtistChanged}")
         }
     }
 }

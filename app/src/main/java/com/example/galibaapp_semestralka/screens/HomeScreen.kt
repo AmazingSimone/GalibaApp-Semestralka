@@ -85,6 +85,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -180,7 +181,7 @@ fun HomeScreen(
 
             FlowRow {
                 Text(
-                    text = "Ahoj, ",
+                    text = stringResource(R.string.title_homescreen),
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize,
 
                     )
@@ -237,7 +238,7 @@ fun HomeScreen(
                 onActiveChange = {
                     homeScreenViewModel.active.value = it
                 },
-                placeholder = { Text(text = "Vyhladaj mesto") },
+                placeholder = { Text(stringResource(R.string.text_search_event_city)) },
                 leadingIcon = {
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }
@@ -287,10 +288,7 @@ fun HomeScreen(
                                     .padding(10.dp)
                                     .clickable {
                                         searchCityViewModel.chooseMesto(mesto)
-                                        Log.d(
-                                            "mestoAkcie",
-                                            "${searchCityViewModel.selectedMesto.value}"
-                                        )
+
                                     },
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize
                             )
@@ -298,21 +296,21 @@ fun HomeScreen(
                                 val onSuccess = {
                                     Toast.makeText(
                                         context,
-                                        "Mesto bolo pridane medzi oblubene",
+                                        context.getString(R.string.toast_city_was_added_to_favourites),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
                                 val onFailure = {
                                     Toast.makeText(
                                         context,
-                                        "Nastala chyba pri pridavani do oblubenych",
+                                        context.getString(R.string.toast_there_was_error_with_adding_city_to_favourites),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
                                 val onExists = {
                                     Toast.makeText(
                                         context,
-                                        "Mesto uz je pridane do oblubenych",
+                                        context.getString(R.string.toast_city_is_already_in_favourites),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -337,7 +335,7 @@ fun HomeScreen(
 
             Text(
                 //modifier = Modifier.padding(vertical = 10.dp),
-                text = "Galiby v okoli:",
+                text = stringResource(R.string.text_events_in_area),
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 //color = MaterialTheme.colorScheme.onSurface
             )
@@ -382,7 +380,7 @@ fun HomeScreen(
 
                 ) {
                     Text(
-                        text = "Je tu trocha prazdno... skus vyhladat ine mesto \uD83C\uDF10",
+                        text = stringResource(R.string.text_its_empty_with_events_here),
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         fontSize = MaterialTheme.typography.headlineSmall.fontSize,
                         fontWeight = FontWeight.ExtraBold,
@@ -392,17 +390,6 @@ fun HomeScreen(
             }
             Spacer(modifier = Modifier.height(15.dp))
         }
-
-        //},
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //TODO 0
-        // OBRAZOVKY HOME SCREEN A FOLLOW SCREEN SU LEN PREKRYTE SPODNYN MAVIGACNYM BAROM NEDA SA DOSTAT NA UPLNY KONIEC LISTU
-
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-        //) {}
-
     }
 }
 
@@ -443,7 +430,7 @@ fun HomeScreenNavigation(
                 Column(Modifier.verticalScroll(rememberScrollState())) {
 
                     Text(
-                        text = "Galiba",
+                        text = stringResource(R.string.app_name),
                         fontSize = MaterialTheme.typography.headlineSmall.fontSize,
                         modifier = Modifier.padding(12.dp)
 
@@ -452,7 +439,6 @@ fun HomeScreenNavigation(
 
                     NavigationDrawerItem(
                         icon = {
-                            Log.d("profilovka", profilePic.toString())
                             if (profilePic?.toString() == "null") {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
@@ -541,14 +527,14 @@ fun HomeScreenNavigation(
                                         val onSuccess = {
                                             Toast.makeText(
                                                 context,
-                                                "Mesto bolo odstranene z oblubenych",
+                                                context.getString(R.string.toast_city_was_removed_from_favourites),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
                                         val onFailure = {
                                             Toast.makeText(
                                                 context,
-                                                "Nastala chyba pri odstranovani z oblubenych",
+                                                context.getString(R.string.toast_there_was_error_with_removing_favourite_city),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
@@ -589,8 +575,8 @@ fun HomeScreenNavigation(
                     )
 
                     val listOfNavItems = listOf(
-                        NavItem("Home", Icons.Default.Home, Screens.HOME.name),
-                        NavItem("Follow", Icons.Default.Favorite, Screens.FOLLOW.name)
+                        NavItem(stringResource(R.string.navbar_home), Icons.Default.Home, Screens.HOME.name),
+                        NavItem(stringResource(R.string.navbar_follow), Icons.Default.Favorite, Screens.FOLLOW.name)
                     )
 
                     NavigationBar {
@@ -895,7 +881,7 @@ fun CustomCard(
 
                     if (!showFullContent) {
                         Text(
-                            text = "Citat viac",
+                            text = stringResource(R.string.text_read_more),
                             fontSize = MaterialTheme.typography.bodySmall.fontSize,
                             fontWeight = FontWeight.ExtraBold,
                             style = MaterialTheme.typography.titleLarge
@@ -924,7 +910,7 @@ fun CustomCard(
                                         },
 
                                         ) {
-                                        Text("Mas zaujem")
+                                        Text(stringResource(R.string.button_is_interested))
                                         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
                                         Icon(imageVector = Icons.Default.Check, contentDescription = "check")
                                     }
@@ -949,7 +935,7 @@ fun CustomCard(
                                         //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
                                     ) {
-                                        Text("Prides")
+                                        Text(stringResource(R.string.button_is_coming))
                                         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
                                         Icon(imageVector = Icons.Default.Check, contentDescription = "check")
                                     }
@@ -961,7 +947,7 @@ fun CustomCard(
                                                 interestedState = 1
                                                 Toast.makeText(
                                                     context,
-                                                    "Pridane do tvojich eventov",
+                                                    context.getString(R.string.toast_added_to_your_events),
                                                     Toast.LENGTH_LONG
                                                 ).show()
 
@@ -979,7 +965,7 @@ fun CustomCard(
                                         //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
                                     ) {
-                                        Text("Mam zaujem")
+                                        Text(stringResource(R.string.button_interested))
                                     }
 
                                     Button(
@@ -989,7 +975,7 @@ fun CustomCard(
                                                 interestedState = 2
                                                 Toast.makeText(
                                                     context,
-                                                    "Pridane do tvojich eventov",
+                                                    context.getString(R.string.toast_added_to_your_events),
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             }
@@ -1005,7 +991,7 @@ fun CustomCard(
                                         },
                                         //colors = ButtonDefaults.buttonColors(primaryLight)
                                     ) {
-                                        Text(text = "Pridem")
+                                        Text(text = stringResource(R.string.button_coming))
                                     }
                                 }
 
@@ -1062,7 +1048,7 @@ fun CustomCard(
                                 //colors = ButtonDefaults.buttonColors(primaryLight)
                             ) {
                                 Text(
-                                    text = "Upravit",
+                                    text = stringResource(R.string.text_edit),
                                     //fontSize = MaterialTheme.typography.bodySmall.fontSize
                                 )
                             }

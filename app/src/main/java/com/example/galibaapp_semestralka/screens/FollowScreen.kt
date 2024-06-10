@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,7 +72,7 @@ fun FollowScreen(
 
             Text(
                 modifier = Modifier.padding(start = 20.dp, bottom = 20.dp),
-                text = "Sleduješ",
+                text = stringResource(R.string.title_following),
                 fontSize = MaterialTheme.typography.headlineLarge.fontSize,
             )
 
@@ -122,7 +123,7 @@ fun FollowScreen(
 
                     ) {
                         Text(
-                            text = "Je tu celkom ticho... skus niekomu hodit follow \uD83D\uDC40",
+                            text = stringResource(R.string.text_its_quet_here_with_following),
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                             fontWeight = FontWeight.ExtraBold,
@@ -130,7 +131,6 @@ fun FollowScreen(
                         )
                     }
                 }
-
             }
         }
     }
@@ -145,13 +145,11 @@ fun CustomListItem(
     popis: String = "",
     profilePic: String?
 ) {
-    //TODO - spytaj sa jak mam spravit podmienku aby sa tam bud pridal alebo nepridal parameter
     Box(Modifier.clickable {
         val onSuccess = {
             navController.navigate(Screens.USER_PROFILE.name) {
                 launchSingleTop = true
             }
-
         }
 
         val onFailure = {
@@ -183,8 +181,8 @@ fun CustomListItem(
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text(text = "Zrušiť sledovanie") },
-                text = { Text(text = "Naozaj chcete zrušiť sledovanie tohto používateľa?") },
+                title = { Text(text = stringResource(R.string.alert_unfollow)) },
+                text = { Text(text = stringResource(R.string.alert_are_you_really_sure_you_want_unfollow)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -197,14 +195,14 @@ fun CustomListItem(
 
                         }
                     ) {
-                        Text(text = "Áno")
+                        Text(stringResource(R.string.button_confirm))
                     }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = { showDialog = false }
                     ) {
-                        Text(text = "Nie")
+                        Text(stringResource(R.string.button_cancel))
                     }
                 }
             )

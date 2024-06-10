@@ -3,7 +3,6 @@ package com.example.galibaapp_semestralka.screens
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -61,11 +60,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.CreateEvent.CreateEventViewModel
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -90,7 +91,9 @@ fun CreateEvent(
     firebaseViewModel: FirebaseViewModel
 ) {
     Surface (
-        modifier = Modifier.fillMaxSize().statusBarsPadding()
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -144,7 +147,7 @@ fun CreateEvent(
                                 navController.popBackStack()
                             }
                         ) {
-                            Text("Potvrdit")
+                            Text(stringResource(R.string.button_confirm))
                         }
                     },
                     dismissButton = {
@@ -152,11 +155,11 @@ fun CreateEvent(
                             onClick = { showDialogCancelCreate = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Vsetky vykonane zmeny budu stratene") },
-                    text = { Text("Si si isty ?") }
+                    title = { Text(stringResource(R.string.alert_all_changes_will_be_lost)) },
+                    text = { Text(stringResource(R.string.alert_are_you_sure)) }
                 )
             }
 
@@ -168,7 +171,7 @@ fun CreateEvent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Vytvor Galibu \uD83D\uDEE0\uFE0F",
+                    text = stringResource(R.string.title_create_event),
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize
                 )
                 IconButton(
@@ -200,7 +203,7 @@ fun CreateEvent(
                     .fillMaxWidth(),
                 value = nazovAkcie,
                 onValueChange = { nazovAkcie = it },
-                label = { Text("Nazov akcie") },
+                label = { Text(stringResource(R.string.text_event_name)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -216,7 +219,6 @@ fun CreateEvent(
 
                 state = calendarState,
                 selection = CalendarSelection.Date {
-                    Log.d("Date", "$it")
                     datumAkcie = it
                 },
                 config = CalendarConfig(
@@ -244,7 +246,7 @@ fun CreateEvent(
                         )
                     }
                 },
-                placeholder = { Text("Datum akcie") },
+                placeholder = { Text(stringResource(R.string.text_event_date)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -268,8 +270,7 @@ fun CreateEvent(
 
                 datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
                 //datumACasAkcie?.format(DateTimeFormatter.ofPattern("DD/MM/uuuu HH:mm",Locale("sk")))
-                Log.d("CasAkcie" , "novy cas $casAkcie")
-                Log.d("CasAkcie" , "datum a cas $datumACasAkcie")
+
             })
 
 
@@ -288,7 +289,7 @@ fun CreateEvent(
                         )
                     }
                 },
-                placeholder = { Text("Zaciatok akcie") },
+                placeholder = { Text(stringResource(R.string.text_event_time)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -320,7 +321,7 @@ fun CreateEvent(
                         singleLine = true,
                         onValueChange = createEventViewModel::onSearchTextChange,
                         label = {
-                            Text(text = "Vyhladaj mesto")
+                            Text(text = stringResource(R.string.text_search_event_city))
                         },
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next
@@ -357,8 +358,8 @@ fun CreateEvent(
                     .fillMaxWidth(),
                 value = miestoAkcie,
                 onValueChange = { miestoAkcie = it },
-                label = { Text("Adresa") },
-                placeholder = { Text("Nazov klubu alebo adresa") },
+                label = { Text(stringResource(R.string.text_event_address)) },
+                placeholder = { Text(stringResource(R.string.text_name_or_address_of_event)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -440,7 +441,7 @@ fun CreateEvent(
                         popisAkcie = it
                     }
                 },
-                label = { Text("Popis akcie") },
+                label = { Text(stringResource(R.string.text_event_bio)) },
                 minLines = 5,
                 maxLines = 20,
                 keyboardOptions = KeyboardOptions(
@@ -472,13 +473,14 @@ fun CreateEvent(
                                     navController.popBackStack()
                                     Toast.makeText(
                                         context,
-                                        "Galiba bola vytvorena !",
+                                        context.getString(R.string.toast_event_was_created),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
 
                                 val onFailure: () -> Unit = {
-                                    Toast.makeText(context, "Nastala chyba", Toast.LENGTH_LONG)
+                                    Toast.makeText(context,
+                                        context.getString(R.string.toast_there_was_error), Toast.LENGTH_LONG)
                                         .show()
                                 }
                                 firebaseViewModel.createEvent(
@@ -494,7 +496,7 @@ fun CreateEvent(
 
                             }
                         ) {
-                            Text("Potvrdit")
+                            Text(stringResource(R.string.button_confirm) )
                         }
                     },
                     dismissButton = {
@@ -502,11 +504,11 @@ fun CreateEvent(
                             onClick = { showDialogConfirmCreate = false },
 
                             ) {
-                            Text("Zrušiť")
+                            Text(stringResource(R.string.button_cancel))
                         }
                     },
-                    title = { Text("Chystas sa vytvorit Galibu") },
-                    text = { Text("Su vsetky udaje spravne ?") }
+                    title = { Text(stringResource(R.string.alert_you_are_about_to_create_event)) },
+                    text = { Text(stringResource(R.string.alert_is_everything_correct)) }
                 )
             }
 
@@ -522,7 +524,7 @@ fun CreateEvent(
                 enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(LocalDate.now()) ||
                         datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
             ) {
-                Text(text = "Vytvorit galibu")
+                Text(text = stringResource(R.string.confirmButton_create_event))
             }
 
         }

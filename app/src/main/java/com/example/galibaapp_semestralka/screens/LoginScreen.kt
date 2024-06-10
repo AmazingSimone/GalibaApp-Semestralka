@@ -43,6 +43,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
 import com.example.galibaapp_semestralka.data.Login.LoginUIevent
 import com.example.galibaapp_semestralka.data.Login.LoginViewModel
@@ -89,7 +91,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                     ) {
 
                         Text(
-                            text = "Vitaj Spat ⚡",
+                            text = stringResource(R.string.title_login),
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                             fontWeight = FontWeight.Bold
                         )
@@ -109,7 +111,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                                 loginViewModel.onLoginEvent(LoginUIevent.emailChanged(it))
                                 //loginBeenClicked = true
                             },
-                            label = { Text("Email") },
+                            label = { Text(stringResource(R.string.text_email)) },
                             singleLine = true,
                             trailingIcon = {
                                 Icon(
@@ -128,7 +130,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                             supportingText = {
                                 //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (loginViewModel.loginUIState.value.emailErr) {
-                                    Text(text = "Email musi byt validny!")
+                                    Text(text = stringResource(R.string.error_email_must_be_valid))
                                 }
                             },
                             isError = loginViewModel.loginUIState.value.emailErr || loginViewModel.badLogin.value
@@ -150,7 +152,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                                 loginViewModel.onLoginEvent(LoginUIevent.passwordChanged(it))
                                 //passwordBeenClicked = true
                             },
-                            label = { Text("Heslo") },
+                            label = { Text(stringResource(R.string.text_password)) },
                             singleLine = true,
                             trailingIcon = {
                                 val iconImage = if (heslo.isEmpty()) {
@@ -177,7 +179,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                             supportingText = {
                                 //Text(text = "Pouzivatelske meno alebo heslo je nespravne")
                                 if (loginViewModel.loginUIState.value.passwordErr) {
-                                    Text(text = "Povinny udaj!")
+                                    Text(text = stringResource(R.string.error_required_field))
                                 }
                             },
                             isError = loginViewModel.loginUIState.value.passwordErr || loginViewModel.badLogin.value,
@@ -186,7 +188,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                         )
 
                         TextButton(onClick = onRegisterClick) {
-                            Text(text = "Nemas ucet ?")
+                            Text(text = stringResource(R.string.text_dont_have_account))
                         }
 
                         val context = LocalContext.current
@@ -196,7 +198,8 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
 
                                 if (!loginViewModel.isAnyUserInputError()) {
                                     val onSuccess = {
-                                        Toast.makeText(context, "Vitaj spat!", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context,
+                                            context.getString(R.string.toast_welcome_back), Toast.LENGTH_LONG).show()
                                         onLoginClick()
                                     }
 
@@ -207,8 +210,8 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
 //                                                duration = SnackbarDuration.Short
 //                                            )
 //                                        }
-                                        Toast.makeText(context, "Nespravny login alebo heslo", Toast.LENGTH_LONG).show()
-                                        //TODO 01 odstran tym padom ostatne Scaffoldy ktore si vytvaral kvoli zlym Snackbarom
+                                        Toast.makeText(context,
+                                            context.getString(R.string.toast_bad_login_or_password), Toast.LENGTH_LONG).show()
                                         loginViewModel.badLogin.value = true
                                     }
                                     firebaseViewModel.login(onSuccess, onFailure, loginViewModel)
@@ -220,7 +223,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                                     )
 
                         ) {
-                            Text(text = "Prihlasit")
+                            Text(text = stringResource(R.string.text_login))
                         }
                     }
                 }
