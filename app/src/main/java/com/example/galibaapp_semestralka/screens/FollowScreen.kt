@@ -1,12 +1,10 @@
 package com.example.galibaapp_semestralka.screens
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -14,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
@@ -36,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -159,7 +155,7 @@ fun CustomListItem(
         firebaseViewModel.selectUser(
             onSuccess,
             onFailure,
-            userId.toString()
+            userId
         )
 
     }) {
@@ -190,7 +186,7 @@ fun CustomListItem(
                             firebaseViewModel.unFollow(
                                 onUnfollowSuccess,
                                 onUnfollowFailure,
-                                userId.toString()
+                                userId
                             )
 
                         }
@@ -249,26 +245,6 @@ fun CustomListItem(
         )
     }
     HorizontalDivider()
-}
-
-@Composable
-fun CustomListItemCard(
-    meno: String,
-    popis: String = "",
-    @DrawableRes
-    profilePic: Int
-) {
-    Card(
-
-    ) {
-        Text(
-            text = meno,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(40.dp),
-            textAlign = TextAlign.Center,
-        )
-    }
 }
 
 

@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,19 +60,26 @@ import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginViewModel: LoginViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
+fun LoginScreen(
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    loginViewModel: LoginViewModel = viewModel(),
+    firebaseViewModel: FirebaseViewModel
+) {
 
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
 
     Box {
-        Surface (modifier = Modifier
+        Surface(
+            modifier = Modifier
 
-            .background(MaterialTheme.colorScheme.background)) {
+                .background(MaterialTheme.colorScheme.background)
+        ) {
 
             val snackbarHostState = remember { SnackbarHostState() }
-            val scope = rememberCoroutineScope()
+            //val scope = rememberCoroutineScope()
 
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -184,7 +190,8 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                         )
 
                         TextButton(
-                            onClick = { onRegisterClick()
+                            onClick = {
+                                onRegisterClick()
                                 email = ""
                                 heslo = ""
 
@@ -201,8 +208,11 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
 
                                 if (!loginViewModel.isAnyUserInputError()) {
                                     val onSuccess = {
-                                        Toast.makeText(context,
-                                            context.getString(R.string.toast_welcome_back), Toast.LENGTH_LONG).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_welcome_back),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         onLoginClick()
                                     }
 
@@ -213,8 +223,11 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
 //                                                duration = SnackbarDuration.Short
 //                                            )
 //                                        }
-                                        Toast.makeText(context,
-                                            context.getString(R.string.toast_bad_login_or_password), Toast.LENGTH_LONG).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_bad_login_or_password),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         loginViewModel.badLogin.value = true
                                     }
                                     firebaseViewModel.login(onSuccess, onFailure, loginViewModel)
@@ -222,7 +235,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                             },
                             enabled = !(
                                     loginViewModel.loginUIState.value.emailErr ||
-                                    loginViewModel.loginUIState.value.passwordErr
+                                            loginViewModel.loginUIState.value.passwordErr
                                     )
 
                         ) {

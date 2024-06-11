@@ -211,7 +211,7 @@ fun HomeScreen(
             }
 
 
-            var active by remember { mutableStateOf(false) }
+            //var active by remember { mutableStateOf(false) }
 
             SearchBar(
                 modifier = Modifier
@@ -332,12 +332,10 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            var eventList = listOf<Event?>()
-
-            if (homeScreenViewModel.selectedCityName.value == anyCityText || homeScreenViewModel.selectedCityName.value == "") {
-                eventList = allEventList.value
+            val eventList: List<Event?> = if (homeScreenViewModel.selectedCityName.value == anyCityText || homeScreenViewModel.selectedCityName.value == "") {
+                allEventList.value
             } else {
-                eventList = allEventByCityList.value
+                allEventByCityList.value
             }
 
             if (eventList.isNotEmpty()) {
@@ -432,7 +430,7 @@ fun HomeScreenNavigation(
 
                     NavigationDrawerItem(
                         icon = {
-                            if (profilePic?.toString() == "null") {
+                            if (profilePic == "null") {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     contentDescription = null
@@ -450,7 +448,7 @@ fun HomeScreenNavigation(
 
 
                         },
-                        label = { Text("@" + username) ?: "" },
+                        label = { Text("@$username") },
                         selected = false,
                         onClick = {
                             scope.launch { drawerState.close() }
@@ -466,7 +464,7 @@ fun HomeScreenNavigation(
 
                     firebaseViewModel.getMyFavouriteCities()
                     val oblubeneMesta by firebaseViewModel.myFavouriteCities.collectAsState()
-                    var selectedItem by rememberSaveable { mutableStateOf(-1) }
+                    var selectedItem by rememberSaveable { mutableIntStateOf(-1) }
 
 
                     Column {
@@ -673,7 +671,7 @@ fun CustomCard(
         mutableStateOf(false)
     }
 
-    var isOwner = firebaseViewModel.currentUserId.value == event?.userId
+    val isOwner = firebaseViewModel.currentUserId.value == event?.userId
 
     val context = LocalContext.current
 
@@ -701,10 +699,8 @@ fun CustomCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-            ) {
-                Box(
-                ) {
+            Column {
+                Box {
                     Row(
                         modifier = Modifier.fillMaxSize(),
                         //horizontalArrangement = Arrangement.SpaceEvenly
@@ -813,7 +809,6 @@ fun CustomCard(
                                 ClickableGoogleMapsLink(
                                     text = event?.location.toString(),
                                     color = MaterialTheme.colorScheme.secondary,
-                                    style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.ExtraBold
                                 )
 
@@ -884,107 +879,111 @@ fun CustomCard(
                         var interestedState by remember { mutableIntStateOf(0) }
                         if (!isOwner) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (interestedState == 1) {
-                                    OutlinedButton(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            val onSuccess = {
-                                                interestedState = 0
-                                            }
+                                when (interestedState) {
+                                    1 -> {
+                                        OutlinedButton(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            onClick = {
+                                                val onSuccess = {
+                                                    interestedState = 0
+                                                }
 
-                                            val onFailure = {
+                                                val onFailure = {
 
-                                            }
-                                            firebaseViewModel.removeInterested(
-                                                onSuccess,
-                                                onFailure,
-                                                event?.eventId.toString()
-                                            )
-                                        },
+                                                }
+                                                firebaseViewModel.removeInterested(
+                                                    onSuccess,
+                                                    onFailure,
+                                                    event?.eventId.toString()
+                                                )
+                                            },
+
+                                            ) {
+                                            Text(stringResource(R.string.button_is_interested))
+                                            Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                                            Icon(imageVector = Icons.Default.Check, contentDescription = "check")
+                                        }
+                                    }
+                                    2 -> {
+                                        Button(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            onClick = {
+                                                val onSuccess = {
+                                                    interestedState = 0
+
+                                                }
+
+                                                val onFailure = {
+
+                                                }
+                                                firebaseViewModel.removeComming(
+                                                    onSuccess,
+                                                    onFailure,
+                                                    event?.eventId.toString()
+                                                )
+                                            },
+                                            //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
                                         ) {
-                                        Text(stringResource(R.string.button_is_interested))
-                                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                                        Icon(imageVector = Icons.Default.Check, contentDescription = "check")
+                                            Text(stringResource(R.string.button_is_coming))
+                                            Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                                            Icon(imageVector = Icons.Default.Check, contentDescription = "check")
+                                        }
                                     }
-                                } else if (interestedState == 2) {
-                                    Button(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        onClick = {
-                                            val onSuccess = {
-                                                interestedState = 0
+                                    else -> {
+                                        OutlinedButton(
+                                            modifier = Modifier.padding(end = 10.dp),
+                                            onClick = {
+                                                val onSuccess = {
+                                                    interestedState = 1
+                                                    Toast.makeText(
+                                                        context,
+                                                        context.getString(R.string.toast_added_to_your_events),
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
 
-                                            }
+                                                }
 
-                                            val onFailure = {
+                                                val onFailure = {
 
-                                            }
-                                            firebaseViewModel.removeComming(
-                                                onSuccess,
-                                                onFailure,
-                                                event?.eventId.toString()
-                                            )
-                                        },
-                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
+                                                }
+                                                firebaseViewModel.addInterested(
+                                                    onSuccess,
+                                                    onFailure,
+                                                    event?.eventId.toString()
+                                                )
+                                            },
+                                            //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
 
-                                    ) {
-                                        Text(stringResource(R.string.button_is_coming))
-                                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                                        Icon(imageVector = Icons.Default.Check, contentDescription = "check")
-                                    }
-                                } else {
-                                    OutlinedButton(
-                                        modifier = Modifier.padding(end = 10.dp),
-                                        onClick = {
-                                            val onSuccess = {
-                                                interestedState = 1
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(R.string.toast_added_to_your_events),
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                        ) {
+                                            Text(stringResource(R.string.button_interested))
+                                        }
 
-                                            }
+                                        Button(
+                                            modifier = Modifier.padding(end = 10.dp),
+                                            onClick = {
+                                                val onSuccess = {
+                                                    interestedState = 2
+                                                    Toast.makeText(
+                                                        context,
+                                                        context.getString(R.string.toast_added_to_your_events),
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
 
-                                            val onFailure = {
+                                                val onFailure = {
 
-                                            }
-                                            firebaseViewModel.addInterested(
-                                                onSuccess,
-                                                onFailure,
-                                                event?.eventId.toString()
-                                            )
-                                        },
-                                        //colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight, disabledContentColor = primaryLight)
-
-                                    ) {
-                                        Text(stringResource(R.string.button_interested))
-                                    }
-
-                                    Button(
-                                        modifier = Modifier.padding(end = 10.dp),
-                                        onClick = {
-                                            val onSuccess = {
-                                                interestedState = 2
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(R.string.toast_added_to_your_events),
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-
-                                            val onFailure = {
-
-                                            }
-                                            firebaseViewModel.addComming(
-                                                onSuccess,
-                                                onFailure,
-                                                event?.eventId.toString()
-                                            )
-                                        },
-                                        //colors = ButtonDefaults.buttonColors(primaryLight)
-                                    ) {
-                                        Text(text = stringResource(R.string.button_coming))
+                                                }
+                                                firebaseViewModel.addComming(
+                                                    onSuccess,
+                                                    onFailure,
+                                                    event?.eventId.toString()
+                                                )
+                                            },
+                                            //colors = ButtonDefaults.buttonColors(primaryLight)
+                                        ) {
+                                            Text(text = stringResource(R.string.button_coming))
+                                        }
                                     }
                                 }
 
@@ -1137,8 +1136,7 @@ fun CustomCard(
 
 @Composable
 fun ClickableGoogleMapsLink(
-    text: String, style: TextStyle = TextStyle.Default,
-    color: Color = TextStyle.Default.color,
+    text: String, color: Color = TextStyle.Default.color,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null
 ) {
@@ -1161,7 +1159,8 @@ fun ClickableGoogleMapsLink(
 
     ClickableText(
         text = annotatedString,
-        onClick = { offset ->
+        onClick = {
+            offset ->
             annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
                 .firstOrNull()?.let { annotation ->
                     uriHandler.openUri(annotation.item)

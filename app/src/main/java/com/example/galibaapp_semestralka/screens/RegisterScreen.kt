@@ -39,10 +39,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -92,7 +92,7 @@ fun RegisterScreen(
         ) {
 
             val snackbarHostState = remember { SnackbarHostState() }
-            val scope = rememberCoroutineScope()
+            //val scope = rememberCoroutineScope()
 
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -299,12 +299,12 @@ fun RegisterScreen(
 
                         )
 
-                        val options = mutableStateListOf<String>(
+                        val options = mutableStateListOf(
                             stringResource(R.string.text_listener),
                             stringResource(R.string.text_artist)
                         )
                         var selectedIndex by rememberSaveable {
-                            mutableStateOf(0)
+                            mutableIntStateOf(0)
                         }
 
                         Spacer(modifier = Modifier.padding(10.dp))

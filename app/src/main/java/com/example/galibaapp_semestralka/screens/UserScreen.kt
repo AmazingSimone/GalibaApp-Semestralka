@@ -31,7 +31,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
@@ -42,8 +41,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,26 +55,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.galibaapp_semestralka.R
 import com.example.galibaapp_semestralka.data.FirebaseViewModel
-import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 import com.example.galibaapp_semestralka.navigation.Screens
 import com.google.accompanist.flowlayout.FlowRow
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState",
+@SuppressLint(
+    "UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState",
     "StateFlowValueCalledInComposition"
 )
 @Composable
 fun UserScreen(
-    navController: NavHostController, loginViewModel: LoginViewModel = viewModel(), firebaseViewModel: FirebaseViewModel
+    navController: NavHostController,
+    firebaseViewModel: FirebaseViewModel
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     val username by firebaseViewModel.username.observeAsState()
     val email by firebaseViewModel.emailId.observeAsState()
@@ -107,13 +102,13 @@ fun UserScreen(
         firebaseViewModel.getMyComingEvents()
     }
 
-    Surface (
+    Surface(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-    ){
+    ) {
 
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -146,7 +141,7 @@ fun UserScreen(
                 }
             }
             Spacer(modifier = Modifier.padding(all = 20.dp))
-            if (profilePic?.toString() == "null") {
+            if (profilePic == "null") {
                 Image(
                     modifier = Modifier
                         .size(200.dp)
@@ -158,7 +153,7 @@ fun UserScreen(
             } else {
                 AsyncImage(
                     model = profilePic,
-                    contentDescription =null,
+                    contentDescription = null,
                     modifier = Modifier
                         .size(200.dp)
                         .clip(CircleShape),
@@ -170,7 +165,9 @@ fun UserScreen(
             Spacer(modifier = Modifier.padding(all = 10.dp))
 
             Text(
-                text = if (isArtist == true) stringResource(R.string.text_artist) else stringResource(R.string.text_listener),
+                text = if (isArtist == true) stringResource(R.string.text_artist) else stringResource(
+                    R.string.text_listener
+                ),
                 fontSize = MaterialTheme.typography.bodyLarge.fontSize
             )
 
@@ -217,7 +214,6 @@ fun UserScreen(
                         socialMediaIcon = R.drawable.instagram_icon
                     )
                     Spacer(modifier = Modifier.padding(all = 10.dp))
-
                 }
 
                 if (facebookUsername != "") {
@@ -360,7 +356,6 @@ fun UserScreen(
                     }
                 }
 
-
                 if (selectedInterested) {
                     for (event in interestedEventList.value) {
 
@@ -383,10 +378,7 @@ fun UserScreen(
                         )
                     }
                 }
-
             }
-
-
 
             Column(
                 modifier = Modifier
@@ -402,23 +394,22 @@ fun UserScreen(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
 
-                    val onSuccess = {
-                        navController.popBackStack()
-                        navController.popBackStack()
-                        if (navController.currentBackStackEntry?.lifecycle?.currentState?.isAtLeast(
-                                Lifecycle.State.CREATED) != false
-                        ) {
-                            navController.navigate(Screens.AUTHROOT.name)
+                        val onSuccess = {
+                            navController.popBackStack()
+                            navController.popBackStack()
+                            if (navController.currentBackStackEntry?.lifecycle?.currentState?.isAtLeast(
+                                    Lifecycle.State.CREATED
+                                ) != false
+                            ) {
+                                navController.navigate(Screens.AUTHROOT.name)
+                            }
                         }
+
+                        val onFailure: () -> Unit = {
+                        }
+
+                        firebaseViewModel.logout(onSuccess, onFailure)
                     }
-
-
-                    val onFailure: () -> Unit = {
-
-                    }
-
-                    firebaseViewModel.logout(onSuccess, onFailure)
-                }
 
                 ) {
                     Text(text = stringResource(R.string.button_log_out))
@@ -434,10 +425,6 @@ fun UserScreen(
                 )
             }
         }
-        //}
-        //)
-
-
     }
 }
 
@@ -449,26 +436,32 @@ fun ClickableSocialMediaChip(
     socialMediaIcon: Int = R.drawable.web_icon_default
 
 ) {
-    var url = ""
-    if (text == "") {
-        url = "https://www.$urlPrefix"
+    val url: String = if (text == "") {
+        "https://www.$urlPrefix"
     } else {
-        url = urlPrefix + text
-
+        urlPrefix + text
     }
 
     val uriHandler = LocalUriHandler.current
 
     var chipColor: Color = MaterialTheme.colorScheme.secondary
 
-    if (socialMediaName == stringResource(R.string.text_instagram)) {
-        chipColor = Color(0xFFC13584)
-    } else if (socialMediaName == stringResource(R.string.text_facebook)) {
-        chipColor = Color(0xFF1877F2)
-    } else if (socialMediaName == stringResource(R.string.text_youtube)) {
-        chipColor = Color(0xFFFF0000)
-    } else if (socialMediaName == stringResource(R.string.text_tiktok)) {
-        chipColor = Color(0xFFff0050)
+    when (socialMediaName) {
+        stringResource(R.string.text_instagram) -> {
+            chipColor = Color(0xFFC13584)
+        }
+
+        stringResource(R.string.text_facebook) -> {
+            chipColor = Color(0xFF1877F2)
+        }
+
+        stringResource(R.string.text_youtube) -> {
+            chipColor = Color(0xFFFF0000)
+        }
+
+        stringResource(R.string.text_tiktok) -> {
+            chipColor = Color(0xFFff0050)
+        }
     }
 
     SuggestionChip(
@@ -477,7 +470,12 @@ fun ClickableSocialMediaChip(
         label = {
             Text(socialMediaName)
         },
-        icon = { Icon(painter = painterResource(id = socialMediaIcon), contentDescription = "socialMediaIcon", modifier = Modifier.size(20.dp))
+        icon = {
+            Icon(
+                painter = painterResource(id = socialMediaIcon),
+                contentDescription = "socialMediaIcon",
+                modifier = Modifier.size(20.dp)
+            )
         }
     )
 }
