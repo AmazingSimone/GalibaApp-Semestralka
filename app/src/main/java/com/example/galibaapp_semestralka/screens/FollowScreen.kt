@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,7 +78,7 @@ fun FollowScreen(
             )
 
 
-            val userList = firebaseViewModel.myFollowedUsers
+            val userList by firebaseViewModel.myFollowedUsers.collectAsState()
 
             Box {
                 if (userList.isNotEmpty()) {
@@ -86,7 +87,6 @@ fun FollowScreen(
                         modifier = Modifier.verticalScroll(rememberScrollState())
                     ) {
                         for (user in userList) {
-                            //Spacer(modifier = Modifier.height(15.dp))
 
                             var username by remember { mutableStateOf("") }
                             var bio by remember { mutableStateOf("") }
@@ -168,7 +168,7 @@ fun CustomListItem(
         val checkedState = remember { mutableStateOf(true) }
 
 
-        val onUnfollowSuccess = {
+        val onUnfollowSuccess: ()-> Unit = {
             firebaseViewModel.isFollowing.value = false
             showDialog = false
             firebaseViewModel.getMyFollowingList()

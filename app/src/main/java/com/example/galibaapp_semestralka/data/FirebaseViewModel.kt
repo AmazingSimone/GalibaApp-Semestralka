@@ -4,9 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.galibaapp_semestralka.data.Login.LoginViewModel
@@ -59,7 +57,10 @@ class FirebaseViewModel : ViewModel() {
 
     val isFollowing: MutableLiveData<Boolean> = MutableLiveData()
 
-    var myFollowedUsers = mutableStateListOf<String?>()
+    //var myFollowedUsers = mutableStateListOf<String?>()
+
+    private val _myFollowedUsers = MutableStateFlow<List<String?>>(emptyList())
+    val myFollowedUsers: StateFlow<List<String?>> = _myFollowedUsers
 
     private val _myFavouriteCities = MutableStateFlow<List<Mesto>>(emptyList())
     val myFavouriteCities: StateFlow<List<Mesto>> = _myFavouriteCities
@@ -87,22 +88,6 @@ class FirebaseViewModel : ViewModel() {
     val tiktokUsername: MutableLiveData<String> = MutableLiveData()
 
     val website: MutableLiveData<String> = MutableLiveData()
-
-    val usernameChanged by  mutableStateOf(username)
-
-    var userBioChanged = mutableStateOf(bio)
-
-    var selectedImageUri = mutableStateOf<Uri?>(null)
-
-    val instagramUsernameChanged = mutableStateOf(instagramUsername)
-
-    val facebookUsernameChanged = mutableStateOf(facebookUsername)
-
-    val youtubeUsernameChanged = mutableStateOf(youtubeUsername)
-
-    val tiktokUsernameChanged = mutableStateOf(tiktokUsername)
-
-    val websiteChanged = mutableStateOf(website)
 
 
     fun checkForActiveUser() {
@@ -956,6 +941,7 @@ class FirebaseViewModel : ViewModel() {
                                         dateAndTime = dateAndTime,
                                         eventDetails = it.get("eventDetails").toString(),
                                         eventName = it.get("eventName").toString(),
+                                        eventPic = it.get("eventPic").toString(),
                                         interested = it.get("interested") as Long?,
                                         location = it.get("location").toString(),
                                         userId = it.get("userId").toString(),
@@ -1019,6 +1005,7 @@ class FirebaseViewModel : ViewModel() {
                                         dateAndTime = dateAndTime,
                                         eventDetails = it.get("eventDetails").toString(),
                                         eventName = it.get("eventName").toString(),
+                                        eventPic = it.get("eventPic").toString(),
                                         interested = it.get("interested") as Long?,
                                         location = it.get("location").toString(),
                                         userId = it.get("userId").toString(),
@@ -1178,7 +1165,6 @@ class FirebaseViewModel : ViewModel() {
                 onUnfollowSuccess()
             }.addOnFailureListener {
                 onUnfollowFailure()
-
             }
     }
 
@@ -1210,9 +1196,11 @@ class FirebaseViewModel : ViewModel() {
                         currentFollowedUsers.add(followerId)
                     }
 
-                    myFollowedUsers = currentFollowedUsers
+                    _myFollowedUsers.value = currentFollowedUsers
                 } else {
-                    myFollowedUsers.clear()
+                    //myFollowedUsers.clear()
+
+                    _myFollowedUsers.value = emptyList()
                 }
             }
     }
