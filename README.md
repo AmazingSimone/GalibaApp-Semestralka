@@ -26,7 +26,7 @@ Bandsintown je známa aplikácia, ktorá pomáha používateľom sledovať svoje
 
 Soundkick, podobne ako Bandsintown, umožňuje používateľom sledovať svojich obľúbených umelcov a objavovať nové koncerty. Poskytuje personalizované odporúčania koncertov a pomáha používateľom priamo prostredníctvom aplikácie nakupovať vstupenky.
 
-### Návrh architektúry aplikácie
+## Návrh architektúry aplikácie
 
 Architektúra našej aplikácie je navrhnutá tak, aby bola užívateľsky prívetivá a efektívna, zabezpečujúc bezproblémový zážitok pre umelcov aj poslucháčov. Zahŕňa:
 
