@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,445 +91,463 @@ fun CreateEvent(
     searchCityViewModel: SearchCityViewModel = viewModel(),
     firebaseViewModel: FirebaseViewModel
 ) {
-    Surface (
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-    ) {
-        Column(
+    var isUploading by rememberSaveable { mutableStateOf(false) }
+
+    Box {
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(all = 20.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .statusBarsPadding()
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(all = 20.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
 
-            var nazovAkcie by rememberSaveable { mutableStateOf("") }
-            //var datumAkcie by rememberSaveable { mutableStateOf("") }
-            var datumAkcie by rememberSaveable {
-                mutableStateOf(LocalDate.MIN)
-            }
+                var nazovAkcie by rememberSaveable { mutableStateOf("") }
+                //var datumAkcie by rememberSaveable { mutableStateOf("") }
+                var datumAkcie by rememberSaveable {
+                    mutableStateOf(LocalDate.MIN)
+                }
 
-            var casAkcie: LocalTime? by rememberSaveable { mutableStateOf(null) }
-
-
-            var datumACasAkcie: LocalDateTime? by rememberSaveable { mutableStateOf(null) }
-
-            val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
-
-            val searchText by searchCityViewModel.searchText.collectAsState()
-
-            val mesta by searchCityViewModel.mestaForEditCreateEvent.collectAsState()
-
-            var miestoAkcie by rememberSaveable { mutableStateOf("") }
-
-            var popisAkcie by rememberSaveable { mutableStateOf("") }
+                var casAkcie: LocalTime? by rememberSaveable { mutableStateOf(null) }
 
 
-            var showDialogCancelCreate by rememberSaveable { mutableStateOf(false) }
+                var datumACasAkcie: LocalDateTime? by rememberSaveable { mutableStateOf(null) }
 
-            val calendarState = rememberUseCaseState()
+                val selectedMesto by searchCityViewModel.selectedMesto.collectAsState()
 
-            val clockState = rememberUseCaseState()
+                val searchText by searchCityViewModel.searchText.collectAsState()
+
+                val mesta by searchCityViewModel.mestaForEditCreateEvent.collectAsState()
+
+                var miestoAkcie by rememberSaveable { mutableStateOf("") }
+
+                var popisAkcie by rememberSaveable { mutableStateOf("") }
 
 
-            if (showDialogCancelCreate) {
-                AlertDialog(
-                    onDismissRequest = { showDialogCancelCreate = false },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showDialogCancelCreate = false
+                var showDialogCancelCreate by rememberSaveable { mutableStateOf(false) }
+
+                val calendarState = rememberUseCaseState()
+
+                val clockState = rememberUseCaseState()
+
+
+                if (showDialogCancelCreate) {
+                    AlertDialog(
+                        onDismissRequest = { showDialogCancelCreate = false },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showDialogCancelCreate = false
 //                                navController.navigate(Screens.AUTHROOT.name) {
 //                                    popUpTo(Screens.HOME.name) { inclusive = true }
 //                                }
+                                    navController.popBackStack()
+                                }
+                            ) {
+                                Text(stringResource(R.string.button_confirm))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { showDialogCancelCreate = false },
+
+                                ) {
+                                Text(stringResource(R.string.button_cancel))
+                            }
+                        },
+                        title = { Text(stringResource(R.string.alert_all_changes_will_be_lost)) },
+                        text = { Text(stringResource(R.string.alert_are_you_sure)) }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.title_create_event),
+                        fontSize = MaterialTheme.typography.headlineLarge.fontSize
+                    )
+                    IconButton(
+                        onClick = {
+                            if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
+                                showDialogCancelCreate = true
+                            } else {
                                 navController.popBackStack()
                             }
-                        ) {
-                            Text(stringResource(R.string.button_confirm))
                         }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showDialogCancelCreate = false },
-
-                            ) {
-                            Text(stringResource(R.string.button_cancel))
-                        }
-                    },
-                    title = { Text(stringResource(R.string.alert_all_changes_will_be_lost)) },
-                    text = { Text(stringResource(R.string.alert_are_you_sure)) }
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.title_create_event),
-                    fontSize = MaterialTheme.typography.headlineLarge.fontSize
-                )
-                IconButton(
-                    onClick = {
-                        if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
-                            showDialogCancelCreate = true
-                        } else {
-                            navController.popBackStack()
-                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
                     }
-                ) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "closeIcon")
                 }
-            }
 
-            BackHandler {
-                if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
-                    showDialogCancelCreate = true
-                } else {
-                    navController.popBackStack()
+                BackHandler {
+                    if (nazovAkcie.isNotEmpty() || (datumAkcie != LocalDate.MIN) || selectedMesto != null || miestoAkcie.isNotEmpty()) {
+                        showDialogCancelCreate = true
+                    } else {
+                        navController.popBackStack()
+                    }
                 }
-            }
 
-            val (eventNameFocusRequester, eventDateFocusRequester, eventCityFocusRequester, eventPlaceFocusRequester, eventBioFocusRequester) = remember { FocusRequester.createRefs() }
+                val (eventNameFocusRequester,
+                    eventDateFocusRequester,
+                    eventCityFocusRequester,
+                    eventPlaceFocusRequester,
+                    eventBioFocusRequester) = remember { FocusRequester.createRefs() }
 
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(eventNameFocusRequester)
-                    .fillMaxWidth(),
-                value = nazovAkcie,
-                onValueChange = { nazovAkcie = it },
-                label = { Text(stringResource(R.string.text_event_name)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { eventCityFocusRequester.requestFocus() }
-                )
-            )
-
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-            CalendarDialog(
-
-                state = calendarState,
-                selection = CalendarSelection.Date {
-                    datumAkcie = it
-                },
-                config = CalendarConfig(
-                    locale = Locale(Locale.getDefault().toLanguageTag())
-                )
-
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(eventDateFocusRequester)
-                    .fillMaxWidth(),
-                value = if (datumAkcie != LocalDate.MIN) {
-                    datumAkcie.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                } else {
-                    ""
-                },
-                onValueChange = {},
-                readOnly = true,
-                leadingIcon = {
-                    IconButton(onClick = { calendarState.show() }) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "callendar icon"
-                        )
-                    }
-                },
-                placeholder = { Text(stringResource(R.string.text_event_date)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { eventCityFocusRequester.requestFocus() }
-                )
-            )
-
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-
-            ClockPopup(state = clockState, selection = ClockSelection.HoursMinutes{
-                hours, minutes ->
-
-                //datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
-                //Log.d("CasAkcie" , "stary cas $casAkcie")
-                //Log.d("CasAkcie" , "stary datum a cas $datumACasAkcie")
-                casAkcie = LocalTime.of(hours, minutes)
-
-
-                datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
-                //datumACasAkcie?.format(DateTimeFormatter.ofPattern("DD/MM/uuuu HH:mm",Locale("sk")))
-
-            })
-
-
-            OutlinedTextField(
-                modifier = Modifier
-                //    .focusRequester(eventDateFocusRequester)
-                    .fillMaxWidth(),
-                value = if (casAkcie != null) casAkcie.toString() else "",
-                onValueChange = {},
-                readOnly = true,
-                leadingIcon = {
-                    IconButton(onClick = { clockState.show() }) {
-                        Icon(
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = "time icon"
-                        )
-                    }
-                },
-                placeholder = { Text(stringResource(R.string.text_event_time)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { eventCityFocusRequester.requestFocus() }
-                )
-            )
-
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .height(searchCityViewModel.dynamicSize.value)
-                    .focusRequester(eventCityFocusRequester)
-
-            ) {
-                Column(
+                OutlinedTextField(
                     modifier = Modifier
-                        .fillMaxSize()
-                    //.weight(1f)
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        value = searchText,
-                        singleLine = true,
-                        onValueChange = searchCityViewModel::onSearchTextChange,
-                        label = {
-                            Text(text = stringResource(R.string.text_search_event_city))
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onNext = { eventPlaceFocusRequester.requestFocus() }
-                        )
+                        .focusRequester(eventNameFocusRequester)
+                        .fillMaxWidth(),
+                    value = nazovAkcie,
+                    onValueChange = { nazovAkcie = it },
+                    label = { Text(stringResource(R.string.text_event_name)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { eventCityFocusRequester.requestFocus() }
+                    )
+                )
+
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                CalendarDialog(
+
+                    state = calendarState,
+                    selection = CalendarSelection.Date {
+                        datumAkcie = it
+                    },
+                    config = CalendarConfig(
+                        locale = Locale(Locale.getDefault().toLanguageTag())
                     )
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(mesta) { mesto ->
-                            Text(
-                                mesto.nazov,
-                                modifier = Modifier
-                                    .padding(6.dp)
-                                    .clickable {
-                                        searchCityViewModel.chooseMesto(mesto)
-                                    }
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .focusRequester(eventDateFocusRequester)
+                        .fillMaxWidth(),
+                    value = if (datumAkcie != LocalDate.MIN) {
+                        datumAkcie.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    } else {
+                        ""
+                    },
+                    onValueChange = {},
+                    readOnly = true,
+                    leadingIcon = {
+                        IconButton(onClick = { calendarState.show() }) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = "callendar icon"
                             )
                         }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(eventPlaceFocusRequester)
-                    .fillMaxWidth(),
-                value = miestoAkcie,
-                onValueChange = { miestoAkcie = it },
-                label = { Text(stringResource(R.string.text_event_address)) },
-                placeholder = { Text(stringResource(R.string.text_name_or_address_of_event)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { eventBioFocusRequester.requestFocus() }
+                    },
+                    placeholder = { Text(stringResource(R.string.text_event_date)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { eventCityFocusRequester.requestFocus() }
+                    )
                 )
-            )
 
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-            var selectedImageUri by remember {
-                mutableStateOf<Uri?>(null)
-            }
-
-            val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.PickVisualMedia(),
-                onResult = {
-                    selectedImageUri = it
-                }
-            )
+                Spacer(modifier = Modifier.padding(all = 10.dp))
 
 
-            Surface(
-                shape = RoundedCornerShape(5.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        singlePhotoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    }
-            ) {
+                ClockPopup(
+                    state = clockState,
+                    selection = ClockSelection.HoursMinutes { hours, minutes ->
+
+                        //datumACasAkcie = LocalDateTime.of(datumAkcie,casAkcie)
+                        //Log.d("CasAkcie" , "stary cas $casAkcie")
+                        //Log.d("CasAkcie" , "stary datum a cas $datumACasAkcie")
+                        casAkcie = LocalTime.of(hours, minutes)
+
+
+                        datumACasAkcie = LocalDateTime.of(datumAkcie, casAkcie)
+                        //datumACasAkcie?.format(DateTimeFormatter.ofPattern("DD/MM/uuuu HH:mm",Locale("sk")))
+
+                    })
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        //    .focusRequester(eventDateFocusRequester)
+                        .fillMaxWidth(),
+                    value = if (casAkcie != null) casAkcie.toString() else "",
+                    onValueChange = {},
+                    readOnly = true,
+                    leadingIcon = {
+                        IconButton(onClick = { clockState.show() }) {
+                            Icon(
+                                imageVector = Icons.Default.AccessTime,
+                                contentDescription = "time icon"
+                            )
+                        }
+                    },
+                    placeholder = { Text(stringResource(R.string.text_event_time)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { eventCityFocusRequester.requestFocus() }
+                    )
+                )
+
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .size(350.dp)
+                        .height(searchCityViewModel.dynamicSize.value)
+                        .focusRequester(eventCityFocusRequester)
 
                 ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                        //.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = searchText,
+                            singleLine = true,
+                            onValueChange = searchCityViewModel::onSearchTextChange,
+                            label = {
+                                Text(text = stringResource(R.string.text_search_event_city))
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = { eventPlaceFocusRequester.requestFocus() }
+                            )
+                        )
 
-                    AsyncImage(
-                        model =selectedImageUri,
-                        contentDescription =null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+                            items(mesta) { mesto ->
+                                Text(
+                                    mesto.nazov,
+                                    modifier = Modifier
+                                        .padding(6.dp)
+                                        .clickable {
+                                            searchCityViewModel.chooseMesto(mesto)
+                                        }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .focusRequester(eventPlaceFocusRequester)
+                        .fillMaxWidth(),
+                    value = miestoAkcie,
+                    onValueChange = { miestoAkcie = it },
+                    label = { Text(stringResource(R.string.text_event_address)) },
+                    placeholder = { Text(stringResource(R.string.text_name_or_address_of_event)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { eventBioFocusRequester.requestFocus() }
                     )
+                )
+
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                var selectedImageUri by remember {
+                    mutableStateOf<Uri?>(null)
+                }
+
+                val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.PickVisualMedia(),
+                    onResult = {
+                        selectedImageUri = it
+                    }
+                )
 
 
+                Surface(
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            singlePhotoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
+                ) {
                     Box(
                         modifier = Modifier
-                            .matchParentSize()
-                            .background(Color(0x80000000))
-                    )
+                            .fillMaxSize()
+                            .size(350.dp)
 
-                    Icon(
-                        imageVector = Icons.Default.Upload,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .align(Alignment.Center)
+                    ) {
+
+                        AsyncImage(
+                            model = selectedImageUri,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(Color(0x80000000))
+                        )
+
+                        Icon(
+                            imageVector = Icons.Default.Upload,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .align(Alignment.Center)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+                val localFocusManager = LocalFocusManager.current
+
+
+                val maxCharPopis = 600
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .focusRequester(eventBioFocusRequester)
+                        .fillMaxWidth(),
+                    value = popisAkcie,
+                    onValueChange = {
+                        if (it.length <= maxCharPopis) {
+                            popisAkcie = it
+                        }
+                    },
+                    label = { Text(stringResource(R.string.text_event_bio)) },
+                    minLines = 5,
+                    maxLines = 20,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { localFocusManager.clearFocus() }
+                    ),
+                    isError = popisAkcie.length == maxCharPopis
+                )
+                Spacer(modifier = Modifier.padding(all = 10.dp))
+
+                var showDialogConfirmCreate by rememberSaveable { mutableStateOf(false) }
+                val context = LocalContext.current
+
+
+                if (showDialogConfirmCreate) {
+                    AlertDialog(
+                        onDismissRequest = { showDialogConfirmCreate = false },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    showDialogConfirmCreate = false
+                                    isUploading = true
+
+                                    val onSuccess = {
+                                        isUploading = false
+                                        navController.popBackStack()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_event_was_created),
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+
+                                    val onFailure: () -> Unit = {
+                                        isUploading = false
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_there_was_error),
+                                            Toast.LENGTH_LONG
+                                        )
+                                            .show()
+                                    }
+                                    firebaseViewModel.createEvent(
+                                        onSuccess,
+                                        onFailure,
+                                        nazovAkcie,
+                                        selectedImageUri,
+                                        miestoAkcie,
+                                        datumACasAkcie,
+                                        selectedMesto,
+                                        popisAkcie
+                                    )
+
+                                }
+                            ) {
+                                Text(stringResource(R.string.button_confirm))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { showDialogConfirmCreate = false },
+
+                                ) {
+                                Text(stringResource(R.string.button_cancel))
+                            }
+                        },
+                        title = { Text(stringResource(R.string.alert_you_are_about_to_create_event)) },
+                        text = { Text(stringResource(R.string.alert_is_everything_correct)) }
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-            val localFocusManager = LocalFocusManager.current
-
-
-            val maxCharPopis = 600
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(eventBioFocusRequester)
-                    .fillMaxWidth(),
-                value = popisAkcie,
-                onValueChange = {
-                    if (it.length <= maxCharPopis) {
-                        popisAkcie = it
-                    }
-                },
-                label = { Text(stringResource(R.string.text_event_bio)) },
-                minLines = 5,
-                maxLines = 20,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { localFocusManager.clearFocus() }
-                ),
-                isError = popisAkcie.length == maxCharPopis
-            )
-            Spacer(modifier = Modifier.padding(all = 10.dp))
-
-            var showDialogConfirmCreate by remember { mutableStateOf(false) }
-            val context = LocalContext.current
-
-            if (showDialogConfirmCreate) {
-                AlertDialog(
-                    onDismissRequest = { showDialogConfirmCreate = false },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showDialogConfirmCreate = false
-//                                navController.navigate(Screens.AUTHROOT.name) {
-//                                    popUpTo(Screens.HOME.name) { inclusive = true }
-//                                }
-
-                                val onSuccess = {
-
-                                    navController.popBackStack()
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.toast_event_was_created),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-
-                                val onFailure: () -> Unit = {
-                                    Toast.makeText(context,
-                                        context.getString(R.string.toast_there_was_error), Toast.LENGTH_LONG)
-                                        .show()
-                                }
-                                firebaseViewModel.createEvent(
-                                    onSuccess,
-                                    onFailure,
-                                    nazovAkcie,
-                                    selectedImageUri,
-                                    miestoAkcie,
-                                    datumACasAkcie,
-                                    selectedMesto,
-                                    popisAkcie
-                                )
-
-                            }
-                        ) {
-                            Text(stringResource(R.string.button_confirm) )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showDialogConfirmCreate = false },
-
-                            ) {
-                            Text(stringResource(R.string.button_cancel))
-                        }
-                    },
-                    title = { Text(stringResource(R.string.alert_you_are_about_to_create_event)) },
-                    text = { Text(stringResource(R.string.alert_is_everything_correct)) }
-                )
-            }
-
-            Button(
-                onClick = {
-                    if (casAkcie == null) {
+                Button(
+                    onClick = {
+                        if (casAkcie == null) {
 //                        casAkcie = LocalTime.of(19, 0)
-                        datumACasAkcie = LocalDateTime.of(datumAkcie,LocalTime.of(19, 0))
-                    }
-                    showDialogConfirmCreate = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(LocalDate.now()) ||
-                        datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
-            ) {
-                Text(text = stringResource(R.string.confirmButton_create_event))
-            }
+                            datumACasAkcie = LocalDateTime.of(datumAkcie, LocalTime.of(19, 0))
+                        }
+                        showDialogConfirmCreate = true
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = nazovAkcie.isNotEmpty() && (datumAkcie != LocalDate.MIN && (datumAkcie.isAfter(
+                        LocalDate.now()
+                    ) ||
+                            datumAkcie.isEqual(LocalDate.now()))) && selectedMesto != null && miestoAkcie.isNotEmpty()
+                ) {
+                    Text(text = stringResource(R.string.confirmButton_create_event))
+                }
 
+            }
+        }
+        if ( isUploading ) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
+
 }
 
 //@Composable
