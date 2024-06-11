@@ -6,6 +6,16 @@ Tento projekt je vyvinutý ako semestrálna práca pre predmet Vývoj aplikáci�
 
 Ako semestrálnu prácu sme si zvolili jednoduchú aplikáciu, ktorá bude slúžiť komunite menším kapelám/umelcom na rýchle vytváranie akcií/koncertov a poslucháčom na rýchle nájdenie takýchto interpretov/akcií menšieho rozmeru. Aplikácia bude závislá na internetovom pripojení používateľa pre nájdenie podujatia akéhokoľvek typu a jej hlavná myšlienka tak bude spropagovať čo najviac nezávislých, spontánnych koncertov konajúcich sa v blízkom okolí na jednom mieste.
 
+## Ako spustiť
+
+Aplikácia sa spúšťa v prostredí Android Studia. Nie je potrebné sťahovať žiadne dodatočné knižnice alebo závislosti, všetko potrebné je už zahrnuté v projekte. Postupujte podľa týchto krokov:
+
+1. Klonujte tento repozitár do vášho lokálneho počítača.
+2. Otvorte Android Studio.
+3. Kliknite na "Open an existing project" a vyberte zložku s projektom Galiba App.
+4. Po načítaní projektu kliknite na tlačidlo "Run" (zelená šípka) v hornej časti Android Studia.
+5. Vyberte emulátor alebo pripojené fyzické zariadenie, na ktorom chcete aplikáciu spustiť.
+
 ## Dostupné aplikácie podobného zamerania
 
 ### Bandsintown
