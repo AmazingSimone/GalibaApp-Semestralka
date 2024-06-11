@@ -8,13 +8,18 @@ Ako semestrálnu prácu sme si zvolili jednoduchú aplikáciu, ktorá bude slú�
 
 ## Ako spustiť
 
-Aplikácia sa spúšťa v prostredí Android Studia. Nie je potrebné sťahovať žiadne dodatočné knižnice alebo závislosti, všetko potrebné je už zahrnuté v projekte. Postupujte podľa týchto krokov:
+Aplikácia sa spúšťa v prostredí Android Studia alebo sa dá stiahnuť naištalovateľný .apk súbor do Android (11+) zariadenia pomocou priloženého linku. Nie je potrebné sťahovať žiadne dodatočné knižnice alebo závislosti, všetko potrebné je už zahrnuté v projekte. Postupujte podľa týchto krokov:
 
+### Pomocou naklonovania:
 1. Klonujte tento repozitár do vášho lokálneho počítača.
 2. Otvorte Android Studio.
 3. Kliknite na "Open an existing project" a vyberte zložku s projektom Galiba App.
 4. Po načítaní projektu kliknite na tlačidlo "Run" (zelená šípka) v hornej časti Android Studia.
 5. Vyberte emulátor alebo pripojené fyzické zariadenie, na ktorom chcete aplikáciu spustiť.
+
+### Pomocou linku na stiahnutie:
+- [Galiba App](https://drive.google.com/file/d/1QLZb3nBlMvudplhu2DoejotuW_fKdSP1/view?usp=drive_link)
+
 
 ## Dostupné aplikácie podobného zamerania
 
