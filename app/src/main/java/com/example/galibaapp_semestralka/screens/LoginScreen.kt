@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -60,21 +62,14 @@ import com.example.galibaapp_semestralka.data.Login.LoginViewModel
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginViewModel: LoginViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
+
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
 
-//    val isFieldsEmpty = email.isNotEmpty() && heslo.isNotEmpty()
-//
-//    var loginBeenClicked by remember {
-//        mutableStateOf(false)
-//    }
-//    var passwordBeenClicked by remember {
-//        mutableStateOf(false)
-//    }
 
     Box {
         Surface (modifier = Modifier
-            .fillMaxSize()
+
             .background(MaterialTheme.colorScheme.background)) {
 
             val snackbarHostState = remember { SnackbarHostState() }
@@ -85,7 +80,10 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
                 content = {
 
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -185,7 +183,14 @@ fun LoginScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, loginView
 
                         )
 
-                        TextButton(onClick = onRegisterClick) {
+                        TextButton(
+                            onClick = { onRegisterClick()
+                                email = ""
+                                heslo = ""
+
+                                loginViewModel.loginUIState.value.emailErr = false
+                                loginViewModel.loginUIState.value.passwordErr = false
+                            }) {
                             Text(text = stringResource(R.string.text_dont_have_account))
                         }
 

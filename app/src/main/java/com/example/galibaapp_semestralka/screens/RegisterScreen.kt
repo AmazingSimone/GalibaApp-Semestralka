@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
@@ -67,31 +69,18 @@ import com.example.galibaapp_semestralka.data.Register.RegisterViewModel
 @SuppressLint("UnrememberedMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, registerViewModel: RegisterViewModel = viewModel(), firebaseViewModel: FirebaseViewModel) {
+fun RegisterScreen(
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    registerViewModel: RegisterViewModel = viewModel(),
+    firebaseViewModel: FirebaseViewModel
+) {
 
     var username by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var heslo by rememberSaveable { mutableStateOf("") }
     var heslo2 by rememberSaveable { mutableStateOf("") }
 
-    var isPasswordSame by remember {
-        mutableStateOf(false)
-    }
-    isPasswordSame = heslo != heslo2
-    val isFieldsEmpty = username.isNotEmpty() && heslo.isNotEmpty() && heslo2.isNotEmpty()
-
-    var loginBeenClicked by remember {
-        mutableStateOf(false)
-    }
-    var emailBeenClicked by remember {
-        mutableStateOf(false)
-    }
-    var passwordBeenClicked by remember {
-        mutableStateOf(false)
-    }
-    var password2BeenClicked by remember {
-        mutableStateOf(false)
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -109,7 +98,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 content = {
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -134,16 +123,17 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             onValueChange = {
                                 username = it
                                 registerViewModel.onRegisterEvent(RegisterUIevent.usernameChanged(it))
-                                loginBeenClicked = true
+                                //loginBeenClicked = true
                             },
                             label = { Text(stringResource(R.string.text_username)) },
                             singleLine = true,
                             trailingIcon = {
-                                Icon(imageVector = Icons.Default.Person, contentDescription = "accBoxIcon")
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "accBoxIcon"
+                                )
                             },
-//                            prefix = {
-//                                Text(text = "@")
-//                            },
+
 
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next
@@ -174,12 +164,15 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             onValueChange = {
                                 email = it
                                 registerViewModel.onRegisterEvent(RegisterUIevent.emailChanged(it))
-                                emailBeenClicked = true
+                                //emailBeenClicked = true
                             },
                             label = { Text(stringResource(R.string.text_email)) },
                             singleLine = true,
                             trailingIcon = {
-                                Icon(imageVector = Icons.Default.Mail, contentDescription = "mailBoxIcon")
+                                Icon(
+                                    imageVector = Icons.Default.Mail,
+                                    contentDescription = "mailBoxIcon"
+                                )
                             },
 
                             keyboardOptions = KeyboardOptions(
@@ -192,7 +185,6 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                                 }
                             ),
                             supportingText = {
-                                //Text(text = "Take pouzivatelske meno uz existuje")
                                 if (registerViewModel.registrationUIState.value.emailErr) {
                                     Text(text = stringResource(R.string.error_email_must_be_valid))
                                 }
@@ -203,7 +195,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
                         Spacer(modifier = Modifier.padding(10.dp))
 
-                        val passwordVisible = remember {
+                        val passwordVisible = rememberSaveable {
                             mutableStateOf(false)
                         }
 
@@ -215,7 +207,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             onValueChange = {
                                 heslo = it
                                 registerViewModel.onRegisterEvent(RegisterUIevent.passwordChanged(it))
-                                passwordBeenClicked = true
+                                //passwordBeenClicked = true
                             },
                             label = { Text(stringResource(R.string.text_password)) },
                             singleLine = true,
@@ -256,7 +248,7 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                         Spacer(modifier = Modifier.padding(10.dp))
 
 
-                        val confirmPasswordVisible = remember {
+                        val confirmPasswordVisible = rememberSaveable {
                             mutableStateOf(false)
                         }
                         val localFocusManager = LocalFocusManager.current
@@ -267,8 +259,12 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                             value = heslo2,
                             onValueChange = {
                                 heslo2 = it
-                                registerViewModel.onRegisterEvent(RegisterUIevent.confirmPasswordChanged(it))
-                                password2BeenClicked = true
+                                registerViewModel.onRegisterEvent(
+                                    RegisterUIevent.confirmPasswordChanged(
+                                        it
+                                    )
+                                )
+                                //password2BeenClicked = true
                             },
                             label = { Text(stringResource(R.string.text_confirm_password)) },
                             singleLine = true,
@@ -303,8 +299,11 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
                         )
 
-                        var options = mutableStateListOf<String>(stringResource(R.string.text_listener), stringResource(R.string.text_artist))
-                        var selectedIndex by remember {
+                        val options = mutableStateListOf<String>(
+                            stringResource(R.string.text_listener),
+                            stringResource(R.string.text_artist)
+                        )
+                        var selectedIndex by rememberSaveable {
                             mutableStateOf(0)
                         }
 
@@ -348,63 +347,54 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
 
 
                         TextButton(
-                            onClick =
-                            //navController.navigate(Screens.LOGIN.name)
-                            onLoginClick
+                            onClick = {
+                                onLoginClick()
+                                username = ""
+                                registerViewModel.registrationUIState.value.usernameErr = false
+                                registerViewModel.registrationUIState.value.usernameIsEmpty = false
+                                email = ""
+                                registerViewModel.registrationUIState.value.emailErr = false
+                                heslo = ""
+                                registerViewModel.registrationUIState.value.passwordErr = false
+                                registerViewModel.registrationUIState.value.passwordMatchErr = false
+                                heslo2 = ""
+                            }
+
                         ) {
                             Text(text = stringResource(R.string.text_already_have_account))
                         }
 
 
                         Spacer(modifier = Modifier.padding(10.dp))
-//                        Button(
-//                            onClick = {
-//                                scope.launch {
-//                                    snackbarHostState.showSnackbar(
-//                                        message = "Hey this is a snackbar",
-//                                        duration = SnackbarDuration.Short
-//                                    )
-//                                }
-//                            })
-//                        {
-//                            Text(text = "Click me")
-//                        }
+
                         val context = LocalContext.current
                         Button(
                             onClick = {
-                                //onRegisterClick()
                                 if (!registerViewModel.isAnyUserInputError()) {
 
-                                    //registerViewModel.onRegisterEvent(RegisterUIevent.RegisterButtonClicked)
-                                    //registerViewModel.signUp()
-                                    //if (
-
-
-
                                     val onSuccess = {
-//                                        scope.launch {
-//                                            snackbarHostState.showSnackbar(
-//                                                message = "User registered successfully",
-//                                                duration = SnackbarDuration.Short
-//                                            )
-//                                        }
-                                        Toast.makeText(context,
-                                            context.getString(R.string.toast_account_was_created), Toast.LENGTH_LONG).show()
+
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_account_was_created),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                         onRegisterClick()
                                     }
 
-                                    val onFailure:() -> Unit = {
-//                                        scope.launch {
-//                                            snackbarHostState.showSnackbar(
-//                                                message = "Pri vytvarani konta sa stala chyba",
-//                                                duration = SnackbarDuration.Short
-//                                            )
-//                                        }
-                                        Toast.makeText(context,
-                                            context.getString(R.string.toast_there_was_error_with_registration), Toast.LENGTH_LONG).show()
+                                    val onFailure: () -> Unit = {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.toast_there_was_error_with_registration),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
 
-                                    firebaseViewModel.signUp(onSuccess, onFailure,registerViewModel)
+                                    firebaseViewModel.signUp(
+                                        onSuccess,
+                                        onFailure,
+                                        registerViewModel
+                                    )
                                 }
 
                             },
@@ -421,12 +411,8 @@ fun RegisterScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit, regist
                     }
                 }
             )
-
-
         }
-
-
-        if(registerViewModel.registerInProgress.value) {
+        if (registerViewModel.registerInProgress.value) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }

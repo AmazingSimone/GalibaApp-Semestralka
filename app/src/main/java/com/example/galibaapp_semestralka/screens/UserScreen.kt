@@ -102,7 +102,6 @@ fun UserScreen(
 
     LaunchedEffect(Unit) {
         firebaseViewModel.getCurrentUserData()
-        //firebaseViewModel.getMyCreatedEvents()
         firebaseViewModel.getAllEventsCreated(byUserId = firebaseViewModel.currentUserId.value.toString())
         firebaseViewModel.getMyInterestedEvents()
         firebaseViewModel.getMyComingEvents()
@@ -114,9 +113,6 @@ fun UserScreen(
             .statusBarsPadding()
     ){
 
-        //Scaffold (
-        //snackbarHost = {SnackbarHost(snackbarHostState)},
-        //content = {
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -168,11 +164,7 @@ fun UserScreen(
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-
-
             }
-
-
 
 
             Spacer(modifier = Modifier.padding(all = 10.dp))
@@ -371,7 +363,6 @@ fun UserScreen(
 
                 if (selectedInterested) {
                     for (event in interestedEventList.value) {
-                        //Spacer(modifier = Modifier.height(15.dp))
 
                         CustomCard(
                             firebaseViewModel = firebaseViewModel,

@@ -127,7 +127,7 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     navController: NavController,
     drawerState: DrawerState,
-    firebaseViewModel: FirebaseViewModel,// = viewModel()
+    firebaseViewModel: FirebaseViewModel,
     homeScreenViewModel: HomeViewModel,
     searchCityViewModel: SearchCityViewModel = viewModel(),
     modifier: Modifier
