@@ -18,7 +18,7 @@ Aplikácia sa spúšťa v prostredí Android Studia alebo sa dá stiahnuť naiš
 5. Vyberte emulátor alebo pripojené fyzické zariadenie, na ktorom chcete aplikáciu spustiť.
 
 ### Pomocou linku na stiahnutie (Mobile):
-- [Galiba App](https://drive.google.com/file/d/1QLZb3nBlMvudplhu2DoejotuW_fKdSP1/view?usp=drive_link)
+- [Galiba App](https://github.com/AmazingSimone/GalibaApp-Semestralka/releases/download/v0.1.0-alpha/Galiba.apk)
 
 
 ## Dostupné aplikácie podobného zamerania
